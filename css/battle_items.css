@@ -26,13 +26,10 @@
 }
 .bip-close {
   background: none; border: none; color: #888;
-  font-size: 14px; cursor: pointer; padding: 0 2px;
-  line-height: 1;
+  font-size: 14px; cursor: pointer; padding: 0 2px; line-height: 1;
 }
 .bip-close:hover { color: #fff; }
-
 .bip-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-
 .bip-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
@@ -51,37 +48,67 @@
    SPRITE-FIXES
    ════════════════════════════════════════════════════════════ */
 
-#enemySprite {
-  z-index: 5;
-  bottom: 75px;
-}
+/* z-index: Canvas(1) < Enemy(5) < Walker(10) < FX(25) */
+#enemySprite { z-index: 5; bottom: 75px; }
 
 .walker-sprite {
   image-rendering: pixelated;
-  height: 80px;
-  width: auto;
-  max-width: 100px;
+  height: 80px; width: auto; max-width: 100px;
   display: block;
   animation: walk-bounce .5s ease-in-out infinite;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
 }
-
 .walker img {
-  height: 80px;
-  width: auto;
-  max-width: 100px;
+  height: 80px; width: auto; max-width: 100px;
   image-rendering: pixelated;
   animation: walk-bounce .5s ease-in-out infinite;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
 }
-
 .walker-follow img { height: 60px; width: auto; max-width: 80px; }
 
 .enemy-img {
   image-rendering: pixelated;
-  height: 68px;
-  width: auto;
-  max-width: 90px;
+  height: 68px; width: auto; max-width: 90px;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,.6));
   display: block;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ✨ SHINY-SYSTEM
+   ════════════════════════════════════════════════════════════ */
+
+/* Goldener Glitter-Puls für Shiny-Sprites */
+@keyframes shiny-sparkle {
+  0%,100% { filter: drop-shadow(0 0 4px #ffd700) drop-shadow(0 0 2px #fff) brightness(1); }
+  50%      { filter: drop-shadow(0 0 12px #ffd700) drop-shadow(0 0 6px #ffec80) brightness(1.25); }
+}
+
+/* Shiny-Gegner-Sprite */
+.enemy-img.shiny-sprite {
+  animation: shiny-sparkle 1.5s ease-in-out infinite;
+}
+
+/* Shiny-Spieler-Sprite (zusätzlich zur Walk-Bounce-Animation) */
+.walker-shiny .walker-sprite,
+.walker-shiny img {
+  animation: walk-bounce .5s ease-in-out infinite, shiny-sparkle 1.5s ease-in-out infinite;
+}
+
+/* Goldener Rahmen für den Namen im Battle-Log */
+#battleLog p:first-child { }
+
+/* Shiny-Toast: Gold statt Standard */
+.toast-shiny {
+  background: linear-gradient(135deg, #b8860b, #ffd700) !important;
+  color: #1a1200 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 16px rgba(255,215,0,.6) !important;
+}
+
+/* Shiny-Indikator im Team-Screen und Box */
+.shiny-star {
+  color: #ffd700;
+  font-size: 12px;
+  margin-left: 3px;
 }
