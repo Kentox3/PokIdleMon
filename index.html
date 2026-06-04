@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IdleV2 — Kanto Side-Scroller</title>
   <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Sicherheits-Override: hidden-Attribut erzwingen */
+    [hidden] { display: none !important; }
+  </style>
 </head>
 <body>
 
 <!-- ═══ LADE-SCREEN ══════════════════════════════════════════ -->
-<div id="loadScreen">
+<div id="loadScreen" style="display:flex">
   <div class="load-box">
     <div class="load-pokeball">⚪</div>
     <h2>IdleV2</h2>
@@ -18,7 +22,7 @@
 </div>
 
 <!-- ═══ AUTH-SCREEN ══════════════════════════════════════════ -->
-<div id="authScreen" hidden>
+<div id="authScreen" style="display:none">
   <div class="auth-box">
     <h2>🎮 IdleV2</h2>
     <p style="color:#aaa;margin-bottom:20px">Kanto Side-Scroller RPG</p>
@@ -33,7 +37,7 @@
       <button class="btn-primary" onclick="doLogin()">Anmelden</button>
     </div>
     <!-- Register -->
-    <div id="registerForm" hidden>
+    <div id="registerForm" style="display:none">
       <input id="regName"     type="text"     placeholder="Trainer-Name (2–20 Zeichen)">
       <input id="regEmail"    type="email"    placeholder="E-Mail" autocomplete="email">
       <input id="regPassword" type="password" placeholder="Passwort (min. 6 Zeichen)" autocomplete="new-password">
@@ -44,7 +48,7 @@
 </div>
 
 <!-- ═══ STARTER-SCREEN ════════════════════════════════════════ -->
-<div id="starterScreen" hidden>
+<div id="starterScreen" style="display:none">
   <div class="starter-box">
     <h2>🌟 Wähle deinen Starter!</h2>
     <input id="trainerName" type="text" placeholder="Dein Trainer-Name" maxlength="20" value="Trainer">
@@ -54,7 +58,7 @@
 </div>
 
 <!-- ═══ SPIEL-SCREEN ══════════════════════════════════════════ -->
-<div id="gameScreen" hidden>
+<div id="gameScreen" style="display:none">
 
   <!-- HUD -->
   <div id="hud">
@@ -73,19 +77,12 @@
 
   <!-- Side-Scroller Szene -->
   <div id="sceneView">
-    <!-- Parallax-Hintergrund -->
     <div class="bg-layer bg-sky"></div>
     <div class="bg-layer bg-mid"></div>
-    <!-- Ground -->
     <div id="sceneGround"></div>
-    <!-- Spieler-Sprites (links, laufen rechts) -->
     <div id="playerSprites"></div>
-    <!-- Gegner-Sprite (rechts, erscheint beim Kampf) -->
     <div id="enemySprite"></div>
-    <!-- Schadenzahlen -->
-    <!-- XP-Popup -->
     <div id="xpPopup"></div>
-    <!-- Toast -->
     <div id="toastZone"></div>
   </div>
 
@@ -111,21 +108,21 @@
   </nav>
 
   <!-- Tab-Views -->
-  <div id="viewWorld" class="tab-view"></div>
+  <div id="viewWorld" class="tab-view" style="display:block"></div>
 
-  <div id="viewTeam" class="tab-view" hidden>
+  <div id="viewTeam" class="tab-view" style="display:none">
     <h3>Party</h3>
     <div id="teamList"></div>
     <h3 style="margin-top:16px">Box</h3>
     <div id="boxPreview" class="box-grid"></div>
   </div>
 
-  <div id="viewBag" class="tab-view" hidden>
+  <div id="viewBag" class="tab-view" style="display:none">
     <h3>Tasche</h3>
     <div id="bagList"></div>
   </div>
 
-  <div id="viewMap" class="tab-view" hidden>
+  <div id="viewMap" class="tab-view" style="display:none">
     <h3>Kanto-Karte</h3>
     <div id="badgeRow" class="badge-row"></div>
     <div id="mapList"></div>
@@ -135,7 +132,7 @@
 
 <!-- ═══ POPUPS ════════════════════════════════════════════════ -->
 <!-- Shop -->
-<div id="shopPopup" class="popup-overlay" hidden>
+<div id="shopPopup" class="popup-overlay" style="display:none">
   <div class="popup-box">
     <div class="popup-header">
       <h3>🏪 Shop</h3>
@@ -146,7 +143,7 @@
 </div>
 
 <!-- Gym -->
-<div id="gymPopup" class="popup-overlay" hidden>
+<div id="gymPopup" class="popup-overlay" style="display:none">
   <div class="popup-box">
     <div class="popup-header">
       <h3>⚔️ Arenakampf</h3>
@@ -157,7 +154,7 @@
 </div>
 
 <!-- Offline-Belohnung -->
-<div id="offlineModal" class="popup-overlay" hidden>
+<div id="offlineModal" class="popup-overlay" style="display:none">
   <div class="popup-box">
     <h3>⏰ Willkommen zurück!</h3>
     <p id="offlineMsg"></p>
@@ -166,19 +163,15 @@
 </div>
 
 <!-- ═══ SCRIPTS ═══════════════════════════════════════════════ -->
-<!-- Firebase compat -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<!-- Daten -->
 <script src="js/pkmn.js"></script>
 <script src="js/moves.js"></script>
 <script src="js/world.js"></script>
-<!-- Logik -->
 <script src="js/engine.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/renderer.js"></script>
 <script src="js/ui.js"></script>
-<!-- Auth + DB zuletzt (db.js feuert firebaseReady) -->
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
 <script src="js/db.js"></script>

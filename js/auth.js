@@ -1,29 +1,46 @@
 // ════════════════════════════════════════════════
 //  auth.js — Login / Registrierung
+//  FIX: Kein hidden-Attribut mehr, direkt display:none setzen
 // ════════════════════════════════════════════════
 
+function hideEl(id)   { var el = document.getElementById(id); if (el) el.style.display = "none"; }
+function showEl(id, d){ var el = document.getElementById(id); if (el) el.style.display = d || "flex"; }
+
 document.addEventListener("firebaseReady", function () {
-  document.getElementById("loadStatus").textContent = "Prüfe Session...";
+  var status = document.getElementById("loadStatus");
+  if (status) status.textContent = "Prüfe Session...";
+
   var uid  = localStorage.getItem("idlev2_uid");
   var name = localStorage.getItem("idlev2_name");
+
   if (uid && name) {
+    // Session gefunden → Lade-Screen bleibt kurz sichtbar, dann weiter
+    hideEl("authScreen");
     document.dispatchEvent(new CustomEvent("gameReady", { detail: { uid:uid, name:name } }));
     return;
   }
-  document.getElementById("loadScreen").hidden = true;
-  document.getElementById("authScreen").hidden = false;
+
+  // Kein Spielstand → Auth-Screen zeigen
+  hideEl("loadScreen");
+  showEl("authScreen", "flex");
 });
 
 function showAuthTab(tab) {
-  document.getElementById("loginForm").hidden    = (tab !== "login");
-  document.getElementById("registerForm").hidden = (tab !== "register");
-  document.getElementById("tabLogin").classList.toggle("active",    tab === "login");
-  document.getElementById("tabRegister").classList.toggle("active", tab === "register");
-  document.getElementById("authMsg").textContent = "";
+  var lf = document.getElementById("loginForm");
+  var rf = document.getElementById("registerForm");
+  if (lf) lf.style.display = tab === "login"    ? "block" : "none";
+  if (rf) rf.style.display = tab === "register" ? "block" : "none";
+  var tl = document.getElementById("tabLogin");
+  var tr = document.getElementById("tabRegister");
+  if (tl) tl.classList.toggle("active", tab === "login");
+  if (tr) tr.classList.toggle("active", tab === "register");
+  var msg = document.getElementById("authMsg");
+  if (msg) msg.textContent = "";
 }
 
 function setMsg(txt, ok) {
   var el = document.getElementById("authMsg");
+  if (!el) return;
   el.textContent = txt;
   el.style.color = ok ? "#22c55e" : "#ef4444";
 }
@@ -43,7 +60,7 @@ function doLogin() {
         var pname = (player && player.name) ? player.name : "Trainer";
         localStorage.setItem("idlev2_uid",  acct.uid);
         localStorage.setItem("idlev2_name", pname);
-        document.getElementById("authScreen").hidden = true;
+        hideEl("authScreen");
         document.dispatchEvent(new CustomEvent("gameReady", { detail: { uid:acct.uid, name:pname } }));
       });
     });
@@ -67,7 +84,7 @@ function doRegister() {
           .then(function() {
             localStorage.setItem("idlev2_uid",  uid);
             localStorage.setItem("idlev2_name", name);
-            document.getElementById("authScreen").hidden = true;
+            hideEl("authScreen");
             document.dispatchEvent(new CustomEvent("gameReady", { detail: { uid:uid, name:name, isNew:true } }));
           });
       });
