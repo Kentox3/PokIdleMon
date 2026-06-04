@@ -48,14 +48,15 @@
 
 
 /* ════════════════════════════════════════════════════════════
-   SPRITE-FIXES — überschreiben main.css
+   SPRITE-FIXES
    ════════════════════════════════════════════════════════════ */
 
-/* FIX: #enemySprite braucht z-index > 1 (Canvas hat z-index:1)
-   Stacking-Reihenfolge: Canvas(1) < Enemy(5) < Walker(10) < FX-Canvas(25) */
-#enemySprite { z-index: 5; }
+/* FIX: z-index Stacking  Canvas(1) < Enemy(5) < Walker(10) < FX(25) */
+#enemySprite {
+  z-index: 5;
+  bottom: 75px;   /* höher auf dem Bildschirm */
+}
 
-/* Lead-Pokémon: height-only → kein Strecken, natürliches Seitenverhältnis */
 .walker-sprite {
   image-rendering: pixelated;
   height: 80px;
@@ -66,7 +67,6 @@
   filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
 }
 
-/* Überschreibt die alte .walker img Regel */
 .walker img {
   height: 80px;
   width: auto;
@@ -78,12 +78,12 @@
 
 .walker-follow img { height: 60px; width: auto; max-width: 80px; }
 
-/* Gegner-Sprite: height-only, gespiegelt */
+/* Gegner-Sprite: kleiner + gespiegelt */
 .enemy-img {
   image-rendering: pixelated;
-  height: 96px;
+  height: 68px;    /* kleiner: 96 → 68 */
   width: auto;
-  max-width: 120px;
+  max-width: 90px;
   transform: scaleX(-1);
   filter: drop-shadow(0 4px 8px rgba(0,0,0,.6));
   display: block;
