@@ -3,26 +3,38 @@
 // renderer_patch.js — Überschreibt Funktionen aus renderer.js
 // ══════════════════════════════════════════════════════════════
 
+// ── Shiny-Sprite-URLs ─────────────────────────────────────────
+var SD_SHINY_FRONT = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/";
+var SD_SHINY_BACK  = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/";
+var PNG_SHINY      = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/";
+var PNG_SHINY_BACK = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/";
+
+// Überschreibt spriteUrl / spriteFallback aus renderer.js
+function spriteUrl(dexId, back, shiny) {
+  if (shiny) return (back ? SD_SHINY_BACK : SD_SHINY_FRONT) + dexId + ".gif";
+  var SD_F = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/";
+  var SD_B = SD_F + "back/";
+  return (back ? SD_B : SD_F) + dexId + ".gif";
+}
+function spriteFallback(dexId, back, shiny) {
+  if (shiny) return (back ? PNG_SHINY_BACK : PNG_SHINY) + dexId + ".png";
+  var PNG_F = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
+  var PNG_B = PNG_F + "back/";
+  return (back ? PNG_B : PNG_F) + dexId + ".png";
+}
+
 // ── Hintergrundbild-Cache ─────────────────────────────────────
-// Schlüssel = Zone-Index+1 (1.png, 2.png, ...)
-// Werte: undefined = noch nicht versucht
-//        'loading'  = lädt gerade
-//        Image      = erfolgreich geladen
-//        null       = nicht vorhanden → Canvas-Fallback
 var _bgImageCache = {};
 
-// ── renderZoneBg: Bild zuerst, Canvas als Fallback ────────────
 function renderZoneBg(zone) {
   if (!zone) return;
   if (_sceneAnimId) cancelAnimationFrame(_sceneAnimId);
   getSceneCanvas(); if (!_sceneCtx) return;
   _sceneT = 0;
 
-  // Zone-Index → Dateiname: 1.png, 2.png, ...
   var zoneIdx = WORLD ? WORLD.findIndex(function(z) { return z.id === zone.id; }) : -1;
-  var imgKey  = zoneIdx + 1; // 1-basiert
+  var imgKey  = zoneIdx + 1;
 
-  // Canvas-Zeichenfunktion als Fallback
   var drawFn;
   if      (zone.type === "sea")     drawFn = function(){ drawSea(_sceneCtx, _sceneCanvas.width, _sceneCanvas.height, _sceneT); };
   else if (zone.type === "gym")     drawFn = function(){ drawGym(_sceneCtx, _sceneCanvas.width, _sceneCanvas.height, _sceneT); };
@@ -34,7 +46,6 @@ function renderZoneBg(zone) {
   }
   else drawFn = function(){ drawRoute(_sceneCtx, _sceneCanvas.width, _sceneCanvas.height, _sceneT, zone); };
 
-  // Bild einmalig laden wenn noch nicht versucht
   if (_bgImageCache[imgKey] === undefined) {
     _bgImageCache[imgKey] = 'loading';
     var img = new Image();
@@ -45,23 +56,53 @@ function renderZoneBg(zone) {
 
   function loop() {
     var cached = _bgImageCache[imgKey];
-
     if (cached && cached !== 'loading') {
-      // Bild vorhanden → einmal zeichnen, kein Loop
       _sceneCtx.drawImage(cached, 0, 0, _sceneCanvas.width, _sceneCanvas.height);
       return;
     }
-
-    // Fallback: animiertes Canvas
     try { drawFn(); } catch(e) {}
     _sceneT++;
     _sceneAnimId = requestAnimationFrame(loop);
   }
-
   loop();
 }
 
-// ── Spieler-Sprite: nur Lead, unverzerrtes GIF ────────────────
+// ── Gegner-Sprite mit Shiny-Support ──────────────────────────
+function renderEnemySprite(enemy, visible) {
+  var container = document.getElementById("enemySprite"); if (!container) return;
+  if (!enemy || !visible) { container.innerHTML = ""; container.style.opacity = "0"; return; }
+
+  var pd = PKMN[enemy.dexId], name = pd ? pd.name : "?";
+  var shiny = !!enemy.shiny;
+  var displayName = (shiny ? "✨ " : "") + name;
+
+  var typeHtml = pd ? pd.types.map(function(t) {
+    return "<span class='type-badge' style='background:" + (TYPE_COLORS[t] || "#aaa") + "'>" + t + "</span>";
+  }).join("") : "";
+
+  container.style.opacity = "1";
+  container.className = shiny ? "enemy-shiny" : "";
+
+  container.innerHTML =
+    "<div class='enemy-info'>" +
+      "<div class='enemy-nameline'>" + displayName +
+        " <span class='enemy-lv'>Lv." + enemy.level + "</span>" + typeHtml +
+      "</div>" +
+      "<div class='enemy-hprow'>" +
+        "<div class='enemy-hpbar'><div class='enemy-hpfill' id='enemyHpFill' style='width:" +
+          Math.max(0, Math.round(enemy.currentHP / enemy.maxHP * 100)) + "%;background:" +
+          hpColor(enemy.currentHP, enemy.maxHP) + "'></div></div>" +
+        "<span class='enemy-hptxt' id='enemyHpTxt'>" + enemy.currentHP + "/" + enemy.maxHP + "</span>" +
+      "</div>" +
+      (enemy.status ? "<span class='status-badge status-" + enemy.status + "'>" + statusText(enemy.status) + "</span>" : "") +
+    "</div>" +
+    "<img class='enemy-img enemy-appear" + (shiny ? " shiny-sprite" : "") + "' " +
+      "src='" + spriteUrl(enemy.dexId, false, shiny) + "' " +
+      "alt='" + displayName + "' " +
+      "onerror='this.src=\"" + spriteFallback(enemy.dexId, false, shiny) + "\"'>";
+}
+
+// ── Spieler-Sprite: Lead + Shiny-Backsprite ───────────────────
 function renderPlayerSprites() {
   var container = document.getElementById("playerSprites");
   if (!container || !STATE) return;
@@ -70,21 +111,40 @@ function renderPlayerSprites() {
   var lead = STATE.party.find(function(p) { return p.currentHP > 0; });
   if (!lead) return;
 
-  var pd  = PKMN[lead.dexId];
-  var div = document.createElement("div");
-  div.className = "walker walker-lead";
+  var pd    = PKMN[lead.dexId];
+  var shiny = !!lead.shiny;
+  var div   = document.createElement("div");
+  div.className = "walker walker-lead" + (shiny ? " walker-shiny" : "");
 
   var hpPct = Math.max(0, Math.round(lead.currentHP / lead.maxHP * 100));
   div.innerHTML =
-    "<img class='walker-sprite' " +
-      "src='" + spriteUrl(lead.dexId, true) + "' " +
+    "<img class='walker-sprite" + (shiny ? " shiny-sprite" : "") + "' " +
+      "src='" + spriteUrl(lead.dexId, true, shiny) + "' " +
       "alt='" + (pd ? pd.name : "?") + "' " +
-      "onerror='this.src=\"" + spriteFallback(lead.dexId, true) + "\"'>" +
+      "onerror='this.src=\"" + spriteFallback(lead.dexId, true, shiny) + "\"'>" +
     "<div class='walker-hpbar'>" +
       "<div class='walker-hpfill' style='width:" + hpPct + "%;background:" + hpColor(lead.currentHP, lead.maxHP) + "'></div>" +
     "</div>";
 
   container.appendChild(div);
+}
+
+// ── Wilder Kampf: Shiny-Ankündigung ───────────────────────────
+function triggerWildBattle(wildPkmn) {
+  clearInterval(STAGE_INTERVAL); _waitingForInput = true;
+  var epd  = PKMN[wildPkmn.dexId];
+  var name = epd ? epd.name : "?";
+  startBattle("wild", wildPkmn);
+  renderEnemySprite(BATTLE.enemy, true); showBattleUI(BATTLE.enemy); clearBattleLog();
+
+  if (wildPkmn.shiny) {
+    appendBattleLog("✨✨✨ Ein SCHILLERNDES " + name + " erscheint! ✨✨✨");
+    showToast("✨ Schillerndes " + name + "! ✨", 6000);
+  } else {
+    appendBattleLog("Ein wildes " + name + " Lv." + wildPkmn.level + " taucht auf!");
+  }
+
+  if (BATTLE.autoFight) startBattleLoop();
 }
 
 // ── Battle-UI ─────────────────────────────────────────────────
@@ -109,7 +169,6 @@ var BATTLE_USABLE_ITEMS = [
 function showBattleItemPanel() {
   if (document.getElementById("battleItemPanel")) { closeBattleItemPanel(); return; }
   if (!STATE || !ITEM_DEFS) return;
-
   var hasAny = BATTLE_USABLE_ITEMS.some(function(k) { return (STATE.items[k] || 0) > 0; });
   if (!hasAny) { showToast("Keine Items dabei!"); return; }
 
@@ -121,7 +180,7 @@ function showBattleItemPanel() {
     "<button class='bip-close' onclick='closeBattleItemPanel()'>✕</button></div>" +
     "<div class='bip-grid' id='bipGrid'></div>";
 
-  var actions = document.getElementById("battleActions");
+  var actions    = document.getElementById("battleActions");
   var moveButtons = document.getElementById("moveButtons");
   if (actions && moveButtons) actions.insertBefore(panel, moveButtons);
 
