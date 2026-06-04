@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  app.js — PokIdleMon Haupt-Controller
+//  app.js — PokIdleMon Controller + Ohnmacht-Sequenz
 // ═══════════════════════════════════════════════════════════════
 
 var STAGE_INTERVAL   = null;
@@ -17,7 +17,6 @@ function showScreen(id) {
   });
 }
 
-// ── Tab-Wechsel ────────────────────────────────────────────────
 function switchTab(tabName) {
   ["World","Team","Bag","Map"].forEach(function(t) {
     var btn  = document.getElementById("tab" + t);
@@ -30,26 +29,56 @@ function switchTab(tabName) {
   if (tabName === "Map")  renderMapScreen();
 }
 
+// ── Ohnmacht-Blackout-Animation ───────────────────────────────
+function showBlackout(callback) {
+  var ov = document.getElementById("blackoutOverlay");
+  if (!ov) { if (callback) callback(); return; }
+  // 1. Weißer Flash (wie im Originalspiel)
+  ov.style.display = "flex";
+  ov.style.background = "#fff";
+  ov.style.opacity = "0";
+  ov.querySelector(".bo-text").textContent = "";
+  setTimeout(function() {
+    ov.style.opacity = "1";
+    setTimeout(function() {
+      // 2. Zu Schwarz überblenden
+      ov.style.background = "#000";
+      setTimeout(function() {
+        // 3. Text einblenden
+        ov.querySelector(".bo-text").textContent = "...";
+        setTimeout(function() {
+          ov.querySelector(".bo-text").textContent = "Du wirst ohnmächtig!";
+          setTimeout(function() {
+            ov.querySelector(".bo-text").textContent = "In der Heilstation aufgewacht...";
+            setTimeout(function() {
+              if (callback) callback();
+              // 4. Ausblenden
+              setTimeout(function() {
+                ov.style.opacity = "0";
+                setTimeout(function() { ov.style.display = "none"; }, 600);
+              }, 800);
+            }, 1200);
+          }, 1500);
+        }, 800);
+      }, 300);
+    }, 200);
+  }, 30);
+}
+
 // ── gameReady ─────────────────────────────────────────────────
 document.addEventListener("gameReady", function(e) {
   var detail = e.detail;
-  if (detail.isNew) {
-    showScreen("starterScreen");
-    showStarterScreen();
-    return;
-  }
+  if (detail.isNew) { showScreen("starterScreen"); showStarterScreen(); return; }
   dbGet(playerPath(detail.uid)).then(function(savedState) {
     if (savedState && savedState.party) {
       var result = loadGameState(detail.uid, savedState);
       startGame(result.awaySeconds);
     } else {
-      showScreen("starterScreen");
-      showStarterScreen();
+      showScreen("starterScreen"); showStarterScreen();
     }
   }).catch(function(err) {
     console.error("Ladefehler:", err);
-    showScreen("starterScreen");
-    showStarterScreen();
+    showScreen("starterScreen"); showStarterScreen();
   });
 });
 
@@ -58,7 +87,7 @@ function onStarterChosen(trainerName, starterDexId) {
   var uid = localStorage.getItem("pokidlemon_uid") || ("u" + Date.now());
   var pd  = PKMN[starterDexId];
   initNewGame(uid, trainerName, starterDexId);
-  showToast("Du hast " + (pd ? pd.name : "?") + " als Starter gewählt!");
+  showToast("Du hast " + (pd?pd.name:"?") + " als Starter gewählt!");
   saveGame();
   startGame(0);
 }
@@ -68,11 +97,7 @@ function startGame(awaySeconds) {
   showScreen("gameScreen");
   updateHUD();
   var zone = getZone(STATE.currentZoneId);
-  if (!zone) {
-    STATE.currentZoneId = "route1";
-    STATE.currentStage  = 1;
-    zone = getZone("route1");
-  }
+  if (!zone) { STATE.currentZoneId="route1"; STATE.currentStage=1; zone=getZone("route1"); }
   renderStageInfo();
   if (zone) renderZoneBg(zone);
   renderPlayerSprites();
@@ -100,13 +125,11 @@ function processStage() {
     if (!isTrainerDefeated(zone.id, STATE.currentStage)) {
       markTrainerDefeated(zone.id, STATE.currentStage);
       healPartyFully();
-      renderPlayerSprites();
-      updateHUD();
+      renderPlayerSprites(); updateHUD();
       showToast("Pokémon wurden geheilt! 🏥");
       if (zone.shopItems && zone.shopItems.length > 0) showCityShop(zone);
     }
-    advanceStage();
-    return;
+    advanceStage(); return;
   }
 
   if (isGymLeaderStage(zone, STATE.currentStage) && !isTrainerDefeated(zone.id, STATE.currentStage)) {
@@ -115,14 +138,13 @@ function processStage() {
 
   var trainer = getTrainerAtStage(zone, STATE.currentStage);
   if (trainer && !isTrainerDefeated(zone.id, STATE.currentStage)) {
-    triggerTrainerBattle(trainer, zone); return;
+    triggerTrainerBattle(trainer); return;
   }
 
   if (zone.wildPokemon && zone.wildPokemon.length > 0 && Math.random() < 0.75) {
     var wild = getWildPokemon(zone);
     if (wild) { triggerWildBattle(wild); return; }
   }
-
   advanceStage();
 }
 
@@ -137,13 +159,9 @@ function advanceStage() {
       STATE.currentZoneId = zone.next;
       var nz = getZone(zone.next);
       if (nz) { renderZoneBg(nz); showToast("Neue Zone: " + nz.name + "!"); }
-    } else {
-      showToast("🏆 Kanto komplett!");
-    }
+    } else { showToast("🏆 Kanto komplett!"); }
   }
-  renderStageInfo();
-  renderPlayerSprites();
-  saveGame();
+  renderStageInfo(); renderPlayerSprites(); saveGame();
 }
 
 // ── Kämpfe starten ────────────────────────────────────────────
@@ -154,7 +172,7 @@ function triggerWildBattle(wildPkmn) {
   renderEnemySprite(BATTLE.enemy, true);
   showBattleUI(BATTLE.enemy);
   clearBattleLog();
-  appendBattleLog("Ein wildes " + (epd ? epd.name : "?") + " Lv." + wildPkmn.level + " taucht auf!");
+  appendBattleLog("Ein wildes " + (epd?epd.name:"?") + " Lv." + wildPkmn.level + " taucht auf!");
   if (BATTLE.autoFight) startBattleLoop();
 }
 
@@ -166,26 +184,26 @@ function triggerTrainerBattle(trainer) {
   showBattleUI(BATTLE.enemy);
   clearBattleLog();
   appendBattleLog(trainer.name + " will kämpfen!");
-  appendBattleLog("Er schickt " + (epd ? epd.name : "?") + " Lv." + BATTLE.enemy.level + "!");
+  appendBattleLog("Er schickt " + (epd?epd.name:"?") + " Lv." + BATTLE.enemy.level + "!");
   if (BATTLE.autoFight) startBattleLoop();
 }
 
 function triggerGymLeader(zone) {
   clearInterval(STAGE_INTERVAL); _waitingForInput = true;
   var gl = zone.gymLeader;
-  startBattle("gym", { name: gl.name, party: gl.party, reward: gl.reward });
+  startBattle("gym", { name:gl.name, party:gl.party, reward:gl.reward });
   var epd = PKMN[BATTLE.enemy.dexId];
   renderEnemySprite(BATTLE.enemy, true);
   showBattleUI(BATTLE.enemy);
   clearBattleLog();
   appendBattleLog("⚔️ Arenaleiter " + gl.name + " tritt an!");
-  appendBattleLog(gl.name + " schickt " + (epd ? epd.name : "?") + " Lv." + BATTLE.enemy.level + "!");
+  appendBattleLog(gl.name + " schickt " + (epd?epd.name:"?") + " Lv." + BATTLE.enemy.level + "!");
   if (BATTLE.autoFight) startBattleLoop();
 }
 
 function startGymFight() { closeGymPopup(); }
 
-// ── Auto-Kampf ────────────────────────────────────────────────
+// ── Auto-Kampf-Schleife ───────────────────────────────────────
 function startBattleLoop() {
   clearInterval(BATTLE_INTERVAL);
   BATTLE_INTERVAL = setInterval(doAutoBattleTurn, BATTLE_TICK_MS);
@@ -196,36 +214,54 @@ function doAutoBattleTurn() {
   var player = getActivePkmn();
   if (!player) { clearInterval(BATTLE_INTERVAL); return; }
 
+  // Spieler greift an
   var pLog = doPlayerAttack(autoPickMove(player, BATTLE.enemy));
   pLog.forEach(function(l) { appendBattleLog(l); });
   updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
 
   var ec = checkBattleEnd();
-  if (ec) { ec.log.forEach(function(l){appendBattleLog(l);}); if(ec.over){clearInterval(BATTLE_INTERVAL);onBattleEnd(ec.result);return;} }
+  if (ec && ec.log) ec.log.forEach(function(l){ appendBattleLog(l); });
+  if (ec && ec.playerSwitched) {
+    // Pokémon gewechselt → Sprites + Moves aktualisieren
+    renderPlayerSprites();
+    renderMoveButtons();
+  }
+  if (ec && ec.over) { clearInterval(BATTLE_INTERVAL); onBattleEnd(ec.result); return; }
 
   if (!BATTLE.over) {
     var eLog = doEnemyAttack();
     eLog.forEach(function(l) { appendBattleLog(l); });
     updatePlayerHp(); renderPlayerSprites();
+
     var ec2 = checkBattleEnd();
-    if (ec2) { ec2.log.forEach(function(l){appendBattleLog(l);}); if(ec2.over){clearInterval(BATTLE_INTERVAL);onBattleEnd(ec2.result);return;} }
+    if (ec2 && ec2.log) ec2.log.forEach(function(l){ appendBattleLog(l); });
+    if (ec2 && ec2.playerSwitched) {
+      renderPlayerSprites();
+      renderMoveButtons();
+    }
+    if (ec2 && ec2.over) { clearInterval(BATTLE_INTERVAL); onBattleEnd(ec2.result); return; }
   }
-  renderEnemySprite(BATTLE.enemy, true);
+
+  if (!BATTLE.over) renderEnemySprite(BATTLE.enemy, true);
 }
 
 // ── Kampf-Ende ────────────────────────────────────────────────
 function onBattleEnd(result) {
   clearInterval(BATTLE_INTERVAL);
-  setTimeout(function() {
-    if (result === "win") {
+
+  if (result === "win") {
+    setTimeout(function() {
       var xp = BATTLE.xpGained || 0;
       var msgs = [];
       STATE.party.forEach(function(p) {
-        if (p.currentHP > 0) applyXP(p, xp).forEach(function(m){msgs.push(m);});
+        if (p.currentHP > 0) applyXP(p, xp).forEach(function(m){ msgs.push(m); });
       });
       msgs.forEach(function(m) { appendBattleLog(m); });
       if (xp > 0) showXPPopup(xp);
-      if (BATTLE.moneyGained > 0) { STATE.money += BATTLE.moneyGained; appendBattleLog("+" + BATTLE.moneyGained + " ₽!"); updateHUD(); }
+      if (BATTLE.moneyGained > 0) {
+        STATE.money += BATTLE.moneyGained;
+        appendBattleLog("+" + BATTLE.moneyGained + " ₽!"); updateHUD();
+      }
       if (BATTLE.type === "gym") {
         var zone = getZone(STATE.currentZoneId);
         if (zone && zone.gymLeader) {
@@ -240,31 +276,52 @@ function onBattleEnd(result) {
       }
       markTrainerDefeated(STATE.currentZoneId, STATE.currentStage);
       saveGame();
-      setTimeout(function() { hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false; renderPlayerSprites(); advanceStage(); startStageLoop(); }, 2500);
-
-    } else if (result === "catch" || result === "flee") {
-      appendBattleLog(result === "flee" ? "Du bist geflohen!" : "Gefangen!");
-      setTimeout(function() { hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false; renderPlayerSprites(); advanceStage(); startStageLoop(); }, 1800);
-
-    } else {
-      appendBattleLog("Dein Team ist K.O.! Zurück zur Heilstation...");
-      healPartyFully();
-      var curIdx = WORLD.findIndex(function(z) { return z.id === STATE.currentZoneId; });
-      for (var i = curIdx; i >= 0; i--) {
-        if (WORLD[i].type === "city" || i === 0) { STATE.currentZoneId = WORLD[i].id; STATE.currentStage = 1; break; }
-      }
-      saveGame();
       setTimeout(function() {
-        hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
-        renderPlayerSprites();
+        hideBattleUI(); renderEnemySprite(null,false);
+        _waitingForInput = false; renderPlayerSprites();
+        advanceStage(); startStageLoop();
+      }, 2500);
+    }, 800);
+
+  } else if (result === "catch" || result === "flee") {
+    appendBattleLog(result === "flee" ? "Du bist geflohen!" : "Pokémon gefangen!");
+    setTimeout(function() {
+      hideBattleUI(); renderEnemySprite(null,false);
+      _waitingForInput = false; renderPlayerSprites();
+      advanceStage(); startStageLoop();
+    }, 1800);
+
+  } else {
+    // ── OHNMACHT-SEQUENZ ──────────────────────────────────────
+    clearInterval(STAGE_INTERVAL);
+    setTimeout(function() {
+      // Ohnmacht-Blackout
+      showBlackout(function() {
+        // Nach dem Blackout: heilen + zurück zur Stadt
+        healPartyFully();
+        // _faintAnnounced zurücksetzen
+        STATE.party.forEach(function(p) { p._faintAnnounced = false; });
+
+        var curIdx = WORLD.findIndex(function(z) { return z.id === STATE.currentZoneId; });
+        for (var i = curIdx; i >= 0; i--) {
+          if (WORLD[i].type === "city" || i === 0) {
+            STATE.currentZoneId = WORLD[i].id;
+            STATE.currentStage  = 1;
+            break;
+          }
+        }
+        saveGame();
+
+        hideBattleUI(); renderEnemySprite(null,false);
+        _waitingForInput = false;
         var zn = getZone(STATE.currentZoneId);
         if (zn) renderZoneBg(zn);
-        renderStageInfo();
-        showToast("Team geheilt! Zurück nach " + (zn ? zn.name : "Stadt") + "!");
+        renderStageInfo(); renderPlayerSprites();
+        showToast("Du bist in " + (zn?zn.name:"einer Stadt") + " aufgewacht! Team geheilt.", 4000);
         startStageLoop();
-      }, 3000);
-    }
-  }, 1000);
+      });
+    }, 600);
+  }
 }
 
 // ── Manuelle Aktionen ─────────────────────────────────────────
@@ -272,17 +329,23 @@ function onMoveClick(moveId) {
   if (!BATTLE || BATTLE.over) return;
   clearInterval(BATTLE_INTERVAL);
   var pLog = doPlayerAttack(moveId);
-  pLog.forEach(function(l){appendBattleLog(l);});
+  pLog.forEach(function(l){ appendBattleLog(l); });
   updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
+
   var ec = checkBattleEnd();
-  if (ec) { ec.log.forEach(function(l){appendBattleLog(l);}); if(ec.over){onBattleEnd(ec.result);return;} }
+  if (ec && ec.log) ec.log.forEach(function(l){ appendBattleLog(l); });
+  if (ec && ec.playerSwitched) { renderPlayerSprites(); renderMoveButtons(); }
+  if (ec && ec.over) { onBattleEnd(ec.result); return; }
+
   if (!BATTLE.over) {
     setTimeout(function() {
       var eLog = doEnemyAttack();
-      eLog.forEach(function(l){appendBattleLog(l);});
+      eLog.forEach(function(l){ appendBattleLog(l); });
       updatePlayerHp(); renderEnemySprite(BATTLE.enemy, true);
       var ec2 = checkBattleEnd();
-      if (ec2) { ec2.log.forEach(function(l){appendBattleLog(l);}); if(ec2.over){onBattleEnd(ec2.result);return;} }
+      if (ec2 && ec2.log) ec2.log.forEach(function(l){ appendBattleLog(l); });
+      if (ec2 && ec2.playerSwitched) { renderPlayerSprites(); renderMoveButtons(); }
+      if (ec2 && ec2.over) { onBattleEnd(ec2.result); return; }
       if (BATTLE.autoFight && !BATTLE.over) startBattleLoop();
     }, 800);
   }
@@ -292,15 +355,15 @@ function onCatchClick(ballType) {
   if (!BATTLE || BATTLE.over) return;
   clearInterval(BATTLE_INTERVAL);
   var result = doCatchAttempt(ballType || "pokeball");
-  result.log.forEach(function(l){appendBattleLog(l);});
+  result.log.forEach(function(l){ appendBattleLog(l); });
   if (result.caught) {
     var pd = PKMN[result.pkmn.dexId];
-    showToast((pd ? pd.name : "?") + " gefangen! " + (result.toParty ? "→ Party" : "→ Box"));
+    showToast((pd?pd.name:"?") + " gefangen! " + (result.toParty?"→ Party":"→ Box"));
     onBattleEnd("catch");
   } else {
     setTimeout(function() {
       var eLog = doEnemyAttack();
-      eLog.forEach(function(l){appendBattleLog(l);});
+      eLog.forEach(function(l){ appendBattleLog(l); });
       updatePlayerHp();
       if (!BATTLE.over && BATTLE.autoFight) startBattleLoop();
     }, 800);
@@ -310,8 +373,7 @@ function onCatchClick(ballType) {
 function onFleeClick() {
   if (!BATTLE || !BATTLE.canFlee || BATTLE.over) { showToast("Flucht nicht möglich!"); return; }
   clearInterval(BATTLE_INTERVAL);
-  doFlee();
-  onBattleEnd("flee");
+  doFlee(); onBattleEnd("flee");
 }
 
 function toggleAutoFight() {

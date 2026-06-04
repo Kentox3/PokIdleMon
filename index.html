@@ -21,47 +21,36 @@
 <!-- ═══ AUTH-SCREEN ══════════════════════════════════════════ -->
 <div id="authScreen" style="display:none">
   <div class="auth-wrap">
-
     <div class="auth-logo">
       <span class="auth-logo-ball">⚪</span>
       <h1>PokIdleMon</h1>
       <p>Kanto Side-Scroller RPG</p>
     </div>
-
-    <!-- ── LOGIN-KARTE ── -->
     <div id="loginCard" class="auth-card">
       <h2>Anmelden</h2>
       <label class="field-label">Nutzername</label>
-      <input id="loginUsername" type="text" placeholder="Dein Nutzername" maxlength="16"
-             autocomplete="username" autocapitalize="off" autocorrect="off">
+      <input id="loginUsername" type="text" placeholder="Dein Nutzername" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off">
       <label class="field-label">PIN <span class="field-hint">(6 Ziffern)</span></label>
-      <input id="loginPin" type="password" placeholder="••••••" maxlength="6"
-             inputmode="numeric" oninput="pinOnly(this)" autocomplete="current-password">
+      <input id="loginPin" type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)" autocomplete="current-password">
       <button class="btn-primary" onclick="doLogin()">🎮 Anmelden</button>
       <p id="loginMsg" class="auth-msg"></p>
       <div class="auth-divider"></div>
       <p class="auth-switch-text">Noch kein Konto?</p>
       <button class="btn-secondary" onclick="switchToRegister()">✨ Jetzt registrieren</button>
     </div>
-
-    <!-- ── REGISTER-KARTE ── -->
     <div id="registerCard" class="auth-card" style="display:none">
       <h2>Konto erstellen</h2>
       <label class="field-label">Nutzername <span class="field-hint">(3–16 Zeichen)</span></label>
-      <input id="regUsername" type="text" placeholder="z. B. AshKetchum" maxlength="16"
-             autocapitalize="off" autocorrect="off">
+      <input id="regUsername" type="text" placeholder="z. B. AshKetchum" maxlength="16" autocapitalize="off" autocorrect="off">
       <label class="field-label">PIN wählen <span class="field-hint">(genau 6 Ziffern)</span></label>
-      <input id="regPin"  type="password" placeholder="••••••" maxlength="6"
-             inputmode="numeric" oninput="pinOnly(this)">
+      <input id="regPin"  type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)">
       <label class="field-label">PIN wiederholen</label>
-      <input id="regPin2" type="password" placeholder="••••••" maxlength="6"
-             inputmode="numeric" oninput="pinOnly(this)">
+      <input id="regPin2" type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)">
       <button class="btn-primary" onclick="doRegister()">✨ Konto erstellen</button>
       <p id="registerMsg" class="auth-msg"></p>
       <div class="auth-divider"></div>
       <button class="btn-secondary" onclick="switchToLogin()">← Zurück zum Login</button>
     </div>
-
   </div>
 </div>
 
@@ -77,30 +66,24 @@
 
 <!-- ═══ SPIEL-SCREEN ══════════════════════════════════════════ -->
 <div id="gameScreen" style="display:none">
-
   <div id="hud">
     <span id="hudPlayer">Trainer</span>
     <span id="hudMoney">0 ₽</span>
     <span id="hudBadges">0/8 🏅</span>
     <button class="btn-logout" onclick="doLogout()">Abmelden</button>
   </div>
-
   <div id="zoneInfoBar">
     <span id="zoneName">Route 1</span>
     <span id="stageInfo">Etappe 1 / 10</span>
     <div id="stageProgressBar"><div id="stageProgressFill"></div></div>
   </div>
-
   <div id="sceneView">
-    <div class="bg-layer bg-sky"></div>
-    <div class="bg-layer bg-mid"></div>
-    <div id="sceneGround"></div>
+    <!-- Canvas wird von renderer.js dynamisch eingefügt -->
     <div id="playerSprites"></div>
     <div id="enemySprite"></div>
     <div id="xpPopup"></div>
     <div id="toastZone"></div>
   </div>
-
   <div id="battlePanel">
     <div id="battleLog"></div>
     <div id="battleActions">
@@ -112,30 +95,34 @@
       </div>
     </div>
   </div>
-
   <nav id="tabs">
     <button id="tabWorld" class="tab active" onclick="onTabWorld()">🌍 Route</button>
     <button id="tabTeam"  class="tab"        onclick="onTabTeam()">👥 Team</button>
     <button id="tabBag"   class="tab"        onclick="onTabBag()">🎒 Tasche</button>
     <button id="tabMap"   class="tab"        onclick="onTabMap()">🗺️ Karte</button>
   </nav>
-
   <div id="viewWorld" class="tab-view" style="display:block"></div>
   <div id="viewTeam"  class="tab-view" style="display:none">
-    <h3>Party</h3>
-    <div id="teamList"></div>
-    <h3 style="margin-top:16px">Box</h3>
-    <div id="boxPreview" class="box-grid"></div>
+    <h3>Party</h3><div id="teamList"></div>
+    <h3 style="margin-top:16px">Box</h3><div id="boxPreview" class="box-grid"></div>
   </div>
-  <div id="viewBag" class="tab-view" style="display:none">
-    <h3>Tasche</h3>
-    <div id="bagList"></div>
+  <div id="viewBag"  class="tab-view" style="display:none"><h3>Tasche</h3><div id="bagList"></div></div>
+  <div id="viewMap"  class="tab-view" style="display:none">
+    <h3>Kanto-Karte</h3><div id="badgeRow" class="badge-row"></div><div id="mapList"></div>
   </div>
-  <div id="viewMap" class="tab-view" style="display:none">
-    <h3>Kanto-Karte</h3>
-    <div id="badgeRow" class="badge-row"></div>
-    <div id="mapList"></div>
-  </div>
+</div>
+
+<!-- ═══ OHNMACHT-BLACKOUT ════════════════════════════════════ -->
+<div id="blackoutOverlay" style="
+  display:none; position:fixed; inset:0; z-index:9999;
+  align-items:center; justify-content:center; flex-direction:column;
+  background:#000; opacity:0;
+  transition:opacity 0.3s ease, background 0.3s ease;
+  pointer-events:all;">
+  <div class="bo-text" style="
+    color:#fff; font-size:20px; font-weight:700; text-align:center;
+    font-family:'Segoe UI',sans-serif; letter-spacing:1px;
+    text-shadow:0 0 20px rgba(255,255,255,0.5);"></div>
 </div>
 
 <!-- ═══ POPUPS ════════════════════════════════════════════════ -->
