@@ -51,10 +51,9 @@
    SPRITE-FIXES
    ════════════════════════════════════════════════════════════ */
 
-/* FIX: z-index Stacking  Canvas(1) < Enemy(5) < Walker(10) < FX(25) */
 #enemySprite {
   z-index: 5;
-  bottom: 75px;   /* höher auf dem Bildschirm */
+  bottom: 75px;
 }
 
 .walker-sprite {
@@ -78,13 +77,11 @@
 
 .walker-follow img { height: 60px; width: auto; max-width: 80px; }
 
-/* Gegner-Sprite: kleiner + gespiegelt */
 .enemy-img {
   image-rendering: pixelated;
-  height: 68px;    /* kleiner: 96 → 68 */
+  height: 68px;
   width: auto;
   max-width: 90px;
-  transform: scaleX(-1);
   filter: drop-shadow(0 4px 8px rgba(0,0,0,.6));
   display: block;
 }
