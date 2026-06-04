@@ -51,20 +51,23 @@
    SPRITE-FIXES — überschreiben main.css
    ════════════════════════════════════════════════════════════ */
 
+/* FIX: #enemySprite braucht z-index > 1 (Canvas hat z-index:1)
+   Stacking-Reihenfolge: Canvas(1) < Enemy(5) < Walker(10) < FX-Canvas(25) */
+#enemySprite { z-index: 5; }
+
 /* Lead-Pokémon: height-only → kein Strecken, natürliches Seitenverhältnis */
 .walker-sprite {
   image-rendering: pixelated;
-  height: 80px;        /* nur Höhe fixieren */
-  width: auto;         /* Breite ergibt sich aus dem GIF-Seitenverhältnis */
-  max-width: 100px;    /* Sicherheitslimit */
+  height: 80px;
+  width: auto;
+  max-width: 100px;
   display: block;
   animation: walk-bounce .5s ease-in-out infinite;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
 }
 
-/* Überschreibt die alte .walker img Regel für die neue .walker-sprite Klasse */
+/* Überschreibt die alte .walker img Regel */
 .walker img {
-  /* Gleiche Logik für Fallback-Fälle die noch .walker img nutzen */
   height: 80px;
   width: auto;
   max-width: 100px;
@@ -73,10 +76,9 @@
   filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
 }
 
-/* Keine Follower-Sprites mehr nötig, aber .walker-follow img als Fallback */
 .walker-follow img { height: 60px; width: auto; max-width: 80px; }
 
-/* Gegner-Sprite: gleiche Logik, spiegelverkehrt */
+/* Gegner-Sprite: height-only, gespiegelt */
 .enemy-img {
   image-rendering: pixelated;
   height: 96px;
