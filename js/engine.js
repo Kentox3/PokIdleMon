@@ -5,7 +5,6 @@
 var STATE = null;
 var _iidCounter = 0;
 
-// ── Pokémon-Instanz erstellen ──────────────────────────────────
 function genIid() { return "p" + (++_iidCounter) + "_" + Date.now(); }
 
 function calcHP(base, level) {
@@ -22,7 +21,6 @@ function getLearnedMoves(dexId, level) {
   pd.moves.forEach(function(entry) {
     if (entry[0] <= level) learned.push(entry[1]);
   });
-  // Keep last 4 unique
   var unique = [];
   learned.reverse().forEach(function(m) {
     if (unique.indexOf(m) < 0 && MOVES[m]) unique.push(m);
@@ -37,80 +35,91 @@ function createPkmnInstance(dexId, level) {
   if (!pd) return null;
   var maxHP = calcHP(pd.hp, level);
   return {
-    iid:       genIid(),
-    dexId:     dexId,
-    nick:      "",
-    level:     level,
-    xp:        0,
-    xpToNext:  xpForLevel(level + 1),
-    currentHP: maxHP,
-    maxHP:     maxHP,
-    atk:       calcStat(pd.atk, level),
-    def:       calcStat(pd.def, level),
-    spa:       calcStat(pd.spa, level),
-    spd:       calcStat(pd.spd, level),
-    spe:       calcStat(pd.spe, level),
-    moves:     getLearnedMoves(dexId, level),
-    status:    null,
+    iid:        genIid(),
+    dexId:      dexId,
+    nick:       "",
+    level:      level,
+    xp:         0,
+    xpToNext:   xpForLevel(level + 1),
+    currentHP:  maxHP,
+    maxHP:      maxHP,
+    atk:        calcStat(pd.atk, level),
+    def:        calcStat(pd.def, level),
+    spa:        calcStat(pd.spa, level),
+    spd:        calcStat(pd.spd, level),
+    spe:        calcStat(pd.spe, level),
+    moves:      getLearnedMoves(dexId, level),
+    status:     null,
     statusTurns: 0,
   };
 }
 
-// ── XP-Formeln ────────────────────────────────────────────────
-function xpForLevel(level) {
-  // Medium-Fast: n^3
-  return level * level * level;
-}
+// ── XP ────────────────────────────────────────────────────────
+function xpForLevel(level) { return level * level * level; }
 
 function calcXPGain(playerLevel, enemyLevel, baseXP, isTrainer) {
   var base = Math.floor((baseXP * enemyLevel) / 7);
   if (isTrainer) base = Math.floor(base * 1.5);
-  // Level-Differenz-Penalty
   var diff = playerLevel - enemyLevel;
-  if (diff > 5) {
-    var penalty = Math.max(0.1, 1 - (diff - 5) * 0.1);
-    base = Math.floor(base * penalty);
-  }
+  if (diff > 5) base = Math.floor(base * Math.max(0.1, 1 - (diff - 5) * 0.1));
   return Math.max(1, base);
 }
 
-// ── Level-Up ──────────────────────────────────────────────────
+// ── Level-Up & Evolution ──────────────────────────────────────
 function applyXP(pkmnInst, xpGained) {
   var msgs = [];
   pkmnInst.xp += xpGained;
+
   while (pkmnInst.xp >= pkmnInst.xpToNext && pkmnInst.level < 100) {
     pkmnInst.xp -= pkmnInst.xpToNext;
     pkmnInst.level++;
     var pd = PKMN[pkmnInst.dexId];
-    // Recalc stats
+
+    // Stats neu berechnen
     var newMaxHP = calcHP(pd.hp, pkmnInst.level);
-    var hpDiff = newMaxHP - pkmnInst.maxHP;
+    pkmnInst.currentHP = Math.min(pkmnInst.currentHP + (newMaxHP - pkmnInst.maxHP), newMaxHP);
     pkmnInst.maxHP = newMaxHP;
-    pkmnInst.currentHP = Math.min(pkmnInst.currentHP + hpDiff, newMaxHP);
     pkmnInst.atk  = calcStat(pd.atk, pkmnInst.level);
     pkmnInst.def  = calcStat(pd.def, pkmnInst.level);
     pkmnInst.spa  = calcStat(pd.spa, pkmnInst.level);
     pkmnInst.spd  = calcStat(pd.spd, pkmnInst.level);
     pkmnInst.spe  = calcStat(pd.spe, pkmnInst.level);
     pkmnInst.xpToNext = xpForLevel(pkmnInst.level + 1);
-    // Check new moves
+
+    // Neue Attacken dieser Spezies auf diesem Level
     pd.moves.forEach(function(entry) {
       if (entry[0] === pkmnInst.level && MOVES[entry[1]]) {
         if (pkmnInst.moves.indexOf(entry[1]) < 0) {
           if (pkmnInst.moves.length >= 4) pkmnInst.moves.shift();
           pkmnInst.moves.push(entry[1]);
-          msgs.push(pkmnInst.nick || pd.name + " lernt " + MOVES[entry[1]].name + "!");
+          msgs.push((pkmnInst.nick || pd.name) + " lernt " + MOVES[entry[1]].name + "!");
         }
       }
     });
+
     msgs.push((pkmnInst.nick || pd.name) + " ist jetzt Level " + pkmnInst.level + "!");
-    // Check evolution
+
+    // ── EVOLUTION ─────────────────────────────────────────────
+    // BUGFIX: Attacken aus der Vorform BEHALTEN, nur neue hinzufügen
     if (pd.evo && pd.evLv && pkmnInst.level >= pd.evLv) {
       var oldName = pkmnInst.nick || pd.name;
+      var currentMoves = pkmnInst.moves.slice(); // alte Attacken merken!
       pkmnInst.dexId = pd.evo;
       var newPd = PKMN[pd.evo];
-      pkmnInst.moves = getLearnedMoves(pd.evo, pkmnInst.level);
-      msgs.push(oldName + " entwickelt sich zu " + newPd.name + "!");
+
+      if (newPd) {
+        // Neue Attacken der Entwicklung die noch nicht bekannt sind
+        newPd.moves.forEach(function(entry) {
+          if (entry[0] <= pkmnInst.level && MOVES[entry[1]]) {
+            if (currentMoves.indexOf(entry[1]) < 0) {
+              if (currentMoves.length >= 4) currentMoves.shift();
+              currentMoves.push(entry[1]);
+            }
+          }
+        });
+      }
+      pkmnInst.moves = currentMoves; // gemergter Movepool
+      msgs.push("✨ " + oldName + " entwickelt sich zu " + (newPd ? newPd.name : "?") + "!");
     }
   }
   return msgs;
@@ -119,20 +128,18 @@ function applyXP(pkmnInst, xpGained) {
 // ── Fangen ────────────────────────────────────────────────────
 function tryCatch(enemyInst, ballType) {
   var pd = PKMN[enemyInst.dexId];
-  var catchRate = pd ? pd.catchRate : 45;
-  var ballMult  = { pokeball:1, superball:1.5, hyperball:2 }[ballType] || 1;
-  var hpFactor  = (enemyInst.maxHP * 3 - enemyInst.currentHP * 2) / (enemyInst.maxHP * 3);
+  var catchRate  = pd ? pd.catchRate : 45;
+  var ballMult   = { pokeball:1, superball:1.5, hyperball:2, masterball:255 }[ballType] || 1;
+  if (ballType === "masterball") return true;
+  var hpFactor   = (enemyInst.maxHP * 3 - enemyInst.currentHP * 2) / (enemyInst.maxHP * 3);
   var statusMult = 1;
   if (enemyInst.status === "sleep" || enemyInst.status === "freeze") statusMult = 2;
-  else if (enemyInst.status === "poison" || enemyInst.status === "paralysis" || enemyInst.status === "burn") statusMult = 1.5;
-
-  var effectiveRate = Math.floor(catchRate * hpFactor * ballMult * statusMult);
-  effectiveRate = Math.max(1, Math.min(255, effectiveRate));
-  var roll = Math.floor(Math.random() * 256);
-  return roll < effectiveRate;
+  else if (enemyInst.status) statusMult = 1.5;
+  var effective  = Math.max(1, Math.min(255, Math.floor(catchRate * hpFactor * ballMult * statusMult)));
+  return Math.floor(Math.random() * 256) < effective;
 }
 
-// ── Initiales STATE ───────────────────────────────────────────
+// ── Neues Spiel ───────────────────────────────────────────────
 function initNewGame(uid, trainerName, starterDexId) {
   var starter = createPkmnInstance(starterDexId, 5);
   STATE = {
@@ -146,10 +153,11 @@ function initNewGame(uid, trainerName, starterDexId) {
     badges:   0,
     badgeIds: [],
     defeatedTrainers: {},
+    visitedZones: { "route1": true },
     currentZoneId: "route1",
     currentStage:  1,
     lastSeen:  Date.now(),
-    version:   2,
+    version:   3,
   };
   return STATE;
 }
@@ -157,11 +165,12 @@ function initNewGame(uid, trainerName, starterDexId) {
 function loadGameState(uid, savedState) {
   STATE = savedState;
   STATE.uid = uid;
-  // Reparatur fehlender Felder
-  if (!STATE.items) STATE.items = { pokeball:5 };
-  if (!STATE.badgeIds) STATE.badgeIds = [];
+  if (!STATE.items)            STATE.items = { pokeball:5 };
+  if (!STATE.badgeIds)         STATE.badgeIds = [];
   if (!STATE.defeatedTrainers) STATE.defeatedTrainers = {};
-  // Offline-Belohnung (max 8 Stunden)
+  if (!STATE.visitedZones)     STATE.visitedZones = {};
+  // Zone als besucht markieren
+  STATE.visitedZones[STATE.currentZoneId] = true;
   var now = Date.now();
   var away = Math.min((now - (STATE.lastSeen || now)) / 1000, 8 * 3600);
   STATE.lastSeen = now;
@@ -185,27 +194,24 @@ function healPartyFully() {
     p.currentHP = p.maxHP;
     p.status = null;
     p.statusTurns = 0;
+    p._faintAnnounced = false;
   });
 }
 
 function addToBox(pkmnInst) {
   STATE.box.push(pkmnInst);
-  if (STATE.box.length > 240) STATE.box.shift(); // Max 240
+  if (STATE.box.length > 240) STATE.box.shift();
 }
 
 function addToParty(pkmnInst) {
-  if (STATE.party.length < 6) {
-    STATE.party.push(pkmnInst);
-    return true;
-  }
+  if (STATE.party.length < 6) { STATE.party.push(pkmnInst); return true; }
   return false;
 }
 
 function getWildPokemon(zone) {
   if (!zone.wildPokemon || zone.wildPokemon.length === 0) return null;
   var total = zone.wildPokemon.reduce(function(s, e) { return s + e.weight; }, 0);
-  var roll = Math.random() * total;
-  var cumulative = 0;
+  var roll  = Math.random() * total, cumulative = 0;
   for (var i = 0; i < zone.wildPokemon.length; i++) {
     cumulative += zone.wildPokemon[i].weight;
     if (roll < cumulative) {
@@ -226,19 +232,23 @@ function isGymLeaderStage(zone, stage) {
   return zone.gymLeader && zone.gymLeader.stage === stage;
 }
 
-function trainerDefeatedKey(zoneId, stage) {
-  return zoneId + ":" + stage;
-}
-
 function isTrainerDefeated(zoneId, stage) {
-  return !!STATE.defeatedTrainers[trainerDefeatedKey(zoneId, stage)];
+  return !!STATE.defeatedTrainers[zoneId + ":" + stage];
 }
 
 function markTrainerDefeated(zoneId, stage) {
-  STATE.defeatedTrainers[trainerDefeatedKey(zoneId, stage)] = true;
+  STATE.defeatedTrainers[zoneId + ":" + stage] = true;
 }
 
-// ── Spieldaten speichern ──────────────────────────────────────
+function markZoneVisited(zoneId) {
+  if (!STATE.visitedZones) STATE.visitedZones = {};
+  STATE.visitedZones[zoneId] = true;
+}
+
+function isZoneVisited(zoneId) {
+  return !!(STATE.visitedZones && STATE.visitedZones[zoneId]);
+}
+
 function saveGame() {
   if (!STATE || !window.dbSet || !window.playerPath) return;
   STATE.lastSeen = Date.now();

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  app.js — PokIdleMon Controller + Ohnmacht-Sequenz
+//  app.js — PokIdleMon Controller + Stadt-Stopp + Schnellreise
 // ═══════════════════════════════════════════════════════════════
 
 var STAGE_INTERVAL   = null;
@@ -7,13 +7,13 @@ var BATTLE_INTERVAL  = null;
 var STAGE_TICK_MS    = 5000;
 var BATTLE_TICK_MS   = 1800;
 var _waitingForInput = false;
+var _inCity          = false;
 
-// ── Screen-Wechsel ────────────────────────────────────────────
+// ── Screens ───────────────────────────────────────────────────
 function showScreen(id) {
   ["starterScreen","gameScreen","loadScreen","authScreen"].forEach(function(sid) {
     var el = document.getElementById(sid);
-    if (!el) return;
-    el.style.display = (sid === id) ? "flex" : "none";
+    if (el) el.style.display = (sid === id) ? "flex" : "none";
   });
 }
 
@@ -27,13 +27,13 @@ function switchTab(tabName) {
   if (tabName === "Team") renderTeamScreen();
   if (tabName === "Bag")  renderBagScreen();
   if (tabName === "Map")  renderMapScreen();
+  if (tabName === "World") renderWorldTab();
 }
 
-// ── Ohnmacht-Blackout-Animation ───────────────────────────────
+// ── Ohnmacht-Blackout ─────────────────────────────────────────
 function showBlackout(callback) {
   var ov = document.getElementById("blackoutOverlay");
   if (!ov) { if (callback) callback(); return; }
-  // 1. Weißer Flash (wie im Originalspiel)
   ov.style.display = "flex";
   ov.style.background = "#fff";
   ov.style.opacity = "0";
@@ -41,10 +41,8 @@ function showBlackout(callback) {
   setTimeout(function() {
     ov.style.opacity = "1";
     setTimeout(function() {
-      // 2. Zu Schwarz überblenden
       ov.style.background = "#000";
       setTimeout(function() {
-        // 3. Text einblenden
         ov.querySelector(".bo-text").textContent = "...";
         setTimeout(function() {
           ov.querySelector(".bo-text").textContent = "Du wirst ohnmächtig!";
@@ -52,7 +50,6 @@ function showBlackout(callback) {
             ov.querySelector(".bo-text").textContent = "In der Heilstation aufgewacht...";
             setTimeout(function() {
               if (callback) callback();
-              // 4. Ausblenden
               setTimeout(function() {
                 ov.style.opacity = "0";
                 setTimeout(function() { ov.style.display = "none"; }, 600);
@@ -73,34 +70,28 @@ document.addEventListener("gameReady", function(e) {
     if (savedState && savedState.party) {
       var result = loadGameState(detail.uid, savedState);
       startGame(result.awaySeconds);
-    } else {
-      showScreen("starterScreen"); showStarterScreen();
-    }
-  }).catch(function(err) {
-    console.error("Ladefehler:", err);
-    showScreen("starterScreen"); showStarterScreen();
-  });
+    } else { showScreen("starterScreen"); showStarterScreen(); }
+  }).catch(function() { showScreen("starterScreen"); showStarterScreen(); });
 });
 
-// ── Starter gewählt ───────────────────────────────────────────
 function onStarterChosen(trainerName, starterDexId) {
   var uid = localStorage.getItem("pokidlemon_uid") || ("u" + Date.now());
   var pd  = PKMN[starterDexId];
   initNewGame(uid, trainerName, starterDexId);
   showToast("Du hast " + (pd?pd.name:"?") + " als Starter gewählt!");
-  saveGame();
-  startGame(0);
+  saveGame(); startGame(0);
 }
 
 // ── Spiel starten ─────────────────────────────────────────────
 function startGame(awaySeconds) {
-  showScreen("gameScreen");
-  updateHUD();
+  showScreen("gameScreen"); updateHUD();
   var zone = getZone(STATE.currentZoneId);
   if (!zone) { STATE.currentZoneId="route1"; STATE.currentStage=1; zone=getZone("route1"); }
+  markZoneVisited(STATE.currentZoneId);
   renderStageInfo();
   if (zone) renderZoneBg(zone);
   renderPlayerSprites();
+  renderWorldTab();
   switchTab("World");
   if (awaySeconds > 60) showOfflineReward(awaySeconds);
   startStageLoop();
@@ -111,6 +102,7 @@ function startStageLoop() {
   clearInterval(STAGE_INTERVAL);
   clearInterval(BATTLE_INTERVAL);
   _waitingForInput = false;
+  _inCity = false;
   hideBattleUI();
   renderEnemySprite(null, false);
   STAGE_INTERVAL = setInterval(processStage, STAGE_TICK_MS);
@@ -121,26 +113,34 @@ function processStage() {
   var zone = getZone(STATE.currentZoneId);
   if (!zone) { advanceStage(); return; }
 
+  // ── STADT: anhalten, City-UI zeigen ──────────────────────
   if (zone.type === "city") {
-    if (!isTrainerDefeated(zone.id, STATE.currentStage)) {
-      markTrainerDefeated(zone.id, STATE.currentStage);
+    clearInterval(STAGE_INTERVAL);
+    _waitingForInput = true;
+    _inCity = true;
+    markZoneVisited(zone.id);
+    if (!isTrainerDefeated(zone.id, 0)) {
+      markTrainerDefeated(zone.id, 0);
       healPartyFully();
-      renderPlayerSprites(); updateHUD();
-      showToast("Pokémon wurden geheilt! 🏥");
-      if (zone.shopItems && zone.shopItems.length > 0) showCityShop(zone);
+      renderPlayerSprites();
+      updateHUD();
     }
-    advanceStage(); return;
+    renderCityView(zone);
+    return;
   }
 
+  // ── GYM-LEADER ────────────────────────────────────────────
   if (isGymLeaderStage(zone, STATE.currentStage) && !isTrainerDefeated(zone.id, STATE.currentStage)) {
     triggerGymLeader(zone); return;
   }
 
+  // ── TRAINER ───────────────────────────────────────────────
   var trainer = getTrainerAtStage(zone, STATE.currentStage);
   if (trainer && !isTrainerDefeated(zone.id, STATE.currentStage)) {
     triggerTrainerBattle(trainer); return;
   }
 
+  // ── WILDPOKÉMON ───────────────────────────────────────────
   if (zone.wildPokemon && zone.wildPokemon.length > 0 && Math.random() < 0.75) {
     var wild = getWildPokemon(zone);
     if (wild) { triggerWildBattle(wild); return; }
@@ -157,11 +157,39 @@ function advanceStage() {
     STATE.currentStage = 1;
     if (zone.next) {
       STATE.currentZoneId = zone.next;
+      markZoneVisited(zone.next);
       var nz = getZone(zone.next);
       if (nz) { renderZoneBg(nz); showToast("Neue Zone: " + nz.name + "!"); }
     } else { showToast("🏆 Kanto komplett!"); }
   }
-  renderStageInfo(); renderPlayerSprites(); saveGame();
+  renderStageInfo(); renderPlayerSprites(); renderWorldTab(); saveGame();
+}
+
+// ── Schnellreise ──────────────────────────────────────────────
+function fastTravelTo(zoneId) {
+  if (!STATE) return;
+  if (BATTLE && !BATTLE.over) { showToast("Im Kampf nicht möglich!"); return; }
+  if (!isZoneVisited(zoneId)) { showToast("Noch nicht besucht!"); return; }
+  clearInterval(STAGE_INTERVAL);
+  clearInterval(BATTLE_INTERVAL);
+  _waitingForInput = false; _inCity = false;
+  hideBattleUI(); renderEnemySprite(null, false);
+  STATE.currentZoneId = zoneId;
+  STATE.currentStage  = 1;
+  var zone = getZone(zoneId);
+  if (zone) renderZoneBg(zone);
+  renderStageInfo(); renderPlayerSprites(); renderWorldTab();
+  saveGame();
+  showToast("✈ Schnellreise nach " + (zone ? zone.name : zoneId) + "!");
+  switchTab("World");
+  startStageLoop();
+}
+
+// ── Aus Stadt weiter ──────────────────────────────────────────
+function continueFromCity() {
+  _waitingForInput = false; _inCity = false;
+  advanceStage();
+  startStageLoop();
 }
 
 // ── Kämpfe starten ────────────────────────────────────────────
@@ -183,7 +211,10 @@ function triggerTrainerBattle(trainer) {
   renderEnemySprite(BATTLE.enemy, true);
   showBattleUI(BATTLE.enemy);
   clearBattleLog();
-  appendBattleLog(trainer.name + " will kämpfen!");
+  // Trainer-Portrait im Log anzeigen
+  var sprite = getTrainerSprite(trainer);
+  if (sprite) renderTrainerPortrait(trainer.name, sprite);
+  appendBattleLog((trainer.isRival ? "⚡ Rival " : "") + trainer.name + " fordert dich heraus!");
   appendBattleLog("Er schickt " + (epd?epd.name:"?") + " Lv." + BATTLE.enemy.level + "!");
   if (BATTLE.autoFight) startBattleLoop();
 }
@@ -196,6 +227,8 @@ function triggerGymLeader(zone) {
   renderEnemySprite(BATTLE.enemy, true);
   showBattleUI(BATTLE.enemy);
   clearBattleLog();
+  var sprite = getGymLeaderSprite(gl.name);
+  if (sprite) renderTrainerPortrait(gl.name + " (" + gl.title + ")", sprite);
   appendBattleLog("⚔️ Arenaleiter " + gl.name + " tritt an!");
   appendBattleLog(gl.name + " schickt " + (epd?epd.name:"?") + " Lv." + BATTLE.enemy.level + "!");
   if (BATTLE.autoFight) startBattleLoop();
@@ -203,7 +236,7 @@ function triggerGymLeader(zone) {
 
 function startGymFight() { closeGymPopup(); }
 
-// ── Auto-Kampf-Schleife ───────────────────────────────────────
+// ── Auto-Kampf ────────────────────────────────────────────────
 function startBattleLoop() {
   clearInterval(BATTLE_INTERVAL);
   BATTLE_INTERVAL = setInterval(doAutoBattleTurn, BATTLE_TICK_MS);
@@ -214,40 +247,31 @@ function doAutoBattleTurn() {
   var player = getActivePkmn();
   if (!player) { clearInterval(BATTLE_INTERVAL); return; }
 
-  // Spieler greift an
   var pLog = doPlayerAttack(autoPickMove(player, BATTLE.enemy));
-  pLog.forEach(function(l) { appendBattleLog(l); });
+  pLog.forEach(function(l){ appendBattleLog(l); });
   updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
 
   var ec = checkBattleEnd();
   if (ec && ec.log) ec.log.forEach(function(l){ appendBattleLog(l); });
-  if (ec && ec.playerSwitched) {
-    // Pokémon gewechselt → Sprites + Moves aktualisieren
-    renderPlayerSprites();
-    renderMoveButtons();
-  }
+  if (ec && ec.playerSwitched) { renderPlayerSprites(); renderMoveButtons(); }
   if (ec && ec.over) { clearInterval(BATTLE_INTERVAL); onBattleEnd(ec.result); return; }
 
   if (!BATTLE.over) {
     var eLog = doEnemyAttack();
-    eLog.forEach(function(l) { appendBattleLog(l); });
+    eLog.forEach(function(l){ appendBattleLog(l); });
     updatePlayerHp(); renderPlayerSprites();
-
     var ec2 = checkBattleEnd();
     if (ec2 && ec2.log) ec2.log.forEach(function(l){ appendBattleLog(l); });
-    if (ec2 && ec2.playerSwitched) {
-      renderPlayerSprites();
-      renderMoveButtons();
-    }
+    if (ec2 && ec2.playerSwitched) { renderPlayerSprites(); renderMoveButtons(); }
     if (ec2 && ec2.over) { clearInterval(BATTLE_INTERVAL); onBattleEnd(ec2.result); return; }
   }
-
   if (!BATTLE.over) renderEnemySprite(BATTLE.enemy, true);
 }
 
 // ── Kampf-Ende ────────────────────────────────────────────────
 function onBattleEnd(result) {
   clearInterval(BATTLE_INTERVAL);
+  hideTrainerPortrait();
 
   if (result === "win") {
     setTimeout(function() {
@@ -256,12 +280,9 @@ function onBattleEnd(result) {
       STATE.party.forEach(function(p) {
         if (p.currentHP > 0) applyXP(p, xp).forEach(function(m){ msgs.push(m); });
       });
-      msgs.forEach(function(m) { appendBattleLog(m); });
+      msgs.forEach(function(m){ appendBattleLog(m); });
       if (xp > 0) showXPPopup(xp);
-      if (BATTLE.moneyGained > 0) {
-        STATE.money += BATTLE.moneyGained;
-        appendBattleLog("+" + BATTLE.moneyGained + " ₽!"); updateHUD();
-      }
+      if (BATTLE.moneyGained > 0) { STATE.money += BATTLE.moneyGained; appendBattleLog("+" + BATTLE.moneyGained + " ₽!"); updateHUD(); }
       if (BATTLE.type === "gym") {
         var zone = getZone(STATE.currentZoneId);
         if (zone && zone.gymLeader) {
@@ -269,8 +290,7 @@ function onBattleEnd(result) {
           if (STATE.badgeIds.indexOf(gl.badgeId) < 0) {
             STATE.badges++; STATE.badgeIds.push(gl.badgeId);
             appendBattleLog("🏅 " + gl.winText);
-            showToast("🏅 " + gl.badge + " erhalten!", 4000);
-            updateHUD();
+            showToast("🏅 " + gl.badge + " erhalten!", 4000); updateHUD();
           }
         }
       }
@@ -278,7 +298,7 @@ function onBattleEnd(result) {
       saveGame();
       setTimeout(function() {
         hideBattleUI(); renderEnemySprite(null,false);
-        _waitingForInput = false; renderPlayerSprites();
+        _waitingForInput=false; renderPlayerSprites();
         advanceStage(); startStageLoop();
       }, 2500);
     }, 800);
@@ -287,36 +307,25 @@ function onBattleEnd(result) {
     appendBattleLog(result === "flee" ? "Du bist geflohen!" : "Pokémon gefangen!");
     setTimeout(function() {
       hideBattleUI(); renderEnemySprite(null,false);
-      _waitingForInput = false; renderPlayerSprites();
+      _waitingForInput=false; renderPlayerSprites();
       advanceStage(); startStageLoop();
     }, 1800);
 
   } else {
-    // ── OHNMACHT-SEQUENZ ──────────────────────────────────────
     clearInterval(STAGE_INTERVAL);
     setTimeout(function() {
-      // Ohnmacht-Blackout
       showBlackout(function() {
-        // Nach dem Blackout: heilen + zurück zur Stadt
         healPartyFully();
-        // _faintAnnounced zurücksetzen
-        STATE.party.forEach(function(p) { p._faintAnnounced = false; });
-
-        var curIdx = WORLD.findIndex(function(z) { return z.id === STATE.currentZoneId; });
+        STATE.party.forEach(function(p){ p._faintAnnounced=false; });
+        var curIdx = WORLD.findIndex(function(z){ return z.id===STATE.currentZoneId; });
         for (var i = curIdx; i >= 0; i--) {
-          if (WORLD[i].type === "city" || i === 0) {
-            STATE.currentZoneId = WORLD[i].id;
-            STATE.currentStage  = 1;
-            break;
-          }
+          if (WORLD[i].type==="city" || i===0) { STATE.currentZoneId=WORLD[i].id; STATE.currentStage=1; break; }
         }
         saveGame();
-
-        hideBattleUI(); renderEnemySprite(null,false);
-        _waitingForInput = false;
+        hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
         var zn = getZone(STATE.currentZoneId);
         if (zn) renderZoneBg(zn);
-        renderStageInfo(); renderPlayerSprites();
+        renderStageInfo(); renderPlayerSprites(); renderWorldTab();
         showToast("Du bist in " + (zn?zn.name:"einer Stadt") + " aufgewacht! Team geheilt.", 4000);
         startStageLoop();
       });
@@ -331,12 +340,10 @@ function onMoveClick(moveId) {
   var pLog = doPlayerAttack(moveId);
   pLog.forEach(function(l){ appendBattleLog(l); });
   updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
-
   var ec = checkBattleEnd();
   if (ec && ec.log) ec.log.forEach(function(l){ appendBattleLog(l); });
   if (ec && ec.playerSwitched) { renderPlayerSprites(); renderMoveButtons(); }
   if (ec && ec.over) { onBattleEnd(ec.result); return; }
-
   if (!BATTLE.over) {
     setTimeout(function() {
       var eLog = doEnemyAttack();
@@ -372,8 +379,7 @@ function onCatchClick(ballType) {
 
 function onFleeClick() {
   if (!BATTLE || !BATTLE.canFlee || BATTLE.over) { showToast("Flucht nicht möglich!"); return; }
-  clearInterval(BATTLE_INTERVAL);
-  doFlee(); onBattleEnd("flee");
+  clearInterval(BATTLE_INTERVAL); doFlee(); onBattleEnd("flee");
 }
 
 function toggleAutoFight() {
@@ -385,6 +391,7 @@ function toggleAutoFight() {
   else clearInterval(BATTLE_INTERVAL);
 }
 
+// ── Tabs ──────────────────────────────────────────────────────
 function onTabWorld() { switchTab("World"); }
 function onTabTeam()  { switchTab("Team"); }
 function onTabBag()   { switchTab("Bag"); }

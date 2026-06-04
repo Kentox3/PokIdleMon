@@ -78,7 +78,6 @@
     <div id="stageProgressBar"><div id="stageProgressFill"></div></div>
   </div>
   <div id="sceneView">
-    <!-- Canvas wird von renderer.js dynamisch eingefügt -->
     <div id="playerSprites"></div>
     <div id="enemySprite"></div>
     <div id="xpPopup"></div>
@@ -89,8 +88,9 @@
     <div id="battleActions">
       <div id="moveButtons"></div>
       <div id="battleBtns">
-        <button id="catchBtn"     class="btn-catch" onclick="onCatchClick('pokeball')" style="display:none">🎯 Fangen</button>
-        <button id="autoFightBtn" class="btn-auto"  onclick="toggleAutoFight()">⚡ Auto</button>
+        <!-- Pokéball-Sprite-Buttons (von renderCatchBalls() befüllt) -->
+        <div id="catchBalls"></div>
+        <button id="autoFightBtn" class="btn-auto" onclick="toggleAutoFight()">⚡ Auto</button>
         <button id="fleeBtn"      class="btn-flee"  onclick="onFleeClick()">🏃 Fliehen</button>
       </div>
     </div>
