@@ -1,0 +1,88 @@
+/* ── Items-Button im Kampf ──────────────────────────────── */
+.btn-items {
+  padding: 6px 10px; border-radius: 8px;
+  background: rgba(253,197,0,.15); border: 1px solid rgba(253,197,0,.4);
+  color: #fcd60a; font-size: 16px; cursor: pointer; transition: .2s;
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-items:hover { background: rgba(253,197,0,.28); border-color: rgba(253,197,0,.8); }
+
+/* ── Item-Panel im Kampf ────────────────────────────────── */
+.battle-item-panel {
+  background: rgba(15,10,30,.95);
+  border: 1px solid rgba(253,197,0,.3);
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 6px;
+  animation: bip-in .2s ease-out;
+}
+@keyframes bip-in { from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);} }
+
+.bip-header {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; font-weight: 700; color: #fcd60a;
+  margin-bottom: 6px; padding-bottom: 5px;
+  border-bottom: 1px solid rgba(253,197,0,.2);
+}
+.bip-close {
+  background: none; border: none; color: #888;
+  font-size: 14px; cursor: pointer; padding: 0 2px;
+  line-height: 1;
+}
+.bip-close:hover { color: #fff; }
+
+.bip-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.bip-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px; padding: 6px 8px; cursor: pointer;
+  min-width: 60px; max-width: 74px; transition: .2s;
+}
+.bip-item:hover { background: rgba(255,255,255,.15); border-color: #fcd60a; transform: scale(1.05); }
+.bip-item-disabled { opacity: .35; cursor: not-allowed; }
+.bip-item-disabled:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.15); transform: none; }
+.bip-sprite { width: 28px; height: 28px; image-rendering: pixelated; display: block; }
+.bip-name { font-size: 9px; color: #ddd; text-align: center; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bip-count { font-size: 10px; color: #ffd700; font-weight: 700; }
+
+
+/* ════════════════════════════════════════════════════════════
+   SPRITE-FIXES — überschreiben main.css
+   ════════════════════════════════════════════════════════════ */
+
+/* Lead-Pokémon: height-only → kein Strecken, natürliches Seitenverhältnis */
+.walker-sprite {
+  image-rendering: pixelated;
+  height: 80px;        /* nur Höhe fixieren */
+  width: auto;         /* Breite ergibt sich aus dem GIF-Seitenverhältnis */
+  max-width: 100px;    /* Sicherheitslimit */
+  display: block;
+  animation: walk-bounce .5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
+}
+
+/* Überschreibt die alte .walker img Regel für die neue .walker-sprite Klasse */
+.walker img {
+  /* Gleiche Logik für Fallback-Fälle die noch .walker img nutzen */
+  height: 80px;
+  width: auto;
+  max-width: 100px;
+  image-rendering: pixelated;
+  animation: walk-bounce .5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
+}
+
+/* Keine Follower-Sprites mehr nötig, aber .walker-follow img als Fallback */
+.walker-follow img { height: 60px; width: auto; max-width: 80px; }
+
+/* Gegner-Sprite: gleiche Logik, spiegelverkehrt */
+.enemy-img {
+  image-rendering: pixelated;
+  height: 96px;
+  width: auto;
+  max-width: 120px;
+  transform: scaleX(-1);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.6));
+  display: block;
+}

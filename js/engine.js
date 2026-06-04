@@ -164,22 +164,15 @@ function loadGameState(uid, savedState) {
   if (!STATE.items)            STATE.items = { pokeball:5 };
   if (!STATE.badgeIds)         STATE.badgeIds = [];
   if (!STATE.defeatedTrainers) STATE.defeatedTrainers = {};
+  if (!STATE.visitedZones)     STATE.visitedZones = {};
 
-  // visitedZones aus Fortschritt rekonstruieren:
-  // Alle Zonen bis zur aktuellen Zone als besucht markieren.
-  // Das behebt alte Saves die visitedZones nicht kennen
-  // und Saves die nur die aktuelle Zone hatten.
+  // IMMER alle Zonen bis zur aktuellen als besucht markieren —
+  // keine Bedingung, damit jeder Save vollständig rekonstruiert wird.
   var curIdx = WORLD.findIndex(function(z) { return z.id === STATE.currentZoneId; });
   if (curIdx < 0) curIdx = 0;
-
-  if (!STATE.visitedZones || Object.keys(STATE.visitedZones).length <= 1) {
-    STATE.visitedZones = {};
-    for (var vi = 0; vi <= curIdx; vi++) {
-      STATE.visitedZones[WORLD[vi].id] = true;
-    }
+  for (var vi = 0; vi <= curIdx; vi++) {
+    STATE.visitedZones[WORLD[vi].id] = true;
   }
-  // Aktuelle Zone immer als besucht sicherstellen
-  STATE.visitedZones[STATE.currentZoneId] = true;
 
   var now = Date.now();
   var away = Math.min((now - (STATE.lastSeen || now)) / 1000, 8 * 3600);
