@@ -1,0 +1,64 @@
+// ── Map-Screen: Schnellreise zu allen besuchten Städten ────────
+function renderMapScreen() {
+  var container=document.getElementById("mapList"); if(!container||!STATE) return;
+  container.innerHTML="";
+  var currentIdx=WORLD.findIndex(function(z){return z.id===STATE.currentZoneId;});
+
+  // ══ SCHNELLREISE: nur besuchte Städte, nicht aktuelle ════════
+  var visitedCities=WORLD.filter(function(z){
+    return z.type==="city" && isZoneVisited(z.id) && z.id!==STATE.currentZoneId;
+  });
+
+  if(visitedCities.length>0){
+    var sh=document.createElement("div"); sh.className="map-section-title"; sh.textContent="✈ Schnellreise"; container.appendChild(sh);
+    var grid=document.createElement("div"); grid.className="city-travel-grid";
+    visitedCities.forEach(function(zone){
+      var badge=zone.gymLeader&&STATE.badgeIds.indexOf(zone.gymLeader.badgeId)>=0?" 🏅":"";
+      var btn=document.createElement("button"); btn.className="city-travel-btn";
+      btn.innerHTML="🏙️ <span>"+zone.name+badge+"</span>";
+      btn.onclick=function(){ fastTravelTo(zone.id); };
+      grid.appendChild(btn);
+    });
+    container.appendChild(grid);
+  } else {
+    var noCity=document.createElement("p"); noCity.className="map-no-travel"; noCity.textContent="Noch keine Städte freigeschaltet."; container.appendChild(noCity);
+  }
+
+  // ══ AKTUELLER STANDORT ═══════════════════════════════════════
+  var curZone=getZone(STATE.currentZoneId);
+  if(curZone){
+    var curDiv=document.createElement("div"); curDiv.className="map-current-loc";
+    var icon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[curZone.type]||"📍";
+    curDiv.innerHTML="<b>📍 Du bist hier:</b> "+icon+" "+curZone.name+" — Etappe "+STATE.currentStage+"/"+curZone.stageCount;
+    container.appendChild(curDiv);
+  }
+
+  // ══ MEDAILLEN ════════════════════════════════════════════════
+  var br=document.getElementById("badgeRow");
+  if(br) br.innerHTML=["stone","cascade","thunder","rainbow","soul","marsh","volcano","earth"].map(function(b){
+    return "<span class='badge-icon"+(STATE.badgeIds.indexOf(b)>=0?" badge-earned":"")+"'>🏅</span>";
+  }).join("");
+
+  // ══ KANTO-FORTSCHRITT (kompakt, nur informativ) ═══════════════
+  var ph=document.createElement("div"); ph.className="map-section-title"; ph.style.marginTop="14px"; ph.textContent="🗺️ Kanto-Fortschritt"; container.appendChild(ph);
+
+  WORLD.forEach(function(zone,idx){
+    var isCurrent=(zone.id===STATE.currentZoneId);
+    var isVisited=isZoneVisited(zone.id);
+    var isUnlocked=idx<=currentIdx;
+    var row=document.createElement("div");
+    var cls="map-zone map-compact";
+    if(isCurrent) cls+=" map-current";
+    else if(isVisited||isUnlocked) cls+=" map-unlocked";
+    else cls+=" map-locked";
+    row.className=cls;
+    var zicon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[zone.type]||"📍";
+    var badgeHtml=zone.gymLeader&&isUnlocked?"<span class='map-badge'>"+(STATE.badgeIds.indexOf(zone.gymLeader.badgeId)>=0?"🏅":"⬜")+"</span>":"";
+    row.innerHTML=
+      zicon+" "+zone.name+
+      (isCurrent?" <span class='map-here'>← hier</span>":"")+
+      (!isUnlocked?"<span style='margin-left:auto;color:#444'>🔒</span>":"")+
+      badgeHtml;
+    container.appendChild(row);
+  });
+}

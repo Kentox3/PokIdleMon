@@ -1,0 +1,3 @@
+// ─── Schnellreise-Patch: nur Städte erlaubt ─────────────────
+// Diese Datei überschreibt fastTravelTo aus app.js
+// (wird nach app.js geladen — daher kein Konflikt)

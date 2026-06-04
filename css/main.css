@@ -56,16 +56,12 @@ body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; mi
 
 /* ── SPIEL-SCREEN ────────────────────────────────────────── */
 #gameScreen { display: flex; flex-direction: column; height: 100vh; max-width: 480px; margin: 0 auto; }
-
-/* HUD */
 #hud { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(0,0,0,.6); font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
 #hudPlayer { font-weight: 700; flex: 1; }
 #hudMoney  { color: #ffd700; }
 #hudBadges { color: #a78bfa; }
 .btn-logout { background: #333; border: none; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 4px; cursor: pointer; }
 .btn-logout:hover { color: #fff; }
-
-/* Zone-Info */
 #zoneInfoBar { background: rgba(0,0,0,.5); padding: 6px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; flex-shrink: 0; }
 #zoneName  { font-weight: 700; flex: 1; }
 #stageInfo { font-size: 12px; color: #aaa; }
@@ -98,7 +94,6 @@ body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; mi
 .status-badge { display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 700; margin-left: 3px; }
 .status-burn{background:#f87171;}.status-poison{background:#c084fc;}.status-paralysis{background:#facc15;color:#333;}.status-sleep{background:#94a3b8;color:#333;}.status-freeze{background:#67e8f9;color:#333;}
 #xpPopup { position: absolute; left: 50%; transform: translateX(-50%); top: 60%; font-size: 18px; font-weight: 700; color: #ffd700; opacity: 0; transition: opacity .4s, transform .8s; pointer-events: none; }
-.dmg-number { position: absolute; font-size: 18px; font-weight: 700; animation: dmg-float 1.2s ease-out forwards; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,.8); }
 @keyframes dmg-float { 0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-50px);} }
 @keyframes portrait-in { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
 
@@ -117,8 +112,6 @@ body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; mi
 .move-type { font-size: 9px; padding: 1px 4px; border-radius: 8px; color: #fff; }
 .move-pwr { font-size: 10px; color: #aaa; }
 #battleBtns { display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
-
-/* Ball-Buttons */
 #catchBalls { display: flex; gap: 6px; align-items: center; }
 .ball-btn { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 4px 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: .2s; }
 .ball-btn:hover { background: rgba(255,255,255,.18); transform: scale(1.05); }
@@ -138,7 +131,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; mi
 .tab-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
 .tab-view h3 { font-size: 14px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
 
-/* ── WORLD-TAB: Encounter-Rates + Route-Info ─────────────── */
+/* ── WORLD-TAB ───────────────────────────────────────────── */
 .zone-info-panel { padding: 4px 0; }
 .zone-info-header { font-size: 15px; font-weight: 700; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.08); }
 .encounter-section, .trainer-section { margin-bottom: 12px; }
@@ -173,8 +166,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; mi
 .city-btn { width: 100%; padding: 7px 0; border-radius: 8px; border: none; background: #4e7cff; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; transition: .2s; }
 .city-btn:hover { background: #6b93ff; }
 .city-continue-btn { width: 100%; padding: 13px; border-radius: 12px; border: none; background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; transition: .2s; }
-.city-continue-btn:hover { opacity: .9; transform: scale(1.01); }
-/* NPC-Handel */
+.city-continue-btn:hover { opacity: .9; }
 .city-npc { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
 .npc-portrait { width: 48px; height: 48px; image-rendering: pixelated; float: left; margin-right: 10px; }
 .npc-bubble { font-size: 12px; color: #ddd; margin-bottom: 8px; min-height: 48px; padding-top: 4px; }
@@ -185,16 +177,38 @@ body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; mi
 .trade-arrow { font-size: 22px; color: #818cf8; }
 .trade-btn { background: #7c3aed !important; margin-top: 4px; }
 
-/* ── KARTE mit Schnellreise ──────────────────────────────── */
+/* ── KARTE: Schnellreise-Städte ──────────────────────────── */
+.map-section-title {
+  font-size: 11px; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(129,140,248,.2);
+}
+/* Große Stadt-Reise-Buttons */
+.city-travel-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.city-travel-btn {
+  width: 100%; padding: 10px 14px; border-radius: 10px;
+  background: rgba(78,124,255,.12); border: 1px solid rgba(78,124,255,.3);
+  color: #b4c8ff; font-size: 14px; font-weight: 600; text-align: left;
+  cursor: pointer; transition: .2s;
+}
+.city-travel-btn:hover {
+  background: rgba(78,124,255,.28); border-color: rgba(78,124,255,.7);
+  color: #fff; transform: translateX(4px);
+}
+.map-no-travel { color: #555; font-size: 13px; font-style: italic; margin-bottom: 12px; }
+.map-current-loc {
+  background: rgba(129,140,248,.1); border: 1px solid rgba(129,140,248,.22);
+  border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-bottom: 10px;
+}
+/* Kompakte Fortschritts-Zeilen */
+.map-compact { padding: 4px 8px; font-size: 12px; border-radius: 5px; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
+
+/* Bestehende Karten-Styles */
 .map-zone { padding: 7px 10px; border-radius: 8px; margin-bottom: 4px; font-size: 13px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .map-unlocked { background: rgba(255,255,255,.05); }
-.map-visited  { background: rgba(255,255,255,.05); }
 .map-locked   { background: rgba(255,255,255,.02); color: #555; }
 .map-current  { background: rgba(129,140,248,.2); border: 1px solid #818cf8; }
 .map-here { color: #818cf8; font-weight: 700; font-size: 11px; }
 .map-badge { margin-left: auto; }
-.map-travel-btn { margin-left: auto; padding: 3px 10px; border-radius: 6px; border: none; background: #3b82f6; color: #fff; font-size: 11px; cursor: pointer; white-space: nowrap; }
-.map-travel-btn:hover { background: #60a5fa; }
 
 /* ── TEAM ────────────────────────────────────────────────── */
 .team-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start; }

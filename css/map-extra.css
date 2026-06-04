@@ -1,0 +1,21 @@
+/* ── Map: Schnellreise-Städte ────────────────────────────── */
+.map-section-title {
+  font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.city-travel-grid {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;
+}
+.city-travel-btn {
+  width: 100%; padding: 10px 14px; border-radius: 10px;
+  background: rgba(78,124,255,.15); border: 1px solid rgba(78,124,255,.35);
+  color: #c4d4ff; font-size: 14px; font-weight: 600; text-align: left;
+  cursor: pointer; transition: .2s; display: flex; align-items: center; gap: 8px;
+}
+.city-travel-btn:hover { background: rgba(78,124,255,.3); border-color: rgba(78,124,255,.7); color: #fff; transform: translateX(3px); }
+.map-no-travel { color: #555; font-size: 13px; font-style: italic; margin-bottom: 14px; padding: 8px 0; }
+.map-current-loc {
+  background: rgba(129,140,248,.12); border: 1px solid rgba(129,140,248,.25);
+  border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-bottom: 10px;
+}
+.map-compact { padding: 5px 8px; font-size: 12px; border-radius: 6px; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }

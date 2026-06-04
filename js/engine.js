@@ -75,7 +75,6 @@ function applyXP(pkmnInst, xpGained) {
     pkmnInst.level++;
     var pd = PKMN[pkmnInst.dexId];
 
-    // Stats neu berechnen
     var newMaxHP = calcHP(pd.hp, pkmnInst.level);
     pkmnInst.currentHP = Math.min(pkmnInst.currentHP + (newMaxHP - pkmnInst.maxHP), newMaxHP);
     pkmnInst.maxHP = newMaxHP;
@@ -86,7 +85,6 @@ function applyXP(pkmnInst, xpGained) {
     pkmnInst.spe  = calcStat(pd.spe, pkmnInst.level);
     pkmnInst.xpToNext = xpForLevel(pkmnInst.level + 1);
 
-    // Neue Attacken dieser Spezies auf diesem Level
     pd.moves.forEach(function(entry) {
       if (entry[0] === pkmnInst.level && MOVES[entry[1]]) {
         if (pkmnInst.moves.indexOf(entry[1]) < 0) {
@@ -99,16 +97,13 @@ function applyXP(pkmnInst, xpGained) {
 
     msgs.push((pkmnInst.nick || pd.name) + " ist jetzt Level " + pkmnInst.level + "!");
 
-    // ── EVOLUTION ─────────────────────────────────────────────
-    // BUGFIX: Attacken aus der Vorform BEHALTEN, nur neue hinzufügen
+    // ── EVOLUTION: alte Attacken behalten, neue mergen ────────
     if (pd.evo && pd.evLv && pkmnInst.level >= pd.evLv) {
       var oldName = pkmnInst.nick || pd.name;
-      var currentMoves = pkmnInst.moves.slice(); // alte Attacken merken!
+      var currentMoves = pkmnInst.moves.slice();
       pkmnInst.dexId = pd.evo;
       var newPd = PKMN[pd.evo];
-
       if (newPd) {
-        // Neue Attacken der Entwicklung die noch nicht bekannt sind
         newPd.moves.forEach(function(entry) {
           if (entry[0] <= pkmnInst.level && MOVES[entry[1]]) {
             if (currentMoves.indexOf(entry[1]) < 0) {
@@ -118,7 +113,7 @@ function applyXP(pkmnInst, xpGained) {
           }
         });
       }
-      pkmnInst.moves = currentMoves; // gemergter Movepool
+      pkmnInst.moves = currentMoves;
       msgs.push("✨ " + oldName + " entwickelt sich zu " + (newPd ? newPd.name : "?") + "!");
     }
   }
@@ -162,15 +157,30 @@ function initNewGame(uid, trainerName, starterDexId) {
   return STATE;
 }
 
+// ── Spielstand laden ──────────────────────────────────────────
 function loadGameState(uid, savedState) {
   STATE = savedState;
   STATE.uid = uid;
   if (!STATE.items)            STATE.items = { pokeball:5 };
   if (!STATE.badgeIds)         STATE.badgeIds = [];
   if (!STATE.defeatedTrainers) STATE.defeatedTrainers = {};
-  if (!STATE.visitedZones)     STATE.visitedZones = {};
-  // Zone als besucht markieren
+
+  // visitedZones aus Fortschritt rekonstruieren:
+  // Alle Zonen bis zur aktuellen Zone als besucht markieren.
+  // Das behebt alte Saves die visitedZones nicht kennen
+  // und Saves die nur die aktuelle Zone hatten.
+  var curIdx = WORLD.findIndex(function(z) { return z.id === STATE.currentZoneId; });
+  if (curIdx < 0) curIdx = 0;
+
+  if (!STATE.visitedZones || Object.keys(STATE.visitedZones).length <= 1) {
+    STATE.visitedZones = {};
+    for (var vi = 0; vi <= curIdx; vi++) {
+      STATE.visitedZones[WORLD[vi].id] = true;
+    }
+  }
+  // Aktuelle Zone immer als besucht sicherstellen
   STATE.visitedZones[STATE.currentZoneId] = true;
+
   var now = Date.now();
   var away = Math.min((now - (STATE.lastSeen || now)) / 1000, 8 * 3600);
   STATE.lastSeen = now;
