@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  app.js — Haupt-Controller, Spielschleife, Events
+//  app.js — PokIdleMon Haupt-Controller
 // ═══════════════════════════════════════════════════════════════
 
 var STAGE_INTERVAL   = null;
@@ -8,24 +8,19 @@ var STAGE_TICK_MS    = 5000;
 var BATTLE_TICK_MS   = 1800;
 var _waitingForInput = false;
 
-// ── Screen-Wechsel (via display statt hidden) ─────────────────
+// ── Screen-Wechsel ────────────────────────────────────────────
 function showScreen(id) {
-  var screens = ["starterScreen","gameScreen","loadScreen","authScreen"];
-  screens.forEach(function(sid) {
+  ["starterScreen","gameScreen","loadScreen","authScreen"].forEach(function(sid) {
     var el = document.getElementById(sid);
     if (!el) return;
-    if (sid === id) {
-      el.style.display = sid === "gameScreen" ? "flex" : "flex";
-    } else {
-      el.style.display = "none";
-    }
+    el.style.display = (sid === id) ? "flex" : "none";
   });
 }
 
 // ── Tab-Wechsel ────────────────────────────────────────────────
 function switchTab(tabName) {
   ["World","Team","Bag","Map"].forEach(function(t) {
-    var btn = document.getElementById("tab" + t);
+    var btn  = document.getElementById("tab" + t);
     var view = document.getElementById("view" + t);
     if (btn)  btn.classList.toggle("active", t === tabName);
     if (view) view.style.display = (t === tabName) ? "block" : "none";
@@ -35,7 +30,7 @@ function switchTab(tabName) {
   if (tabName === "Map")  renderMapScreen();
 }
 
-// ── gameReady-Event ────────────────────────────────────────────
+// ── gameReady ─────────────────────────────────────────────────
 document.addEventListener("gameReady", function(e) {
   var detail = e.detail;
   if (detail.isNew) {
@@ -43,13 +38,11 @@ document.addEventListener("gameReady", function(e) {
     showStarterScreen();
     return;
   }
-  // Lade gespeicherten Spielstand
   dbGet(playerPath(detail.uid)).then(function(savedState) {
     if (savedState && savedState.party) {
       var result = loadGameState(detail.uid, savedState);
       startGame(result.awaySeconds);
     } else {
-      // Kein Spielstand → Starter-Auswahl
       showScreen("starterScreen");
       showStarterScreen();
     }
@@ -62,8 +55,8 @@ document.addEventListener("gameReady", function(e) {
 
 // ── Starter gewählt ───────────────────────────────────────────
 function onStarterChosen(trainerName, starterDexId) {
-  var uid  = localStorage.getItem("idlev2_uid") || ("u" + Date.now());
-  var pd   = PKMN[starterDexId];
+  var uid = localStorage.getItem("pokidlemon_uid") || ("u" + Date.now());
+  var pd  = PKMN[starterDexId];
   initNewGame(uid, trainerName, starterDexId);
   showToast("Du hast " + (pd ? pd.name : "?") + " als Starter gewählt!");
   saveGame();
@@ -103,7 +96,6 @@ function processStage() {
   var zone = getZone(STATE.currentZoneId);
   if (!zone) { advanceStage(); return; }
 
-  // Stadt/City → Heilen + Shop
   if (zone.type === "city") {
     if (!isTrainerDefeated(zone.id, STATE.currentStage)) {
       markTrainerDefeated(zone.id, STATE.currentStage);
@@ -117,20 +109,15 @@ function processStage() {
     return;
   }
 
-  // Gym-Leader
   if (isGymLeaderStage(zone, STATE.currentStage) && !isTrainerDefeated(zone.id, STATE.currentStage)) {
-    triggerGymLeader(zone);
-    return;
+    triggerGymLeader(zone); return;
   }
 
-  // Trainer
   var trainer = getTrainerAtStage(zone, STATE.currentStage);
   if (trainer && !isTrainerDefeated(zone.id, STATE.currentStage)) {
-    triggerTrainerBattle(trainer, zone);
-    return;
+    triggerTrainerBattle(trainer, zone); return;
   }
 
-  // Wildpokémon
   if (zone.wildPokemon && zone.wildPokemon.length > 0 && Math.random() < 0.75) {
     var wild = getWildPokemon(zone);
     if (wild) { triggerWildBattle(wild); return; }
@@ -148,10 +135,10 @@ function advanceStage() {
     STATE.currentStage = 1;
     if (zone.next) {
       STATE.currentZoneId = zone.next;
-      var nextZone = getZone(zone.next);
-      if (nextZone) { renderZoneBg(nextZone); showToast("Neue Zone: " + nextZone.name + "!"); }
+      var nz = getZone(zone.next);
+      if (nz) { renderZoneBg(nz); showToast("Neue Zone: " + nz.name + "!"); }
     } else {
-      showToast("🏆 Du hast Kanto komplett erkundet!");
+      showToast("🏆 Kanto komplett!");
     }
   }
   renderStageInfo();
@@ -159,10 +146,9 @@ function advanceStage() {
   saveGame();
 }
 
-// ── Wildpokémon ───────────────────────────────────────────────
+// ── Kämpfe starten ────────────────────────────────────────────
 function triggerWildBattle(wildPkmn) {
-  clearInterval(STAGE_INTERVAL);
-  _waitingForInput = true;
+  clearInterval(STAGE_INTERVAL); _waitingForInput = true;
   var epd = PKMN[wildPkmn.dexId];
   startBattle("wild", wildPkmn);
   renderEnemySprite(BATTLE.enemy, true);
@@ -172,10 +158,8 @@ function triggerWildBattle(wildPkmn) {
   if (BATTLE.autoFight) startBattleLoop();
 }
 
-// ── Trainer ───────────────────────────────────────────────────
-function triggerTrainerBattle(trainer, zone) {
-  clearInterval(STAGE_INTERVAL);
-  _waitingForInput = true;
+function triggerTrainerBattle(trainer) {
+  clearInterval(STAGE_INTERVAL); _waitingForInput = true;
   startBattle("trainer", trainer);
   var epd = PKMN[BATTLE.enemy.dexId];
   renderEnemySprite(BATTLE.enemy, true);
@@ -186,10 +170,8 @@ function triggerTrainerBattle(trainer, zone) {
   if (BATTLE.autoFight) startBattleLoop();
 }
 
-// ── Gym-Leader ────────────────────────────────────────────────
 function triggerGymLeader(zone) {
-  clearInterval(STAGE_INTERVAL);
-  _waitingForInput = true;
+  clearInterval(STAGE_INTERVAL); _waitingForInput = true;
   var gl = zone.gymLeader;
   startBattle("gym", { name: gl.name, party: gl.party, reward: gl.reward });
   var epd = PKMN[BATTLE.enemy.dexId];
@@ -214,28 +196,19 @@ function doAutoBattleTurn() {
   var player = getActivePkmn();
   if (!player) { clearInterval(BATTLE_INTERVAL); return; }
 
-  var moveId = autoPickMove(player, BATTLE.enemy);
-  var pLog = doPlayerAttack(moveId);
+  var pLog = doPlayerAttack(autoPickMove(player, BATTLE.enemy));
   pLog.forEach(function(l) { appendBattleLog(l); });
-  updateEnemyHp(BATTLE.enemy);
-  updatePlayerHp();
-  updateCatchButton(BATTLE.enemy);
+  updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
 
-  var endCheck = checkBattleEnd();
-  if (endCheck) {
-    endCheck.log.forEach(function(l) { appendBattleLog(l); });
-    if (endCheck.over) { clearInterval(BATTLE_INTERVAL); onBattleEnd(endCheck.result); return; }
-  }
+  var ec = checkBattleEnd();
+  if (ec) { ec.log.forEach(function(l){appendBattleLog(l);}); if(ec.over){clearInterval(BATTLE_INTERVAL);onBattleEnd(ec.result);return;} }
+
   if (!BATTLE.over) {
     var eLog = doEnemyAttack();
     eLog.forEach(function(l) { appendBattleLog(l); });
-    updatePlayerHp();
-    renderPlayerSprites();
-    var endCheck2 = checkBattleEnd();
-    if (endCheck2) {
-      endCheck2.log.forEach(function(l) { appendBattleLog(l); });
-      if (endCheck2.over) { clearInterval(BATTLE_INTERVAL); onBattleEnd(endCheck2.result); return; }
-    }
+    updatePlayerHp(); renderPlayerSprites();
+    var ec2 = checkBattleEnd();
+    if (ec2) { ec2.log.forEach(function(l){appendBattleLog(l);}); if(ec2.over){clearInterval(BATTLE_INTERVAL);onBattleEnd(ec2.result);return;} }
   }
   renderEnemySprite(BATTLE.enemy, true);
 }
@@ -245,29 +218,20 @@ function onBattleEnd(result) {
   clearInterval(BATTLE_INTERVAL);
   setTimeout(function() {
     if (result === "win") {
-      var xp   = BATTLE.xpGained || 0;
+      var xp = BATTLE.xpGained || 0;
       var msgs = [];
       STATE.party.forEach(function(p) {
-        if (p.currentHP > 0) {
-          var lv = applyXP(p, xp);
-          lv.forEach(function(m) { msgs.push(m); });
-        }
+        if (p.currentHP > 0) applyXP(p, xp).forEach(function(m){msgs.push(m);});
       });
       msgs.forEach(function(m) { appendBattleLog(m); });
       if (xp > 0) showXPPopup(xp);
-      if (BATTLE.moneyGained > 0) {
-        STATE.money += BATTLE.moneyGained;
-        appendBattleLog("+" + BATTLE.moneyGained + " ₽!");
-        updateHUD();
-      }
-      // Medaille (Gym)
+      if (BATTLE.moneyGained > 0) { STATE.money += BATTLE.moneyGained; appendBattleLog("+" + BATTLE.moneyGained + " ₽!"); updateHUD(); }
       if (BATTLE.type === "gym") {
         var zone = getZone(STATE.currentZoneId);
         if (zone && zone.gymLeader) {
           var gl = zone.gymLeader;
           if (STATE.badgeIds.indexOf(gl.badgeId) < 0) {
-            STATE.badges++;
-            STATE.badgeIds.push(gl.badgeId);
+            STATE.badges++; STATE.badgeIds.push(gl.badgeId);
             appendBattleLog("🏅 " + gl.winText);
             showToast("🏅 " + gl.badge + " erhalten!", 4000);
             updateHUD();
@@ -276,43 +240,22 @@ function onBattleEnd(result) {
       }
       markTrainerDefeated(STATE.currentZoneId, STATE.currentStage);
       saveGame();
-      setTimeout(function() {
-        hideBattleUI();
-        renderEnemySprite(null, false);
-        _waitingForInput = false;
-        renderPlayerSprites();
-        advanceStage();
-        startStageLoop();
-      }, 2500);
+      setTimeout(function() { hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false; renderPlayerSprites(); advanceStage(); startStageLoop(); }, 2500);
 
     } else if (result === "catch" || result === "flee") {
-      var msg = result === "flee" ? "Du bist geflohen!" : "Pokémon gefangen!";
-      appendBattleLog(msg);
-      setTimeout(function() {
-        hideBattleUI();
-        renderEnemySprite(null, false);
-        _waitingForInput = false;
-        renderPlayerSprites();
-        advanceStage();
-        startStageLoop();
-      }, 1800);
+      appendBattleLog(result === "flee" ? "Du bist geflohen!" : "Gefangen!");
+      setTimeout(function() { hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false; renderPlayerSprites(); advanceStage(); startStageLoop(); }, 1800);
 
-    } else { // lose
+    } else {
       appendBattleLog("Dein Team ist K.O.! Zurück zur Heilstation...");
       healPartyFully();
       var curIdx = WORLD.findIndex(function(z) { return z.id === STATE.currentZoneId; });
       for (var i = curIdx; i >= 0; i--) {
-        if (WORLD[i].type === "city" || i === 0) {
-          STATE.currentZoneId = WORLD[i].id;
-          STATE.currentStage  = 1;
-          break;
-        }
+        if (WORLD[i].type === "city" || i === 0) { STATE.currentZoneId = WORLD[i].id; STATE.currentStage = 1; break; }
       }
       saveGame();
       setTimeout(function() {
-        hideBattleUI();
-        renderEnemySprite(null, false);
-        _waitingForInput = false;
+        hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
         renderPlayerSprites();
         var zn = getZone(STATE.currentZoneId);
         if (zn) renderZoneBg(zn);
@@ -329,20 +272,17 @@ function onMoveClick(moveId) {
   if (!BATTLE || BATTLE.over) return;
   clearInterval(BATTLE_INTERVAL);
   var pLog = doPlayerAttack(moveId);
-  pLog.forEach(function(l) { appendBattleLog(l); });
-  updateEnemyHp(BATTLE.enemy);
-  updatePlayerHp();
-  updateCatchButton(BATTLE.enemy);
+  pLog.forEach(function(l){appendBattleLog(l);});
+  updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
   var ec = checkBattleEnd();
-  if (ec) { ec.log.forEach(function(l) { appendBattleLog(l); }); if (ec.over) { onBattleEnd(ec.result); return; } }
+  if (ec) { ec.log.forEach(function(l){appendBattleLog(l);}); if(ec.over){onBattleEnd(ec.result);return;} }
   if (!BATTLE.over) {
     setTimeout(function() {
       var eLog = doEnemyAttack();
-      eLog.forEach(function(l) { appendBattleLog(l); });
-      updatePlayerHp();
-      renderEnemySprite(BATTLE.enemy, true);
+      eLog.forEach(function(l){appendBattleLog(l);});
+      updatePlayerHp(); renderEnemySprite(BATTLE.enemy, true);
       var ec2 = checkBattleEnd();
-      if (ec2) { ec2.log.forEach(function(l) { appendBattleLog(l); }); if (ec2.over) { onBattleEnd(ec2.result); return; } }
+      if (ec2) { ec2.log.forEach(function(l){appendBattleLog(l);}); if(ec2.over){onBattleEnd(ec2.result);return;} }
       if (BATTLE.autoFight && !BATTLE.over) startBattleLoop();
     }, 800);
   }
@@ -352,7 +292,7 @@ function onCatchClick(ballType) {
   if (!BATTLE || BATTLE.over) return;
   clearInterval(BATTLE_INTERVAL);
   var result = doCatchAttempt(ballType || "pokeball");
-  result.log.forEach(function(l) { appendBattleLog(l); });
+  result.log.forEach(function(l){appendBattleLog(l);});
   if (result.caught) {
     var pd = PKMN[result.pkmn.dexId];
     showToast((pd ? pd.name : "?") + " gefangen! " + (result.toParty ? "→ Party" : "→ Box"));
@@ -360,7 +300,7 @@ function onCatchClick(ballType) {
   } else {
     setTimeout(function() {
       var eLog = doEnemyAttack();
-      eLog.forEach(function(l) { appendBattleLog(l); });
+      eLog.forEach(function(l){appendBattleLog(l);});
       updatePlayerHp();
       if (!BATTLE.over && BATTLE.autoFight) startBattleLoop();
     }, 800);
@@ -383,7 +323,6 @@ function toggleAutoFight() {
   else clearInterval(BATTLE_INTERVAL);
 }
 
-// ── Tab-Navigation ─────────────────────────────────────────────
 function onTabWorld() { switchTab("World"); }
 function onTabTeam()  { switchTab("Team"); }
 function onTabBag()   { switchTab("Bag"); }
