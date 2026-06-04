@@ -5,10 +5,10 @@
 var STAGE_INTERVAL   = null;
 var BATTLE_INTERVAL  = null;
 var STAGE_TICK_MS    = 5000;
-var BATTLE_TICK_MS   = 2200; // etwas länger für Animationen
+var BATTLE_TICK_MS   = 2200;
 var _waitingForInput = false;
 var _inCity          = false;
-var _animRunning     = false; // blockiert Doppel-Turns
+var _animRunning     = false;
 
 // ── Screens ───────────────────────────────────────────────────
 function showScreen(id) {
@@ -56,14 +56,61 @@ function showBlackout(callback) {
   },30);
 }
 
-// ── gameReady ─────────────────────────────────────────────────
+// ── gameReady — ROBUST: niemals blindes Überschreiben des Saves ─
 document.addEventListener("gameReady", function(e) {
-  var d=e.detail;
-  if(d.isNew){showScreen("starterScreen"); showStarterScreen(); return;}
-  dbGet(playerPath(d.uid)).then(function(saved){
-    if(saved&&saved.party){var r=loadGameState(d.uid,saved); startGame(r.awaySeconds);}
-    else{showScreen("starterScreen"); showStarterScreen();}
-  }).catch(function(){showScreen("starterScreen"); showStarterScreen();});
+  var d = e.detail;
+
+  // Neuer Account → Starter wählen (kein Save vorhanden, sicher)
+  if (d.isNew) { showScreen("starterScreen"); showStarterScreen(); return; }
+
+  var status = document.getElementById("loadStatus");
+  if (status) status.textContent = "Lade Spielstand...";
+
+  dbGet(playerPath(d.uid)).then(function(saved) {
+
+    // ── Kein Save in Firebase → Starter (sicher, da nichts zu überschreiben) ──
+    if (!saved || !saved.party || saved.party.length === 0) {
+      showScreen("starterScreen"); showStarterScreen(); return;
+    }
+
+    // ── Save vorhanden → laden ──
+    try {
+      var r = loadGameState(d.uid, saved);
+      // Sanity-Check: hat STATE danach mindestens 1 Pokémon?
+      if (!STATE || !STATE.party || STATE.party.length === 0) {
+        // Save inkonsistent aber vorhanden → Route 1, kein Starter-Screen!
+        if (!STATE) STATE = saved;
+        STATE.uid = d.uid;
+        if (!STATE.party || STATE.party.length === 0) {
+          showScreen("starterScreen"); showStarterScreen(); return;
+        }
+      }
+      startGame(r.awaySeconds);
+    } catch(loadErr) {
+      // loadGameState hat geworfen (sollte durch intern try-catch nicht passieren)
+      // NIEMALS Starter zeigen hier — würde alten Save überschreiben!
+      console.error("[gameReady] loadGameState Fehler:", loadErr);
+      if (status) status.textContent = "Ladefehler – bitte Seite neu laden";
+      showScreen("loadScreen");
+      // Zeige Fehlermeldung statt Starter
+      var lb = document.querySelector(".load-box");
+      if (lb) lb.innerHTML =
+        "<div style='color:#ef4444;font-size:16px;margin-bottom:12px'>⚠️ Ladefehler</div>" +
+        "<p style='color:#aaa;margin-bottom:16px;font-size:13px'>Spielstand konnte nicht geladen werden.<br>Daten sind sicher!</p>" +
+        "<button onclick='window.location.reload()' style='padding:10px 20px;background:#4e7cff;border:none;border-radius:8px;color:#fff;cursor:pointer'>🔄 Neu laden</button>";
+    }
+
+  }).catch(function(firebaseErr) {
+    // Firebase-Verbindungsfehler — KEIN Starter, Save könnte noch existieren!
+    console.error("[gameReady] Firebase-Fehler:", firebaseErr);
+    if (status) status.textContent = "Verbindungsfehler";
+    showScreen("loadScreen");
+    var lb = document.querySelector(".load-box");
+    if (lb) lb.innerHTML =
+      "<div style='color:#ef4444;font-size:16px;margin-bottom:12px'>⚠️ Verbindungsfehler</div>" +
+      "<p style='color:#aaa;margin-bottom:16px;font-size:13px'>Firebase nicht erreichbar.<br>Dein Spielstand ist sicher!</p>" +
+      "<button onclick='window.location.reload()' style='padding:10px 20px;background:#4e7cff;border:none;border-radius:8px;color:#fff;cursor:pointer'>🔄 Erneut versuchen</button>";
+  });
 });
 
 function onStarterChosen(trainerName, starterDexId) {
@@ -98,7 +145,6 @@ function startStageLoop() {
 function processStage() {
   if(!STATE||_waitingForInput) return;
   var zone=getZone(STATE.currentZoneId); if(!zone){advanceStage(); return;}
-
   if(zone.type==="city"){
     clearInterval(STAGE_INTERVAL); _waitingForInput=true; _inCity=true;
     markZoneVisited(zone.id);
@@ -194,26 +240,19 @@ function doAutoBattleTurn() {
   if(!BATTLE||BATTLE.over||_animRunning){clearInterval(BATTLE_INTERVAL); return;}
   var player=getActivePkmn(); if(!player) return;
   _animRunning=true;
-  clearInterval(BATTLE_INTERVAL); // während Animation keine neue Runde
-
+  clearInterval(BATTLE_INTERVAL);
   var moveId=autoPickMove(player, BATTLE.enemy);
   var move=MOVES[moveId]||{type:"Normal"};
-
-  // ── Spieler-Animation → Schaden → Gegner-Animation → Schaden
   doAttackAnimation(move.type, true, function() {
-    // Treffer: Schaden anwenden
     var pLog=doPlayerAttack(moveId);
     pLog.forEach(function(l){appendBattleLog(l);});
     updateEnemyHp(BATTLE.enemy); updatePlayerHp(); updateCatchButton(BATTLE.enemy);
   }, function() {
-    // Nach Spieler-Animation
     var ec=checkBattleEnd();
     if(ec&&ec.log) ec.log.forEach(function(l){appendBattleLog(l);});
     if(ec&&ec.playerSwitched){renderPlayerSprites(); renderMoveButtons();}
     if(ec&&ec.over){_animRunning=false; onBattleEnd(ec.result); return;}
-
     if(!BATTLE.over) {
-      // Gegner greift an
       var eMoveId=autoPickMove(BATTLE.enemy, getActivePkmn());
       var eMove=MOVES[eMoveId]||{type:"Normal"};
       doAttackAnimation(eMove.type, false, function() {
@@ -229,9 +268,7 @@ function doAutoBattleTurn() {
         _animRunning=false;
         if(BATTLE&&!BATTLE.over&&BATTLE.autoFight) startBattleLoop();
       });
-    } else {
-      _animRunning=false;
-    }
+    } else { _animRunning=false; }
   });
 }
 
@@ -240,11 +277,11 @@ function onBattleEnd(result) {
   clearInterval(BATTLE_INTERVAL);
   _animRunning=false;
   hideTrainerPortrait();
-
   if(result==="win") {
     setTimeout(function(){
       var xp=BATTLE.xpGained||0, msgs=[];
-      STATE.party.forEach(function(p){if(p.currentHP>0) applyXP(p,xp).forEach(function(m){msgs.push(m);});});
+      var enemyDexId = BATTLE.enemy ? BATTLE.enemy.dexId : null;
+      STATE.party.forEach(function(p){if(p.currentHP>0) applyXP(p,xp,enemyDexId).forEach(function(m){msgs.push(m);});});
       msgs.forEach(function(m){appendBattleLog(m);});
       if(xp>0) showXPPopup(xp);
       if(BATTLE.moneyGained>0){STATE.money+=BATTLE.moneyGained; appendBattleLog("+"+BATTLE.moneyGained+" ₽!"); updateHUD();}
@@ -266,14 +303,13 @@ function onBattleEnd(result) {
         renderPlayerSprites(); advanceStage(); startStageLoop();
       }, 2500);
     }, 500);
-
   } else if(result==="catch"||result==="flee") {
     appendBattleLog(result==="flee"?"Du bist geflohen!":"Pokémon gefangen!");
+    saveGame();
     setTimeout(function(){
       hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
       renderPlayerSprites(); advanceStage(); startStageLoop();
     }, 1800);
-
   } else {
     clearInterval(STAGE_INTERVAL);
     setTimeout(function(){
@@ -295,13 +331,11 @@ function onBattleEnd(result) {
   }
 }
 
-// ── Manuelle Aktionen (mit Animation) ────────────────────────
+// ── Manuelle Aktionen ─────────────────────────────────────────
 function onMoveClick(moveId) {
   if(!BATTLE||BATTLE.over||_animRunning) return;
-  clearInterval(BATTLE_INTERVAL);
-  _animRunning=true;
+  clearInterval(BATTLE_INTERVAL); _animRunning=true;
   var move=MOVES[moveId]||{type:"Normal"};
-
   doAttackAnimation(move.type, true, function(){
     var pLog=doPlayerAttack(moveId);
     pLog.forEach(function(l){appendBattleLog(l);});
@@ -326,9 +360,7 @@ function onMoveClick(moveId) {
         _animRunning=false;
         if(BATTLE.autoFight&&!BATTLE.over) startBattleLoop();
       });
-    } else {
-      _animRunning=false;
-    }
+    } else { _animRunning=false; }
   });
 }
 

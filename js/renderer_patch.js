@@ -9,7 +9,6 @@ var SD_SHINY_BACK  = "https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 var PNG_SHINY      = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/";
 var PNG_SHINY_BACK = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/";
 
-// Überschreibt spriteUrl / spriteFallback aus renderer.js
 function spriteUrl(dexId, back, shiny) {
   if (shiny) return (back ? SD_SHINY_BACK : SD_SHINY_FRONT) + dexId + ".gif";
   var SD_F = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/";
@@ -102,7 +101,7 @@ function renderEnemySprite(enemy, visible) {
       "onerror='this.src=\"" + spriteFallback(enemy.dexId, false, shiny) + "\"'>";
 }
 
-// ── Spieler-Sprite: Lead + Shiny-Backsprite ───────────────────
+// ── Spieler-Sprite: Lead + Shiny ─────────────────────────────
 function renderPlayerSprites() {
   var container = document.getElementById("playerSprites");
   if (!container || !STATE) return;
@@ -129,11 +128,38 @@ function renderPlayerSprites() {
   container.appendChild(div);
 }
 
-// ── Wilder Kampf: Shiny-Ankündigung ───────────────────────────
+// ── Tab-System mit Pokédex ────────────────────────────────────
+function switchTab(tabName) {
+  ["World","Team","Bag","Map","Dex"].forEach(function(t) {
+    var btn  = document.getElementById("tab"  + t);
+    var view = document.getElementById("view" + t);
+    if (btn)  btn.classList.toggle("active", t === tabName);
+    if (view) view.style.display = (t === tabName) ? "block" : "none";
+  });
+  if (tabName === "Team")  renderTeamScreen();
+  if (tabName === "Bag")   renderBagScreen();
+  if (tabName === "Map")   renderMapScreen();
+  if (tabName === "World") renderWorldTab();
+  if (tabName === "Dex")   renderPokedexScreen();
+}
+function onTabWorld(){ switchTab("World"); }
+function onTabTeam() { switchTab("Team");  }
+function onTabBag()  { switchTab("Bag");   }
+function onTabMap()  { switchTab("Map");   }
+function onTabDex()  { switchTab("Dex");   }
+
+// ── Wilder Kampf: Seen-Tracking + Shiny-Ankündigung ──────────
 function triggerWildBattle(wildPkmn) {
   clearInterval(STAGE_INTERVAL); _waitingForInput = true;
   var epd  = PKMN[wildPkmn.dexId];
   var name = epd ? epd.name : "?";
+
+  // ── Pokédex: als gesehen markieren ──
+  if (STATE) {
+    if (!STATE.seen) STATE.seen = {};
+    STATE.seen[wildPkmn.dexId] = true;
+  }
+
   startBattle("wild", wildPkmn);
   renderEnemySprite(BATTLE.enemy, true); showBattleUI(BATTLE.enemy); clearBattleLog();
 
@@ -180,7 +206,7 @@ function showBattleItemPanel() {
     "<button class='bip-close' onclick='closeBattleItemPanel()'>✕</button></div>" +
     "<div class='bip-grid' id='bipGrid'></div>";
 
-  var actions    = document.getElementById("battleActions");
+  var actions     = document.getElementById("battleActions");
   var moveButtons = document.getElementById("moveButtons");
   if (actions && moveButtons) actions.insertBefore(panel, moveButtons);
 

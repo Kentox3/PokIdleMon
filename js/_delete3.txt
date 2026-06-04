@@ -1,0 +1,3 @@
+  var uid  = localStorage.getItem("pokidlemon_uid");
+  var name = localStorage.getItem("pokidlemon_name");
+  // PLACEHOLDER
