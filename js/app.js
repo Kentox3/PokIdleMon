@@ -59,26 +59,16 @@ function showBlackout(callback) {
 // ── gameReady — ROBUST: niemals blindes Überschreiben des Saves ─
 document.addEventListener("gameReady", function(e) {
   var d = e.detail;
-
-  // Neuer Account → Starter wählen (kein Save vorhanden, sicher)
   if (d.isNew) { showScreen("starterScreen"); showStarterScreen(); return; }
-
   var status = document.getElementById("loadStatus");
   if (status) status.textContent = "Lade Spielstand...";
-
   dbGet(playerPath(d.uid)).then(function(saved) {
-
-    // ── Kein Save in Firebase → Starter (sicher, da nichts zu überschreiben) ──
     if (!saved || !saved.party || saved.party.length === 0) {
       showScreen("starterScreen"); showStarterScreen(); return;
     }
-
-    // ── Save vorhanden → laden ──
     try {
       var r = loadGameState(d.uid, saved);
-      // Sanity-Check: hat STATE danach mindestens 1 Pokémon?
       if (!STATE || !STATE.party || STATE.party.length === 0) {
-        // Save inkonsistent aber vorhanden → Route 1, kein Starter-Screen!
         if (!STATE) STATE = saved;
         STATE.uid = d.uid;
         if (!STATE.party || STATE.party.length === 0) {
@@ -87,21 +77,16 @@ document.addEventListener("gameReady", function(e) {
       }
       startGame(r.awaySeconds);
     } catch(loadErr) {
-      // loadGameState hat geworfen (sollte durch intern try-catch nicht passieren)
-      // NIEMALS Starter zeigen hier — würde alten Save überschreiben!
       console.error("[gameReady] loadGameState Fehler:", loadErr);
       if (status) status.textContent = "Ladefehler – bitte Seite neu laden";
       showScreen("loadScreen");
-      // Zeige Fehlermeldung statt Starter
       var lb = document.querySelector(".load-box");
       if (lb) lb.innerHTML =
         "<div style='color:#ef4444;font-size:16px;margin-bottom:12px'>⚠️ Ladefehler</div>" +
         "<p style='color:#aaa;margin-bottom:16px;font-size:13px'>Spielstand konnte nicht geladen werden.<br>Daten sind sicher!</p>" +
         "<button onclick='window.location.reload()' style='padding:10px 20px;background:#4e7cff;border:none;border-radius:8px;color:#fff;cursor:pointer'>🔄 Neu laden</button>";
     }
-
   }).catch(function(firebaseErr) {
-    // Firebase-Verbindungsfehler — KEIN Starter, Save könnte noch existieren!
     console.error("[gameReady] Firebase-Fehler:", firebaseErr);
     if (status) status.textContent = "Verbindungsfehler";
     showScreen("loadScreen");
@@ -125,7 +110,8 @@ function onStarterChosen(trainerName, starterDexId) {
 function startGame(awaySeconds) {
   showScreen("gameScreen"); updateHUD();
   var zone=getZone(STATE.currentZoneId);
-  if(!zone){STATE.currentZoneId="route1"; STATE.currentStage=1; zone=getZone("route1");}
+  // Fallback: alabastia (nicht mehr route1)
+  if(!zone){STATE.currentZoneId="alabastia"; STATE.currentStage=1; zone=getZone("alabastia");}
   markZoneVisited(STATE.currentZoneId);
   renderStageInfo(); if(zone) renderZoneBg(zone);
   renderPlayerSprites(); renderWorldTab();
@@ -160,6 +146,7 @@ function processStage() {
   advanceStage();
 }
 
+// app.js advanceStage — wird von renderer_patch.js überschrieben (mit Gym-Skip)
 function advanceStage() {
   if(!STATE) return;
   var zone=getZone(STATE.currentZoneId); if(!zone) return;
@@ -174,13 +161,13 @@ function advanceStage() {
   renderStageInfo(); renderPlayerSprites(); renderWorldTab(); saveGame();
 }
 
-// ── Schnellreise ──────────────────────────────────────────────
+// ── Schnellreise (patch.js überschreibt diese) ────────────────
 function fastTravelTo(zoneId) {
   if(!STATE) return;
   if(BATTLE&&!BATTLE.over){showToast("Im Kampf nicht möglich!"); return;}
   if(!isZoneVisited(zoneId)){showToast("Noch nicht besucht!"); return;}
   clearInterval(STAGE_INTERVAL); clearInterval(BATTLE_INTERVAL);
-  _waitingForInput=false; _inCity=false;
+  _waitingForInput=false; _inCity=false; _animRunning=false;
   hideBattleUI(); renderEnemySprite(null,false);
   STATE.currentZoneId=zoneId; STATE.currentStage=1;
   var zone=getZone(zoneId); if(zone) renderZoneBg(zone);
@@ -189,6 +176,7 @@ function fastTravelTo(zoneId) {
   switchTab("World"); startStageLoop();
 }
 
+// continueFromCity — wird von renderer_patch.js überschrieben
 function continueFromCity() {
   _waitingForInput=false; _inCity=false; advanceStage(); startStageLoop();
 }
@@ -228,7 +216,7 @@ function triggerGymLeader(zone) {
 
 function startGymFight(){closeGymPopup();}
 
-// ── Auto-Kampf mit Animationen ────────────────────────────────
+// ── Auto-Kampf ────────────────────────────────────────────────
 function startBattleLoop() {
   clearInterval(BATTLE_INTERVAL);
   BATTLE_INTERVAL=setInterval(function(){
@@ -272,62 +260,43 @@ function doAutoBattleTurn() {
   });
 }
 
-// ── Kampf-Ende ────────────────────────────────────────────────
+// onBattleEnd — wird von renderer_patch.js überschrieben (returnToCity etc.)
 function onBattleEnd(result) {
-  clearInterval(BATTLE_INTERVAL);
-  _animRunning=false;
-  hideTrainerPortrait();
+  clearInterval(BATTLE_INTERVAL); _animRunning=false; hideTrainerPortrait();
   if(result==="win") {
     setTimeout(function(){
-      var xp=BATTLE.xpGained||0, msgs=[];
-      var enemyDexId = BATTLE.enemy ? BATTLE.enemy.dexId : null;
-      STATE.party.forEach(function(p){if(p.currentHP>0) applyXP(p,xp,enemyDexId).forEach(function(m){msgs.push(m);});});
+      var xp=BATTLE.xpGained||0, msgs=[], eid=BATTLE.enemy?BATTLE.enemy.dexId:null;
+      STATE.party.forEach(function(p){if(p.currentHP>0)applyXP(p,xp,eid).forEach(function(m){msgs.push(m);});});
       msgs.forEach(function(m){appendBattleLog(m);});
       if(xp>0) showXPPopup(xp);
       if(BATTLE.moneyGained>0){STATE.money+=BATTLE.moneyGained; appendBattleLog("+"+BATTLE.moneyGained+" ₽!"); updateHUD();}
       if(BATTLE.type==="gym"){
         var zone=getZone(STATE.currentZoneId);
-        if(zone&&zone.gymLeader){
-          var gl=zone.gymLeader;
-          if(STATE.badgeIds.indexOf(gl.badgeId)<0){
-            STATE.badges++; STATE.badgeIds.push(gl.badgeId);
-            appendBattleLog("🏅 "+gl.winText);
-            showToast("🏅 "+gl.badge+" erhalten!", 4000); updateHUD();
-          }
-        }
+        if(zone&&zone.gymLeader){var gl=zone.gymLeader;
+          if(STATE.badgeIds.indexOf(gl.badgeId)<0){STATE.badges++;STATE.badgeIds.push(gl.badgeId);
+            appendBattleLog("🏅 "+gl.winText);showToast("🏅 "+gl.badge+" erhalten!",4000);updateHUD();}}
       }
       markTrainerDefeated(STATE.currentZoneId, STATE.currentStage);
       saveGame();
-      setTimeout(function(){
-        hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
-        renderPlayerSprites(); advanceStage(); startStageLoop();
-      }, 2500);
-    }, 500);
+      setTimeout(function(){hideBattleUI();renderEnemySprite(null,false);_waitingForInput=false;
+        renderPlayerSprites();advanceStage();startStageLoop();},2500);
+    },500);
   } else if(result==="catch"||result==="flee") {
-    appendBattleLog(result==="flee"?"Du bist geflohen!":"Pokémon gefangen!");
-    saveGame();
-    setTimeout(function(){
-      hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
-      renderPlayerSprites(); advanceStage(); startStageLoop();
-    }, 1800);
+    appendBattleLog(result==="flee"?"Du bist geflohen!":"Pokémon gefangen!"); saveGame();
+    setTimeout(function(){hideBattleUI();renderEnemySprite(null,false);_waitingForInput=false;
+      renderPlayerSprites();advanceStage();startStageLoop();},1800);
   } else {
     clearInterval(STAGE_INTERVAL);
-    setTimeout(function(){
-      showBlackout(function(){
-        healPartyFully();
-        STATE.party.forEach(function(p){p._faintAnnounced=false;});
-        var curIdx=WORLD.findIndex(function(z){return z.id===STATE.currentZoneId;});
-        for(var i=curIdx;i>=0;i--){
-          if(WORLD[i].type==="city"||i===0){STATE.currentZoneId=WORLD[i].id; STATE.currentStage=1; break;}
-        }
-        saveGame();
-        hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
-        var zn=getZone(STATE.currentZoneId); if(zn) renderZoneBg(zn);
-        renderStageInfo(); renderPlayerSprites(); renderWorldTab();
-        showToast("Du bist in "+(zn?zn.name:"einer Stadt")+" aufgewacht! Team geheilt.", 4000);
-        startStageLoop();
-      });
-    }, 600);
+    setTimeout(function(){showBlackout(function(){
+      healPartyFully(); STATE.party.forEach(function(p){p._faintAnnounced=false;});
+      var curIdx=WORLD.findIndex(function(z){return z.id===STATE.currentZoneId;});
+      for(var i=curIdx;i>=0;i--){if(WORLD[i].type==="city"||i===0){STATE.currentZoneId=WORLD[i].id;STATE.currentStage=1;break;}}
+      saveGame(); hideBattleUI(); renderEnemySprite(null,false); _waitingForInput=false;
+      var zn=getZone(STATE.currentZoneId); if(zn) renderZoneBg(zn);
+      renderStageInfo();renderPlayerSprites();renderWorldTab();
+      showToast("Du bist in "+(zn?zn.name:"einer Stadt")+" aufgewacht! Team geheilt.",4000);
+      startStageLoop();
+    });},600);
   }
 }
 
@@ -343,7 +312,7 @@ function onMoveClick(moveId) {
   }, function(){
     var ec=checkBattleEnd();
     if(ec&&ec.log) ec.log.forEach(function(l){appendBattleLog(l);});
-    if(ec&&ec.playerSwitched){renderPlayerSprites(); renderMoveButtons();}
+    if(ec&&ec.playerSwitched){renderPlayerSprites();renderMoveButtons();}
     if(ec&&ec.over){_animRunning=false; onBattleEnd(ec.result); return;}
     if(!BATTLE.over){
       var eMoveId=autoPickMove(BATTLE.enemy,getActivePkmn());
@@ -355,7 +324,7 @@ function onMoveClick(moveId) {
       }, function(){
         var ec2=checkBattleEnd();
         if(ec2&&ec2.log) ec2.log.forEach(function(l){appendBattleLog(l);});
-        if(ec2&&ec2.playerSwitched){renderPlayerSprites(); renderMoveButtons();}
+        if(ec2&&ec2.playerSwitched){renderPlayerSprites();renderMoveButtons();}
         if(ec2&&ec2.over){_animRunning=false; onBattleEnd(ec2.result); return;}
         _animRunning=false;
         if(BATTLE.autoFight&&!BATTLE.over) startBattleLoop();
