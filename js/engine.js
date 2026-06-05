@@ -152,7 +152,7 @@ function tryCatch(enemyInst,ballType){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  NEUES SPIEL — startet in ALABASTIA
+//  NEUES SPIEL
 // ══════════════════════════════════════════════════════════════
 function initNewGame(uid, trainerName, starterDexId) {
   var starter = createPkmnInstance(starterDexId, 5);
@@ -162,18 +162,20 @@ function initNewGame(uid, trainerName, starterDexId) {
     items: { pokeball:5, superball:0, hyperball:0, potion:3, superpotion:0 },
     money: 1000, badges: 0, badgeIds: [],
     defeatedTrainers: {},
-    visitedZones: { "alabastia": true }, // ← Alabastia als Startort
-    currentZoneId: "alabastia",          // ← Start in Alabastia
+    visitedZones: { "alabastia": true },
+    currentZoneId: "alabastia",
     currentStage: 1,
     seen: {}, caught: {},
-    lastSeen: Date.now(), version: 4,
+    eventFlags: {},         // einmalige Events: rival-kämpfe, NPC-Dialoge
+    currentBuilding: null,  // aktuell betretenes Gebäude
+    lastSeen: Date.now(), version: 5,
   };
   STATE.caught[starterDexId] = true;
   STATE.seen[starterDexId]   = true;
   return STATE;
 }
 
-// ── Spielstand laden — SEHR ROBUST ───────────────────────────
+// ── Spielstand laden ─────────────────────────────────────────
 function loadGameState(uid, savedState) {
   try {
     STATE = savedState; STATE.uid = uid;
@@ -185,6 +187,8 @@ function loadGameState(uid, savedState) {
     if(!STATE.caught)           STATE.caught={};
     if(!STATE.party)            STATE.party=[];
     if(!STATE.box)              STATE.box=[];
+    if(!STATE.eventFlags)       STATE.eventFlags={};     // NEU
+    if(!STATE.currentBuilding)  STATE.currentBuilding=null; // NEU
 
     STATE.party.forEach(function(p){ try{ fixPkmn(p); }catch(e){ console.warn("[load] party:",e); } });
     STATE.box.forEach(function(p){   try{ fixPkmn(p); }catch(e){ console.warn("[load] box:",e);   } });
@@ -192,25 +196,60 @@ function loadGameState(uid, savedState) {
     STATE.party.forEach(function(p){ if(p&&p.dexId){ STATE.caught[p.dexId]=true; STATE.seen[p.dexId]=true; } });
     STATE.box.forEach(function(p){   if(p&&p.dexId){ STATE.caught[p.dexId]=true; STATE.seen[p.dexId]=true; } });
 
-    var curIdx=-1;
-    try{ curIdx=WORLD.findIndex(function(z){ return z.id===STATE.currentZoneId; }); }catch(e){}
+    // Besuchte Zonen rekonstruieren (nur Hauptzonen, keine Gebäude)
+    var mainZones = WORLD.filter(function(z) { return z.type !== "building"; });
+    var curIdx = mainZones.findIndex(function(z){ return z.id===STATE.currentZoneId; });
     if(curIdx<0){ STATE.currentZoneId="alabastia"; STATE.currentStage=1; curIdx=0; }
-    for(var vi=0;vi<=curIdx;vi++){ try{ STATE.visitedZones[WORLD[vi].id]=true; }catch(e){} }
+    for(var vi=0;vi<=curIdx;vi++){
+      try{ STATE.visitedZones[mainZones[vi].id]=true; }catch(e){}
+    }
+
+    // Building-State zurücksetzen (falls Absturz in Gebäude)
+    STATE.currentBuilding = null;
 
   } catch(e) {
     console.error("[loadGameState]",e);
     if(!STATE) STATE=savedState||{}; STATE.uid=uid;
-    if(!STATE.party)  STATE.party=[];
-    if(!STATE.box)    STATE.box=[];
-    if(!STATE.items)  STATE.items={pokeball:5};
-    if(!STATE.seen)   STATE.seen={};
-    if(!STATE.caught) STATE.caught={};
+    if(!STATE.party)        STATE.party=[];
+    if(!STATE.box)          STATE.box=[];
+    if(!STATE.items)        STATE.items={pokeball:5};
+    if(!STATE.seen)         STATE.seen={};
+    if(!STATE.caught)       STATE.caught={};
+    if(!STATE.eventFlags)   STATE.eventFlags={};
+    if(!STATE.currentBuilding) STATE.currentBuilding=null;
     if(!STATE.currentZoneId){ STATE.currentZoneId="alabastia"; STATE.currentStage=1; }
     if(!STATE.visitedZones)  STATE.visitedZones={"alabastia":true};
   }
   var now=Date.now(), away=Math.min((now-(STATE.lastSeen||now))/1000,8*3600);
   STATE.lastSeen=now;
   return { state:STATE, awaySeconds:Math.floor(away) };
+}
+
+// ── Event-Flag Funktionen (neu) ───────────────────────────────
+function isEventFlagSet(flagId) {
+  if(!flagId||!STATE||!STATE.eventFlags) return false;
+  return !!STATE.eventFlags[flagId];
+}
+function setEventFlag(flagId) {
+  if(!flagId||!STATE) return;
+  if(!STATE.eventFlags) STATE.eventFlags={};
+  STATE.eventFlags[flagId] = true;
+}
+
+// ── Condition-Check für Exits ─────────────────────────────────
+function checkExitCondition(cond) {
+  if(!cond||!STATE) return true;
+  if(cond.minBadges && STATE.badges < cond.minBadges) return false;
+  if(cond.hasBadge  && STATE.badgeIds.indexOf(cond.hasBadge)<0) return false;
+  if(cond.hasItem   && (!STATE.items[cond.hasItem]||STATE.items[cond.hasItem]<=0)) return false;
+  if(cond.eventFlag && !isEventFlagSet(cond.eventFlag)) return false;
+  return true;
+}
+
+// ── Rival-Starter (konträres Starter-System) ──────────────────
+function getRivalStarterDexId() {
+  var map = { 1:4, 4:7, 7:1 };
+  return map[STATE ? STATE.starter : 4] || 4;
 }
 
 function getActivePkmn(){ if(!STATE) return null; return STATE.party.find(function(p){ return p.currentHP>0; })||null; }

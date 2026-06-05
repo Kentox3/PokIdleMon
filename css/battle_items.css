@@ -1,115 +1,140 @@
-/* ── Items-Button im Kampf ──────────────────────────────── */
-.btn-items { padding:6px 10px; border-radius:8px; background:rgba(253,197,0,.15); border:1px solid rgba(253,197,0,.4); color:#fcd60a; font-size:16px; cursor:pointer; transition:.2s; display:flex; align-items:center; gap:4px; }
-.btn-items:hover { background:rgba(253,197,0,.28); border-color:rgba(253,197,0,.8); }
+/* ════════════════════════════════════════════════════════════
+   HUB-ARCHITEKTUR — Städte, Gebäude, Exits, Terminus
+   ════════════════════════════════════════════════════════════ */
+.hub-section-title {
+  font-size:11px; font-weight:700; color:#818cf8; text-transform:uppercase;
+  letter-spacing:1px; padding:6px 0 4px; margin-top:14px; border-bottom:1px solid rgba(129,140,248,.2);
+}
+.hub-buildings { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; padding:10px 0; }
+.hub-building-card {
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12);
+  border-radius:12px; padding:14px 10px; text-align:center; cursor:pointer; transition:.2s; user-select:none;
+}
+.hub-building-card:hover { background:rgba(255,255,255,.10); border-color:rgba(129,140,248,.5); transform:translateY(-2px); }
+.hub-bldg-icon { font-size:28px; margin-bottom:6px; }
+.hub-bldg-name { font-size:11px; color:#aaa; line-height:1.3; }
 
-/* ── Item-Panel im Kampf ────────────────────────────────── */
-.battle-item-panel { background:rgba(15,10,30,.95); border:1px solid rgba(253,197,0,.3); border-radius:10px; padding:8px; margin-bottom:6px; animation:bip-in .2s ease-out; }
-@keyframes bip-in { from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);} }
-.bip-header { display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:700; color:#fcd60a; margin-bottom:6px; padding-bottom:5px; border-bottom:1px solid rgba(253,197,0,.2); }
-.bip-close { background:none; border:none; color:#888; font-size:14px; cursor:pointer; padding:0 2px; line-height:1; }
-.bip-close:hover { color:#fff; }
-.bip-grid { display:flex; flex-wrap:wrap; gap:5px; }
-.bip-item { display:flex; flex-direction:column; align-items:center; gap:2px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:8px; padding:6px 8px; cursor:pointer; min-width:60px; max-width:74px; transition:.2s; }
-.bip-item:hover { background:rgba(255,255,255,.15); border-color:#fcd60a; transform:scale(1.05); }
-.bip-item-disabled { opacity:.35; cursor:not-allowed; }
-.bip-item-disabled:hover { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.15); transform:none; }
-.bip-sprite { width:28px; height:28px; image-rendering:pixelated; display:block; }
-.bip-name { font-size:9px; color:#ddd; text-align:center; max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.bip-count { font-size:10px; color:#ffd700; font-weight:700; }
+.hub-exits { display:flex; flex-direction:column; gap:8px; padding:8px 0; }
+.hub-exit-card {
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12);
+  border-radius:10px; padding:12px 14px; cursor:pointer; transition:.2s;
+}
+.hub-exit-card:hover:not(.hub-exit-locked) { background:rgba(129,140,248,.12); border-color:rgba(129,140,248,.4); }
+.hub-exit-label   { font-size:14px; font-weight:700; color:#ddd; }
+.hub-exit-desc    { font-size:12px; color:#888; margin-top:2px; }
+.hub-exit-locked  { opacity:.55; cursor:not-allowed; border-color:rgba(255,255,255,.07); }
+.hub-exit-locked-msg { font-size:11px; color:#f87171; margin-top:4px; }
+
+/* ── Gebäude-Innenansicht ────────────────────────────────── */
+.bldg-section { margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,.07); }
+.bldg-section:last-child { border-bottom:none; }
+.bldg-section-title { font-size:13px; font-weight:700; color:#ddd; margin-bottom:8px; }
+.bldg-npc-row { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+.bldg-npc-portrait { width:52px; height:52px; image-rendering:pixelated; flex-shrink:0; border-radius:8px; }
+.bldg-npc-text { font-size:13px; color:#bbb; font-style:italic; line-height:1.5; }
+.bldg-feat-desc { font-size:12px; color:#888; margin-bottom:8px; }
+.bldg-lore-text {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:8px; padding:10px 12px; font-size:13px; color:#bbb; line-height:1.6; margin-bottom:10px;
+}
+.shop-item { display:flex; align-items:center; gap:10px; padding:8px 4px; border-bottom:1px solid rgba(255,255,255,.06); }
+.shop-item:last-child { border-bottom:none; }
+.shop-item-info { flex:1; }
+.shop-item-name  { font-size:13px; font-weight:700; color:#ddd; }
+.shop-item-desc  { font-size:11px; color:#888; margin-top:1px; }
+.shop-item-price { font-size:13px; color:#facc15; min-width:60px; text-align:right; }
+.shop-buy-btn {
+  background:rgba(99,102,241,.25); border:1px solid rgba(99,102,241,.5);
+  color:#818cf8; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:12px; transition:.15s; white-space:nowrap;
+}
+.shop-buy-btn:hover:not(:disabled) { background:rgba(99,102,241,.45); }
+.shop-buy-btn:disabled { opacity:.3; cursor:not-allowed; }
+
+/* ── VM/HM-Belohnung Block ───────────────────────────────── */
+.bldg-hm-reward {
+  display:flex; align-items:center;
+  background:rgba(29,158,117,.10); border:1px solid rgba(29,158,117,.3);
+  border-radius:10px; padding:12px 14px; margin-bottom:10px;
+}
+
+/* ── NPC-Tausch Vorschau ─────────────────────────────────── */
+.npc-trade-preview {
+  display:flex; align-items:center; justify-content:center; gap:16px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:10px; padding:14px; margin:10px 0;
+}
+.trade-pkmn-card { text-align:center; }
+.trade-pkmn-card img { width:64px; height:64px; image-rendering:pixelated; }
+.trade-pkmn-name  { font-size:13px; font-weight:700; color:#ddd; margin-top:4px; }
+.trade-pkmn-label { font-size:10px; color:#555; }
+.trade-arrow-big  { font-size:28px; color:#818cf8; flex-shrink:0; }
+
+/* ── Bag — VM-Beutel ─────────────────────────────────────── */
+.bag-section-header {
+  font-size:11px; font-weight:700; color:#818cf8; text-transform:uppercase;
+  letter-spacing:1px; padding:8px 4px 4px; margin-top:12px;
+  border-bottom:1px solid rgba(129,140,248,.2);
+}
+.bag-hm-item {
+  background:rgba(29,158,117,.06); border-color:rgba(29,158,117,.2) !important;
+  border-radius:10px !important; padding:10px 8px !important;
+  display:grid !important; grid-template-columns:44px 60px 1fr auto !important;
+  align-items:center !important; gap:8px !important;
+}
+.bag-hm-num  { font-size:11px; font-weight:700; color:#1d9e75; }
+.bag-hm-type { font-size:10px; padding:2px 6px; border-radius:4px; color:#fff; text-align:center; }
+.bag-hm-usage{ font-size:10px; color:#555; margin-top:3px; }
+.bag-hm-status { font-size:11px; white-space:nowrap; }
+.bag-hm-locked { color:#f87171; }
 
 /* ════════════════════════════════════════════════════════════
-   SPRITE-FIXES
+   CITY — Rival + Arena
    ════════════════════════════════════════════════════════════ */
-
-/* z-index: Canvas(1) < Enemy(5) < Walker(10) < FX(25) */
-#enemySprite {
-  z-index: 5;
-  bottom: 75px;
+.city-rival-block {
+  background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(234,179,8,.08));
+  border:1px solid rgba(239,68,68,.3); border-radius:12px; padding:12px 14px; margin-bottom:12px;
 }
-
-/* Lead-Pokémon: height-only → kein Strecken */
-.walker-sprite {
-  image-rendering: pixelated;
-  height: 80px;
-  width: auto;
-  max-width: 100px;
-  display: block;
-  animation: walk-bounce .5s ease-in-out infinite;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
+.city-rival-done { background:rgba(34,197,94,.06); border-color:rgba(34,197,94,.2); }
+.city-rival-inner { display:flex; align-items:flex-start; gap:12px; margin-bottom:8px; }
+.city-rival-portrait { width:56px; height:56px; image-rendering:pixelated; flex-shrink:0; border-radius:8px; }
+.city-rival-text { font-size:13px; color:#ddd; line-height:1.5; }
+.city-rival-btn {
+  width:100%; background:linear-gradient(135deg,#ef4444,#dc2626) !important;
+  border:none !important; color:#fff !important; font-weight:700;
+  padding:10px !important; border-radius:8px !important; cursor:pointer; font-size:14px;
+  box-shadow:0 2px 8px rgba(239,68,68,.4); transition:.2s !important;
 }
-.walker img {
-  height: 80px;
-  width: auto;
-  max-width: 100px;
-  image-rendering: pixelated;
-  animation: walk-bounce .5s ease-in-out infinite;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
-}
-/* Nur 1 Pokémon (Lead) — Follower ausgeblendet */
-.walker-follow { display: none !important; }
-.walker-follow img { display: none !important; }
+.city-rival-btn:hover { opacity:.9; transform:scale(1.02); }
+.city-continue-disabled { opacity:.35 !important; cursor:not-allowed !important; background:rgba(255,255,255,.05) !important; }
 
-/* Gegner-Sprite */
-.enemy-img {
-  image-rendering: pixelated;
-  height: 68px;
-  width: auto;
-  max-width: 90px;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,.6));
-  display: block;
-}
+.city-gym-block { background:rgba(129,140,248,.08); border:1px solid rgba(129,140,248,.25); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+.city-gym-beaten { background:rgba(34,197,94,.06); border-color:rgba(34,197,94,.2); }
+.city-gym-inner { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+.city-gym-portrait { width:52px; height:52px; image-rendering:pixelated; flex-shrink:0; border-radius:8px; }
+.city-gym-info { flex:1; }
+.city-gym-name   { font-size:13px; font-weight:700; color:#ddd; }
+.city-gym-leader { font-size:12px; color:#aaa; margin-top:2px; }
+.city-gym-req    { font-size:11px; color:#818cf8; margin-top:3px; }
+.city-gym-btn { width:100%; background:linear-gradient(135deg,#818cf8,#6366f1); border:none; color:#fff; font-weight:700; padding:10px; border-radius:8px; cursor:pointer; font-size:13px; transition:.2s; box-shadow:0 2px 8px rgba(99,102,241,.35); }
+.city-gym-btn:hover { opacity:.9; transform:scale(1.02); }
+.city-gym-btn-locked { background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.12) !important; color:#555 !important; cursor:not-allowed !important; box-shadow:none !important; transform:none !important; }
 
-/* ════════════════════════════════════════════════════════════
-   ✨ SHINY-SYSTEM
-   ════════════════════════════════════════════════════════════ */
-@keyframes shiny-sparkle {
-  0%,100% { filter: drop-shadow(0 0 4px #ffd700) brightness(1); }
-  50%      { filter: drop-shadow(0 0 12px #ffd700) brightness(1.25); }
-}
-.enemy-img.shiny-sprite { animation: shiny-sparkle 1.5s ease-in-out infinite; }
-.walker-shiny .walker-sprite,
-.walker-shiny img { animation: walk-bounce .5s ease-in-out infinite, shiny-sparkle 1.5s ease-in-out infinite; }
-.shiny-star { color:#ffd700; font-size:12px; margin-left:3px; }
-
-/* ════════════════════════════════════════════════════════════
-   📖 POKÉDEX
-   ════════════════════════════════════════════════════════════ */
-#tabs .tab { font-size:10px; padding:7px 2px; }
-
-.dex-header { padding:8px 0 10px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:8px; }
-.dex-counts { display:flex; gap:14px; font-size:13px; margin-bottom:6px; }
-.dex-count-item { color:#aaa; }
-.dex-count-item b { color:#fff; }
-.dex-progress-bar { height:5px; background:rgba(255,255,255,.1); border-radius:3px; }
-.dex-progress-fill { height:100%; background:linear-gradient(90deg,#818cf8,#a78bfa); border-radius:3px; transition:width .5s; }
-
-.dex-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:6px; }
-.dex-entry { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:.2s; position:relative; }
-.dex-entry:hover { background:rgba(255,255,255,.12); transform:scale(1.04); }
-.dex-caught { background:rgba(129,140,248,.1); border-color:rgba(129,140,248,.3); }
-.dex-unseen { opacity:.5; }
-.dex-num { font-size:9px; color:#666; margin-bottom:2px; }
-.dex-sprite { width:48px; height:48px; image-rendering:pixelated; display:block; margin:0 auto 2px; }
-.dex-silhouette { filter:brightness(0) contrast(1); }
-.dex-unknown { width:48px; height:48px; margin:0 auto 2px; display:flex; align-items:center; justify-content:center; font-size:20px; color:#444; }
-.dex-name { font-size:10px; color:#ccc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.dex-pokeball { position:absolute; top:3px; right:4px; font-size:9px; }
-
-.dex-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); display:flex; align-items:center; justify-content:center; z-index:800; padding:12px; }
-.dex-detail-box { background:#16213e; border:1px solid rgba(255,255,255,.15); border-radius:16px; width:100%; max-width:460px; max-height:90vh; overflow-y:auto; display:flex; flex-direction:column; }
-.dex-detail-box::-webkit-scrollbar { width:4px; }
-.dex-detail-box::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:2px; }
-.dex-detail-header { display:flex; align-items:flex-start; justify-content:space-between; padding:14px 16px 10px; border-bottom:1px solid rgba(255,255,255,.08); }
-.dex-detail-titlerow { display:flex; flex-direction:column; gap:4px; }
-.dex-detail-num { font-size:11px; color:#666; }
-.dex-detail-name { font-size:20px; font-weight:700; }
-.dex-close-btn { background:none; border:none; color:#888; font-size:20px; cursor:pointer; padding:0; line-height:1; flex-shrink:0; }
-.dex-close-btn:hover { color:#fff; }
-.dex-detail-body { display:flex; gap:0; padding:14px 16px; }
-.dex-detail-left { width:140px; flex-shrink:0; margin-right:14px; }
-.dex-detail-right { flex:1; min-width:0; overflow-y:auto; }
-.dex-sprite-box { text-align:center; margin-bottom:10px; }
-.dex-detail-sprite { width:100px; height:100px; image-rendering:pixelated; display:block; margin:0 auto; }
+/* ── Pokédex ─────────────────────────────────────────────── */
+.dex-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:8px; padding:8px 4px; }
+.dex-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 6px; text-align:center; cursor:pointer; transition:.15s; }
+.dex-card:hover { background:rgba(129,140,248,.15); border-color:#818cf8; }
+.dex-card.not-seen { opacity:.3; filter:grayscale(1); }
+.dex-card.caught   { border-color:rgba(34,197,94,.4); }
+.dex-card-num  { font-size:9px; color:#555; margin-bottom:2px; }
+.dex-card-img  { width:40px; height:40px; image-rendering:pixelated; }
+.dex-card-name { font-size:10px; color:#aaa; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dex-types     { display:flex; justify-content:center; gap:3px; flex-wrap:wrap; margin-top:3px; }
+.dex-detail    { padding:8px 4px; }
+.dex-detail-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.dex-big-img   { width:80px; height:80px; image-rendering:pixelated; }
+.dex-detail-info { flex:1; }
+.dex-detail-name { font-size:18px; font-weight:700; color:#ddd; }
+.dex-detail-num  { font-size:12px; color:#555; }
 .dex-catch-count { font-size:10px; color:#818cf8; margin-top:3px; }
 .dex-section-title { font-size:11px; color:#818cf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-weight:700; }
 .dex-stats { margin-bottom:4px; }
@@ -130,42 +155,3 @@
 .dex-move-pp     { color:#888; text-align:right; }
 .dex-empty       { color:#555; font-size:12px; font-style:italic; padding:6px 0; }
 .dex-catch-hint  { color:#818cf8; font-style:normal; }
-
-/* ════════════════════════════════════════════════════════════
-   CITY — Gary/Rival-Block
-   ════════════════════════════════════════════════════════════ */
-.city-rival-block {
-  background: linear-gradient(135deg, rgba(239,68,68,.12), rgba(234,179,8,.08));
-  border: 1px solid rgba(239,68,68,.3);
-  border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;
-}
-.city-rival-done { background:rgba(34,197,94,.06); border-color:rgba(34,197,94,.2); }
-.city-rival-inner { display:flex; align-items:flex-start; gap:12px; margin-bottom:8px; }
-.city-rival-portrait { width:56px; height:56px; image-rendering:pixelated; flex-shrink:0; border-radius:8px; }
-.city-rival-text { font-size:13px; color:#ddd; line-height:1.5; }
-.city-rival-btn {
-  width:100%; background:linear-gradient(135deg,#ef4444,#dc2626) !important;
-  border:none !important; color:#fff !important; font-weight:700;
-  padding:10px !important; border-radius:8px !important; cursor:pointer; font-size:14px;
-  box-shadow:0 2px 8px rgba(239,68,68,.4); transition:.2s !important;
-}
-.city-rival-btn:hover { opacity:.9; transform:scale(1.02); }
-
-/* Weiter-Button gesperrt */
-.city-continue-disabled {
-  opacity:.35 !important; cursor:not-allowed !important;
-  background:rgba(255,255,255,.05) !important;
-}
-
-/* ── Arena-Block in der Stadtansicht ─────────────────────── */
-.city-gym-block { background:rgba(129,140,248,.08); border:1px solid rgba(129,140,248,.25); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
-.city-gym-beaten { background:rgba(34,197,94,.06); border-color:rgba(34,197,94,.2); }
-.city-gym-inner { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
-.city-gym-portrait { width:52px; height:52px; image-rendering:pixelated; flex-shrink:0; border-radius:8px; }
-.city-gym-info { flex:1; }
-.city-gym-name   { font-size:13px; font-weight:700; color:#ddd; }
-.city-gym-leader { font-size:12px; color:#aaa; margin-top:2px; }
-.city-gym-req    { font-size:11px; color:#818cf8; margin-top:3px; }
-.city-gym-btn { width:100%; background:linear-gradient(135deg,#818cf8,#6366f1); border:none; color:#fff; font-weight:700; padding:10px; border-radius:8px; cursor:pointer; font-size:13px; transition:.2s; box-shadow:0 2px 8px rgba(99,102,241,.35); }
-.city-gym-btn:hover { opacity:.9; transform:scale(1.02); }
-.city-gym-btn-locked { background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.12) !important; color:#555 !important; cursor:not-allowed !important; box-shadow:none !important; transform:none !important; }
