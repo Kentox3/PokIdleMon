@@ -1,0 +1,7 @@
+    uid: uid, name: trainerName, starter: starterDexId,
+    party: [starter], box: [],
+    items: { pokeball:5, superball:0, hyperball:0, potion:3, superpotion:0 },
+    money: 1000, badges: 0, badgeIds: [],
+    defeatedTrainers: {},
+    visitedZones: { "alabastia": true },
+    currentZoneId: "alabastia", currentStage: 1,

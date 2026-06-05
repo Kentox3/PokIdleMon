@@ -1,0 +1,69 @@
+  // ══ 31. VERTANIA ARENA — 7 Orden nötig ═══════════════════
+  {
+    id:"viridian_gym", name:"Vertania Arena", type:"gym",
+    bgGround:"#808060", bgSky:"#a0a080", bgMid:"#909070",
+    stageCount:5, wildPokemon:[],
+    minBadges: 7,  // Giovanni nur mit 7/8 Orden zugänglich
+    trainers:[
+      { stage:2, name:"Trainer Clyde", party:[{dexId:111,lv:44},{dexId:74,lv:44}], reward:2500 },
+      { stage:4, name:"Trainer Bruce", party:[{dexId:28,lv:46},{dexId:76,lv:46}], reward:3000 },
+    ],
+    gymLeader:{
+      stage:5, name:"Giovanni", title:"Arenaleiter & Boss",
+      badge:"Erdmedaille", badgeId:"earth",
+      party:[{dexId:111,lv:45},{dexId:28,lv:55},{dexId:76,lv:50},{dexId:31,lv:53}],
+      reward:5500, winText:"Alle 8 Medaillen! Zur Pokémon-Liga!"
+    },
+    next:"victory_road"
+  },
+
+  // ══ 32. SIEGERSTRASSE ═════════════════════════════════════
+  {
+    id:"victory_road", name:"Siegerstraße", type:"dungeon",
+    bgGround:"#3a3050", bgSky:"#1a1030", bgMid:"#2a2040",
+    stageCount:20,
+    wildPokemon:[
+      { dexId:74,  minLv:42, maxLv:58, weight:22 },
+      { dexId:75,  minLv:42, maxLv:58, weight:18 },
+      { dexId:41,  minLv:42, maxLv:55, weight:15 },
+      { dexId:42,  minLv:45, maxLv:58, weight:12 },
+      { dexId:95,  minLv:42, maxLv:58, weight:12 },
+      { dexId:105, minLv:40, maxLv:55, weight:12 },
+      { dexId:67,  minLv:40, maxLv:55, weight:9  },
+    ],
+    trainers:[
+      { stage:4,  name:"Trainer Max",    party:[{dexId:75,lv:48},{dexId:105,lv:48}], reward:3500 },
+      { stage:9,  name:"Trainer Peter",  party:[{dexId:95,lv:50},{dexId:112,lv:50}], reward:4500 },
+      { stage:14, name:"Trainer Stefan", party:[{dexId:75,lv:52},{dexId:112,lv:52},{dexId:42,lv:52}], reward:5500 },
+      { stage:18, name:"Rivalenkampf IV",party:[{dexId:22,lv:53},{dexId:55,lv:53},{dexId:28,lv:54},{dexId:65,lv:55},{dexId:6,lv:58}], reward:8000, isRival:true },
+    ],
+    next:"elite_four"
+  },
+
+  // ══ 33. POKÉMON-LIGA ══════════════════════════════════════
+  {
+    id:"elite_four", name:"Pokémon-Liga", type:"gym",
+    bgGround:"#2a2040", bgSky:"#0a0820", bgMid:"#1a1030",
+    stageCount:5, wildPokemon:[],
+    trainers:[
+      { stage:1, name:"Agathe (Elite Vier)",    isBoss:true, party:[{dexId:131,lv:54},{dexId:124,lv:56},{dexId:87,lv:54},{dexId:91,lv:56},{dexId:124,lv:58}], reward:5800 },
+      { stage:2, name:"Bruno (Elite Vier)",     isBoss:true, party:[{dexId:95,lv:53},{dexId:106,lv:55},{dexId:107,lv:55},{dexId:95,lv:53},{dexId:68,lv:58}], reward:5800 },
+      { stage:3, name:"Agathe II (Elite Vier)", isBoss:true, party:[{dexId:92,lv:54},{dexId:93,lv:56},{dexId:94,lv:58},{dexId:93,lv:56},{dexId:94,lv:60}], reward:6000 },
+      { stage:4, name:"Siegfried (Elite Vier)", isBoss:true, party:[{dexId:147,lv:56},{dexId:148,lv:58},{dexId:130,lv:58},{dexId:148,lv:58},{dexId:149,lv:62}], reward:6200 },
+    ],
+    gymLeader:{
+      stage:5, name:"Blau", title:"Champion",
+      badge:"Champion", badgeId:"champion",
+      party:[{dexId:18,lv:63},{dexId:55,lv:61},{dexId:28,lv:59},{dexId:65,lv:63},{dexId:112,lv:61},{dexId:6,lv:65}],
+      reward:15000, winText:"🏆 Du bist Pokémon-Champion!"
+    },
+    next:null
+  }
+];
+
+function getZone(id) {
+  return WORLD.find(function(z) { return z.id === id; }) || null;
+}
+
+var START_ZONE  = "alabastia";
+var START_STAGE = 1;

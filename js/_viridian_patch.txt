@@ -1,0 +1,18 @@
+  // ══ 31. VERTANIA ARENA — 7 Orden nötig ═══════════════════
+  {
+    id:"viridian_gym", name:"Vertania Arena", type:"gym",
+    bgGround:"#808060", bgSky:"#a0a080", bgMid:"#909070",
+    stageCount:5, wildPokemon:[],
+    minBadges: 7,  // Giovanni nur mit 7/8 Orden zugänglich
+    trainers:[
+      { stage:2, name:"Trainer Clyde", party:[{dexId:111,lv:44},{dexId:74,lv:44}], reward:2500 },
+      { stage:4, name:"Trainer Bruce", party:[{dexId:28,lv:46},{dexId:76,lv:46}], reward:3000 },
+    ],
+    gymLeader:{
+      stage:5, name:"Giovanni", title:"Arenaleiter & Boss",
+      badge:"Erdmedaille", badgeId:"earth",
+      party:[{dexId:111,lv:45},{dexId:28,lv:55},{dexId:76,lv:50},{dexId:31,lv:53}],
+      reward:5500, winText:"Alle 8 Medaillen! Zur Pokémon-Liga!"
+    },
+    next:"victory_road"
+  },
