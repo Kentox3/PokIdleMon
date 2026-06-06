@@ -14,20 +14,12 @@
 <body>
 
 <div id="loadScreen" style="display:flex">
-  <div class="load-box">
-    <div class="load-pokeball">⚪</div>
-    <h2>PokIdleMon</h2>
-    <p id="loadStatus">Verbinde...</p>
-  </div>
+  <div class="load-box"><div class="load-pokeball">⚪</div><h2>PokIdleMon</h2><p id="loadStatus">Verbinde...</p></div>
 </div>
 
 <div id="authScreen" style="display:none">
   <div class="auth-wrap">
-    <div class="auth-logo">
-      <span class="auth-logo-ball">⚪</span>
-      <h1>PokIdleMon</h1>
-      <p>Kanto Side-Scroller RPG</p>
-    </div>
+    <div class="auth-logo"><span class="auth-logo-ball">⚪</span><h1>PokIdleMon</h1><p>Kanto Side-Scroller RPG</p></div>
     <div id="loginCard" class="auth-card">
       <h2>Anmelden</h2>
       <label class="field-label">Nutzername</label>
@@ -83,11 +75,7 @@
     <div id="enemySprite"></div>
     <div id="xpPopup"></div>
     <div id="toastZone"></div>
-    <!-- Encounter-Ladebar -->
-    <div id="ebWrap">
-      <div id="ebFill"></div>
-      <div id="ebIcon" class="eb-icon"></div>
-    </div>
+    <div id="ebWrap"><div id="ebFill"></div><div id="ebIcon" class="eb-icon"></div></div>
   </div>
   <div id="battlePanel">
     <div id="battleLog"></div>
@@ -121,10 +109,7 @@
   <div id="viewDex"  class="tab-view" style="display:none"></div>
 </div>
 
-<div id="blackoutOverlay" style="
-  display:none;position:fixed;inset:0;z-index:9999;
-  align-items:center;justify-content:center;flex-direction:column;
-  background:#000;opacity:0;transition:opacity 0.3s ease;pointer-events:all;">
+<div id="blackoutOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;flex-direction:column;background:#000;opacity:0;transition:opacity 0.3s ease;pointer-events:all;">
   <div class="bo-text" style="color:#fff;font-size:20px;font-weight:700;text-align:center;"></div>
 </div>
 
@@ -151,7 +136,9 @@
 <script src="js/patch.js"></script>
 <script src="js/renderer_patch.js"></script>
 <script src="js/bg_patch.js"></script>
+<script src="js/world_patch.js"></script>
 <script src="js/renderer_fixes.js"></script>
 <script src="js/encounter_bar.js"></script>
+<script src="js/buildings_extra.js"></script>
 </body>
 </html>

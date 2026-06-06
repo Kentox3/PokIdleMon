@@ -9,9 +9,9 @@ var PHYSICAL_TYPES = new Set(["Normal","Fighting","Flying","Poison","Ground","Ro
 
 var MOVES = {
   // ── Struggle (Fallback wenn alle PP leer) ──────────────────
-  struggle:        { name:"Kampf",          type:"Normal",   pwr:50,  acc:100, pp:999, effect:null },
+  struggle:        { name:"Kräftemessen",   type:"Normal",   pwr:50,  acc:100, pp:999, effect:null },
 
-  // ── Normal – Angriff ───────────────────────────────────────
+  // ── Normal – Angriff ──────────────────────────────────────
   tackle:          { name:"Tackle",          type:"Normal",   pwr:35,  acc:95,  pp:35, effect:null },
   kratzer:         { name:"Kratzer",         type:"Normal",   pwr:40,  acc:100, pp:35, effect:null },
   pfund:           { name:"Pfund",           type:"Normal",   pwr:40,  acc:100, pp:35, effect:null },
