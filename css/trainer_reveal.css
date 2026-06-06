@@ -1,14 +1,11 @@
 /* ════════════════════════════════════════════════════════════
    TRAINER-REVEAL — Trainer steht kurz an Pokémon-Stelle
    ════════════════════════════════════════════════════════════ */
-
-/* Container-Klasse während Trainer-Reveal */
 .trainer-reveal {
   display: flex !important;
   align-items: center;
   justify-content: center;
 }
-
 .trainer-reveal-inner {
   display: flex;
   flex-direction: column;
@@ -16,13 +13,10 @@
   gap: 6px;
   animation: trainerWalkIn 0.4s ease-out;
 }
-
 @keyframes trainerWalkIn {
   from { transform: translateX(40px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
-
-/* Trainer-Sprite: groß, zentriert, leicht pixeliert */
 .trainer-reveal-sprite {
   width: 80px;
   height: 80px;
@@ -30,8 +24,6 @@
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
 }
-
-/* Name unter dem Sprite */
 .trainer-reveal-name {
   font-size: 12px;
   color: #ccc;
@@ -40,4 +32,177 @@
   background: rgba(0,0,0,0.5);
   padding: 2px 8px;
   border-radius: 4px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PLAYER SPRITE — Info-Box (Name, Level, Typen, HP, XP)
+   ════════════════════════════════════════════════════════════ */
+
+/* Walker-Container: Sprite links, Info rechts */
+.walker {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Info-Box rechts neben/unter dem Sprite */
+.walker-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 110px;
+  max-width: 150px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 5px 7px;
+  backdrop-filter: blur(4px);
+}
+
+/* HP-Zeile: Balken + Text */
+.walker-hprow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.walker-hpbar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.walker-hpfill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s, background 0.3s;
+}
+.walker-hptxt {
+  font-size: 10px;
+  color: #ccc;
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Name + Level + Status */
+.walker-nameline {
+  font-size: 11px;
+  color: #eee;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.walker-lv {
+  font-size: 10px;
+  color: #aaa;
+}
+
+/* Typ-Badges */
+.walker-types {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+/* XP-Zeile */
+.walker-xprow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.walker-xpbar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.10);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.walker-xpfill {
+  height: 100%;
+  border-radius: 2px;
+  background: #818cf8;
+  transition: width 0.4s;
+}
+.walker-xptxt {
+  font-size: 9px;
+  color: #666;
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEAM-SCREEN — Neue Aktions-Buttons
+   ════════════════════════════════════════════════════════════ */
+.team-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 36px;
+}
+
+/* Kompakte Action-Buttons: ↑ ↓ ★ 📦 */
+.team-act-sm {
+  width: 32px;
+  height: 30px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #aaa;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.team-act-sm:hover:not(:disabled) {
+  background: rgba(129,140,248,0.25);
+  color: #fff;
+  border-color: rgba(129,140,248,0.5);
+}
+.team-act-sm:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* Lead-Badge im Team-Screen */
+.team-lead-badge {
+  font-size: 9px;
+  background: rgba(250,204,21,0.2);
+  color: #facc15;
+  border: 1px solid rgba(250,204,21,0.3);
+  border-radius: 3px;
+  padding: 0px 4px;
+  margin-left: 2px;
+}
+
+/* Team XP-Bar */
+.team-xprow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+}
+.team-xpbar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.10);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.team-xpfill {
+  height: 100%;
+  background: #818cf8;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.team-xptxt {
+  font-size: 9px;
+  color: #555;
+  white-space: nowrap;
 }

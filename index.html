@@ -11,7 +11,6 @@
 </head>
 <body>
 
-<!-- ═══ LADE-SCREEN ══════════════════════════════════════════════════════════════════════ -->
 <div id="loadScreen" style="display:flex">
   <div class="load-box">
     <div class="load-pokeball">⚪</div>
@@ -20,7 +19,6 @@
   </div>
 </div>
 
-<!-- ═══ AUTH-SCREEN ══════════════════════════════════════════════════════════════════════ -->
 <div id="authScreen" style="display:none">
   <div class="auth-wrap">
     <div class="auth-logo">
@@ -56,7 +54,6 @@
   </div>
 </div>
 
-<!-- ═══ STARTER-SCREEN ════════════════════════════════════════════════════════════════════ -->
 <div id="starterScreen" style="display:none">
   <div class="starter-box">
     <h2>🌟 Wähle deinen Starter!</h2>
@@ -67,7 +64,6 @@
   </div>
 </div>
 
-<!-- ═══ SPIEL-SCREEN ══════════════════════════════════════════════════════════════════════ -->
 <div id="gameScreen" style="display:none">
   <div id="hud">
     <span id="hudPlayer">Trainer</span>
@@ -92,7 +88,7 @@
       <div id="moveButtons"></div>
       <div id="battleBtns">
         <div id="catchBalls"></div>
-        <button id="itemBattleBtn" class="btn-items" onclick="showBattleItemPanel()" style="display:none" title="Items nutzen">🎒</button>
+        <!-- 🎒 Item-Button entfernt — Items über Tasche nutzbar -->
         <button id="autoFightBtn" class="btn-auto" onclick="toggleAutoFight()">⚡ Auto</button>
         <button id="fleeBtn"      class="btn-flee"  onclick="onFleeClick()">🏃 Fliehen</button>
       </div>
@@ -119,7 +115,6 @@
   <div id="viewDex"  class="tab-view" style="display:none"></div>
 </div>
 
-<!-- ═══ OHNMACHT-BLACKOUT ══════════════════════════════════════════════════════════════════ -->
 <div id="blackoutOverlay" style="
   display:none; position:fixed; inset:0; z-index:9999;
   align-items:center; justify-content:center; flex-direction:column;
@@ -127,12 +122,10 @@
   <div class="bo-text" style="color:#fff;font-size:20px;font-weight:700;text-align:center;"></div>
 </div>
 
-<!-- ═══ POPUPS ═══════════════════════════════════════════════════════════════════════════ -->
 <div id="shopPopup"    class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>🏪 Shop</h3><button onclick="closeShop()">✕</button></div><div id="shopItemList"></div></div></div>
 <div id="gymPopup"     class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>⚔️ Arena</h3><button onclick="closeGymPopup()">✕</button></div><div id="gymContent"></div></div></div>
 <div id="offlineModal" class="popup-overlay" style="display:none"><div class="popup-box"><h3>⏰ Willkommen zurück!</h3><p id="offlineMsg"></p><button class="btn-primary" onclick="closeOfflineModal()">OK</button></div></div>
 
-<!-- ═══ SCRIPTS ══════════════════════════════════════════════════════════════════════════ -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="js/pkmn.js"></script>
@@ -150,5 +143,6 @@
 <script src="js/patch.js"></script>
 <script src="js/renderer_patch.js"></script>
 <script src="js/bg_patch.js"></script>
+<script src="js/renderer_fixes.js"></script>
 </body>
 </html>

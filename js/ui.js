@@ -13,12 +13,10 @@ var BALL_SPRITES = {
 };
 
 var ITEM_DEFS = {
-  // ── Fang-Items ────────────────────────────────────────────
   pokeball:    { name:"Pokéball",    desc:"Normaler Pokéball",     img: ITEM_BASE+"poke-ball.png" },
   superball:   { name:"Superball",   desc:"Bessere Fangchance",    img: ITEM_BASE+"great-ball.png" },
   hyperball:   { name:"Hyperball",   desc:"Beste Fangchance",      img: ITEM_BASE+"ultra-ball.png" },
   masterball:  { name:"Meisterball", desc:"Immer fangen",          img: ITEM_BASE+"master-ball.png" },
-  // ── Heil-Items ────────────────────────────────────────────
   potion:      { name:"Trank",       desc:"+20 HP",                img: ITEM_BASE+"potion.png" },
   superpotion: { name:"Supertrank",  desc:"+50 HP",                img: ITEM_BASE+"super-potion.png" },
   hyperpotion: { name:"Hypertrank",  desc:"+200 HP",               img: ITEM_BASE+"hyper-potion.png" },
@@ -29,16 +27,10 @@ var ITEM_DEFS = {
   paralysheal: { name:"Paraheilm.", desc:"Heilt Lähmung",          img: ITEM_BASE+"paralyze-heal.png" },
   fullheal:    { name:"Vollheiler",  desc:"Alle Status",           img: ITEM_BASE+"full-heal.png" },
   revive:      { name:"Beleber",     desc:"Belebt K.O. Pokémon",  img: ITEM_BASE+"revive.png" },
-  // ── Sonstige ──────────────────────────────────────────────
   escape:      { name:"Fluchtweg",   desc:"Flieht aus Höhlen",     img: ITEM_BASE+"escape-rope.png" },
-  // ── Schlüssel-Items ───────────────────────────────────────
   old_amber:    { name:"Altes Bernstein", desc:"Schlüsselitem: Fossil", img: ITEM_BASE+"old-amber.png",    isKey:true },
   dome_fossil:  { name:"Kuppelfossil",    desc:"Schlüsselitem: Fossil", img: ITEM_BASE+"dome-fossil.png",  isKey:true },
   helix_fossil: { name:"Spiralenfossil",  desc:"Schlüsselitem: Fossil", img: ITEM_BASE+"helix-fossil.png", isKey:true },
-  // ── VMs (Versteckte Maschinen / HMs) ─────────────────────
-  // VMs sind Schlüsselitems und schalten Spielpfade frei.
-  // Sie können nicht im Kampf benutzt werden, zeigen aber an
-  // welche Routen der Spieler betreten darf.
   hm_cut:      { name:"VM01 Zerschneider", desc:"Schneidet Büsche frei. Braucht Kaskadenmedaille.",
                  img: ITEM_BASE+"hm01.png", isHM:true, hmType:"Normal",
                  lockedBy:"cascade", usageDesc:"Zinnia Arena-Eingang" },
@@ -56,7 +48,6 @@ var ITEM_DEFS = {
                  lockedBy:"stone", usageDesc:"Rotes Felsgebirge (noch nicht aktiv)" },
 };
 
-// ── Trainer-Sprites ───────────────────────────────────────────
 var TRAINER_SPRITES = {
   youngster:   PS_TRAINER+"youngster.png",   lass:       PS_TRAINER+"lass.png",
   hiker:       PS_TRAINER+"hiker.png",        biker:      PS_TRAINER+"biker.png",
@@ -154,7 +145,6 @@ function renderWorldTab() {
 
   var icon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[zone.type]||"📍";
   var html="<div class='zone-info-panel'><div class='zone-info-header'>"+icon+" <b>"+zone.name+"</b></div>";
-
   if(zone.wildPokemon&&zone.wildPokemon.length>0){
     var total=zone.wildPokemon.reduce(function(s,e){return s+e.weight;},0);
     html+="<div class='encounter-section'><div class='encounter-title'>🎲 Wilde Pokémon</div>";
@@ -192,7 +182,6 @@ function renderWorldTab() {
 }
 
 function renderCityView(zone) {
-  // Basis-Fallback — wird von renderer_patch.js durch renderCityHub ersetzt
   var container=document.getElementById("viewWorld"); if(!container) return;
   container.innerHTML="<div class='city-view'><div class='city-header'><div class='city-title'>🏙️ "+zone.name+"</div></div></div>";
   if(typeof renderCityHub==="function") renderCityHub(zone);
@@ -200,10 +189,13 @@ function renderCityView(zone) {
 
 function healInCity(){healPartyFully();renderPlayerSprites();updateHUD();showToast("Team vollständig geheilt! 💚");}
 
-// ── Team-Screen ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+//  TEAM-SCREEN — Realtime + Up/Down/Lead/Box Aktionen
+// ══════════════════════════════════════════════════════════════
 function renderTeamScreen() {
   var container=document.getElementById("teamList"); if(!container||!STATE) return;
   container.innerHTML="";
+  var n=STATE.party.length;
   STATE.party.forEach(function(p,idx){
     var pd=PKMN[p.dexId],name=pd?pd.name:"?";
     var hpPct=Math.round(p.currentHP/p.maxHP*100),xpPct=Math.min(100,Math.round(p.xp/p.xpToNext*100));
@@ -213,18 +205,25 @@ function renderTeamScreen() {
       "<div class='team-info'>"+
         "<div class='team-nameline'><b>"+(p.nick||name)+"</b> <span class='team-lv'>Lv."+p.level+"</span>"+
           (p.status?"<span class='status-badge status-"+p.status+"'>"+statusText(p.status)+"</span>":"")+
+          (idx===0?"<span class='team-lead-badge'>★ Lead</span>":"")+
         "</div>"+
         "<div class='team-types'>"+(pd?pd.types.map(function(t){return "<span class='type-badge' style='background:"+(TYPE_COLORS[t]||"#aaa")+"'>"+t+"</span>";}).join(""):"")+"</div>"+
         "<div class='team-hprow'><div class='team-hpbar'><div class='team-hpfill' style='width:"+Math.max(0,hpPct)+"%;background:"+hpColor(p.currentHP,p.maxHP)+"'></div></div> <span class='team-hptxt'>"+p.currentHP+"/"+p.maxHP+"</span></div>"+
-        "<div class='team-xprow'><div class='team-xpbar'><div class='team-xpfill' style='width:"+xpPct+"%'></div></div> <span class='team-xptxt'>"+p.xp+"/"+p.xpToNext+" EP</span></div>"+
+        "<div class='team-xprow'><div class='team-xpbar'><div class='team-xpfill' style='width:"+xpPct+"%'></div></div> <span class='team-xptxt'>EP "+p.xp+"/"+p.xpToNext+"</span></div>"+
         "<div class='team-moves'>"+p.moves.map(function(m){var mv=MOVES[m];return mv?"<span class='mini-move' style='border-color:"+(TYPE_COLORS[mv.type]||"#888")+"'>"+mv.name+"</span>":"";}).join("")+"</div>"+
       "</div>"+
       "<div class='team-actions'>"+
-        "<button onclick='setLeadPkmn("+idx+")'"+( idx===0?" disabled":"")+">⬆ Lead</button>"+
-        "<button onclick='sendToBox("+idx+")'>📦 Box</button>"+
+        "<button class='team-act-sm' "+(idx===0?"disabled":"")+
+          " onclick='movePartyUp("+idx+")' title='Nach oben'>↑</button>"+
+        "<button class='team-act-sm' "+(idx===n-1?"disabled":"")+
+          " onclick='movePartyDown("+idx+")' title='Nach unten'>↓</button>"+
+        "<button class='team-act-sm' "+(idx===0?"disabled":"")+
+          " onclick='setLeadPkmn("+idx+")' title='Als Lead setzen'>★</button>"+
+        "<button class='team-act-sm' onclick='sendToBox("+idx+")' title='In Box senden'>📦</button>"+
       "</div>";
     container.appendChild(card);
   });
+  // Box-Vorschau
   var boxSection=document.getElementById("boxPreview");
   if(boxSection){
     boxSection.innerHTML=STATE.box.length===0
@@ -238,32 +237,49 @@ function renderTeamScreen() {
   }
 }
 
-function setLeadPkmn(idx){if(!STATE||idx===0)return;STATE.party.unshift(STATE.party.splice(idx,1)[0]);renderTeamScreen();saveGame();}
+// ── Party-Manipulations-Funktionen ────────────────────────────
+function setLeadPkmn(idx){
+  if(!STATE||idx===0) return;
+  STATE.party.unshift(STATE.party.splice(idx,1)[0]);
+  renderTeamScreen(); renderPlayerSprites(); saveGame();
+}
+function movePartyUp(idx){
+  if(!STATE||idx<=0||idx>=STATE.party.length) return;
+  var tmp=STATE.party[idx]; STATE.party[idx]=STATE.party[idx-1]; STATE.party[idx-1]=tmp;
+  if(idx===1) renderPlayerSprites(); // Lead hat sich verändert
+  renderTeamScreen(); saveGame();
+}
+function movePartyDown(idx){
+  if(!STATE||idx<0||idx>=STATE.party.length-1) return;
+  var tmp=STATE.party[idx]; STATE.party[idx]=STATE.party[idx+1]; STATE.party[idx+1]=tmp;
+  if(idx===0) renderPlayerSprites(); // Lead hat sich verändert
+  renderTeamScreen(); saveGame();
+}
 function sendToBox(idx){
   if(!STATE||STATE.party.length<=1){showToast("Mindestens 1 Pokémon!");return;}
-  var p=STATE.party.splice(idx,1)[0];addToBox(p);renderTeamScreen();saveGame();
+  var p=STATE.party.splice(idx,1)[0]; addToBox(p);
+  if(idx===0) renderPlayerSprites();
+  renderTeamScreen(); saveGame();
   showToast((PKMN[p.dexId]?PKMN[p.dexId].name:"?")+" → Box");
 }
 function recallFromBox(idx){
   if(!STATE||STATE.party.length>=6){showToast("Party voll!");return;}
-  var p=STATE.box.splice(idx,1)[0];STATE.party.push(p);renderTeamScreen();saveGame();
+  var p=STATE.box.splice(idx,1)[0]; STATE.party.push(p);
+  renderTeamScreen(); saveGame();
   showToast((PKMN[p.dexId]?PKMN[p.dexId].name:"?")+" → Party");
 }
 
 // ══════════════════════════════════════════════════════════════
-//  BAG — Drei Sektionen: VMs / Schlüsselitems / Verbrauchsitems
+//  BAG
 // ══════════════════════════════════════════════════════════════
 function renderBagScreen() {
   var container=document.getElementById("bagList"); if(!container||!STATE) return;
   container.innerHTML="";
 
-  // ── 1. VM-Beutel (HMs) ─────────────────────────────────────
   var hmKeys=Object.keys(ITEM_DEFS).filter(function(k){return ITEM_DEFS[k].isHM&&(STATE.items[k]||0)>0;});
   if(hmKeys.length>0){
     var hmHeader=document.createElement("div"); hmHeader.className="bag-section-header";
-    hmHeader.innerHTML="📀 VM-Beutel";
-    container.appendChild(hmHeader);
-
+    hmHeader.innerHTML="📀 VM-Beutel"; container.appendChild(hmHeader);
     hmKeys.forEach(function(key){
       var def=ITEM_DEFS[key];
       var badgeOk=!def.lockedBy||(STATE.badgeIds&&STATE.badgeIds.indexOf(def.lockedBy)>=0);
@@ -272,23 +288,16 @@ function renderBagScreen() {
       row.innerHTML=
         "<div class='bag-hm-num'>"+key.replace("hm_","VM").toUpperCase()+"</div>"+
         "<div class='bag-hm-type' style='background:"+typeColor+"'>"+def.hmType+"</div>"+
-        "<div class='bag-info'><b>"+def.name+"</b><br>"+
-          "<small>"+def.desc+"</small><br>"+
-          "<small class='bag-hm-usage'>🗺️ "+def.usageDesc+"</small>"+
-        "</div>"+
-        "<div class='bag-hm-status"+(badgeOk?"":" bag-hm-locked")+"'>"+
-          (badgeOk?"✅ Aktiv":"🔒 Abzeichen fehlt")+
-        "</div>";
+        "<div class='bag-info'><b>"+def.name+"</b><br><small>"+def.desc+"</small><br><small class='bag-hm-usage'>🗺️ "+def.usageDesc+"</small></div>"+
+        "<div class='bag-hm-status"+(badgeOk?"":" bag-hm-locked")+"'>"+(badgeOk?"✅ Aktiv":"🔒 Abzeichen fehlt")+"</div>";
       container.appendChild(row);
     });
   }
 
-  // ── 2. Schlüsselitems ────────────────────────────────────
   var keyKeys=Object.keys(ITEM_DEFS).filter(function(k){return ITEM_DEFS[k].isKey&&!ITEM_DEFS[k].isHM&&(STATE.items[k]||0)>0;});
   if(keyKeys.length>0){
     var kiHeader=document.createElement("div"); kiHeader.className="bag-section-header";
-    kiHeader.innerHTML="🗝️ Schlüsselitems";
-    container.appendChild(kiHeader);
+    kiHeader.innerHTML="🗝️ Schlüsselitems"; container.appendChild(kiHeader);
     keyKeys.forEach(function(key){
       var def=ITEM_DEFS[key], count=STATE.items[key]||0;
       var row=document.createElement("div"); row.className="bag-item";
@@ -301,17 +310,15 @@ function renderBagScreen() {
     });
   }
 
-  // ── 3. Verbrauchsitems ────────────────────────────────────
   var useableKeys=Object.keys(ITEM_DEFS).filter(function(k){
     return !ITEM_DEFS[k].isHM&&!ITEM_DEFS[k].isKey&&(STATE.items[k]||0)>0;
   });
   if(useableKeys.length>0){
     var regHeader=document.createElement("div"); regHeader.className="bag-section-header";
-    regHeader.innerHTML="💊 Items";
-    container.appendChild(regHeader);
+    regHeader.innerHTML="💊 Items"; container.appendChild(regHeader);
     useableKeys.forEach(function(key){
       var count=STATE.items[key]||0;
-      var def=ITEM_DEFS[key],row=document.createElement("div"); row.className="bag-item";
+      var def=ITEM_DEFS[key], row=document.createElement("div"); row.className="bag-item";
       row.innerHTML=
         "<div class='bag-icon-wrap'><img src='"+(def.img||"")+"' class='bag-item-sprite' onerror='this.style.display=\"none\"'></div>"+
         "<div class='bag-info'><b>"+def.name+"</b><br><small>"+def.desc+"</small></div>"+
@@ -373,8 +380,6 @@ function renderCatchBalls(visible){
 function renderMapScreen() {
   var container=document.getElementById("mapList"); if(!container||!STATE) return;
   container.innerHTML="";
-  var currentIdx=WORLD.findIndex(function(z){return z.id===STATE.currentZoneId;});
-
   var visitedCities=WORLD.filter(function(z){
     return z.type==="city" && isZoneVisited(z.id) && z.id!==STATE.currentZoneId;
   });
@@ -394,7 +399,6 @@ function renderMapScreen() {
     noCity.textContent="Noch keine weiteren Städte freigeschaltet.";
     container.appendChild(noCity);
   }
-
   var curZone=getZone(STATE.currentZoneId);
   if(curZone){
     var curDiv=document.createElement("div"); curDiv.className="map-current-loc";
@@ -402,30 +406,22 @@ function renderMapScreen() {
     curDiv.innerHTML="<b>📍 Du bist hier:</b> "+zIcon+" <b>"+curZone.name+"</b>"+(curZone.stageCount?" — Etappe "+STATE.currentStage+"/"+curZone.stageCount:"");
     container.appendChild(curDiv);
   }
-
   var br=document.getElementById("badgeRow");
   if(br) br.innerHTML=["stone","cascade","thunder","rainbow","soul","marsh","volcano","earth"].map(function(b){
     return "<span class='badge-icon"+(STATE.badgeIds.indexOf(b)>=0?" badge-earned":"")+"'>🏅</span>";
   }).join("");
-
   var progHeader=document.createElement("div"); progHeader.className="map-section-title"; progHeader.style.marginTop="14px";
   progHeader.textContent="🗺️ Kanto-Fortschritt"; container.appendChild(progHeader);
   WORLD.forEach(function(zone){
-    if(zone.type==="building") return; // Gebäude nicht in Map
-    var isCurrent=(zone.id===STATE.currentZoneId);
-    var isVisited=isZoneVisited(zone.id);
+    if(zone.type==="building") return;
+    var isCurrent=(zone.id===STATE.currentZoneId), isVisited=isZoneVisited(zone.id);
     var row=document.createElement("div");
     var cls="map-zone map-compact";
-    if(isCurrent) cls+=" map-current";
-    else if(isVisited) cls+=" map-unlocked";
-    else cls+=" map-locked";
+    if(isCurrent) cls+=" map-current"; else if(isVisited) cls+=" map-unlocked"; else cls+=" map-locked";
     row.className=cls;
     var zIcon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[zone.type]||"📍";
     var badgeHtml=zone.gymLeader&&isVisited?"<span class='map-badge'>"+(STATE.badgeIds.indexOf(zone.gymLeader.badgeId)>=0?"🏅":"⬜")+"</span>":"";
-    row.innerHTML=zIcon+" "+zone.name+
-      (isCurrent?" <span class='map-here'>← hier</span>":"")+
-      (!isVisited?"<span style='margin-left:auto;color:#444;font-size:11px'>🔒</span>":"")+
-      badgeHtml;
+    row.innerHTML=zIcon+" "+zone.name+(isCurrent?" <span class='map-here'>← hier</span>":"")+(!isVisited?"<span style='margin-left:auto;color:#444;font-size:11px'>🔒</span>":"")+badgeHtml;
     container.appendChild(row);
   });
 }
@@ -446,8 +442,7 @@ function showCityShop(zone){
   zone.shopItems.forEach(function(item){
     var canAfford=STATE.money>=item.cost, def=ITEM_DEFS[item.id];
     var row=document.createElement("div"); row.className="shop-row";
-    row.innerHTML=
-      (def&&def.img?"<img src='"+def.img+"' width='28' height='28' style='image-rendering:pixelated;margin-right:8px' onerror='this.style.display=\"none\"'>":"")+
+    row.innerHTML=(def&&def.img?"<img src='"+def.img+"' width='28' height='28' style='image-rendering:pixelated;margin-right:8px' onerror='this.style.display=\"none\"'>":"")+
       "<div class='shop-info'><b>"+item.name+"</b> – "+item.desc+"</div>"+
       "<div class='shop-price'>"+item.cost+" ₽</div>"+
       "<button "+(canAfford?"":"disabled")+" onclick='buyItem(\""+item.id+"\","+item.cost+")'>Kaufen</button>";
@@ -466,8 +461,8 @@ function showOfflineReward(awaySeconds){
   if(awaySeconds<60) return;
   var modal=document.getElementById("offlineModal"),msg=document.getElementById("offlineMsg");
   if(!modal||!msg) return;
-  var h=Math.floor(awaySeconds/3600),m=Math.floor((awaySeconds%3600)/60);
-  msg.textContent="Du warst "+(h>0?h+"h ":"")+m+"m weg!";
+  var h=Math.floor(awaySeconds/3600),m2=Math.floor((awaySeconds%3600)/60);
+  msg.textContent="Du warst "+(h>0?h+"h ":"")+m2+"m weg!";
   modal.style.display="flex";
 }
 function closeOfflineModal(){var m=document.getElementById("offlineModal");if(m)m.style.display="none";}
