@@ -55,7 +55,8 @@ function fixPkmn(p) {
     }
     if(!p.evs) p.evs=initEVs();
     if(!p.pp)  p.pp=initPP(p.moves||[]);
-    if(p.shiny===undefined) p.shiny=false;
+    if(p.shiny===undefined)         p.shiny=false;
+    if(p.readyToEvolve===undefined) p.readyToEvolve=null;
     if(!p.moves||p.moves.length===0) p.moves=["tackle"];
     (p.moves||[]).forEach(function(mid){ try{ if(p.pp[mid]===undefined) p.pp[mid]=ppMax(mid); }catch(e){ p.pp[mid]=10; } });
   } catch(e){ console.warn("[fixPkmn]",e,p); }
@@ -72,7 +73,8 @@ function createPkmnInstance(dexId, level) {
     atk:calcStat(pd.atk,level,ivs.atk,0), def:calcStat(pd.def,level,ivs.def,0),
     spa:calcStat(pd.spa,level,ivs.spc,0), spd:calcStat(pd.spd,level,ivs.spc,0),
     spe:calcStat(pd.spe,level,ivs.spe,0),
-    ivs:ivs, evs:evs, moves:moves, pp:initPP(moves), status:null, statusTurns:0, shiny:false,
+    ivs:ivs, evs:evs, moves:moves, pp:initPP(moves),
+    status:null, statusTurns:0, shiny:false, readyToEvolve:null,
   };
 }
 
@@ -129,12 +131,10 @@ function applyXP(pkmnInst,xpGained,enemyDexId){
         }
       });
       msgs.push((pkmnInst.nick||pd.name)+" ist jetzt Level "+pkmnInst.level+"!");
-      if(pd.evo&&pd.evLv&&pkmnInst.level>=pd.evLv){
-        var oldName=pkmnInst.nick||pd.name, cm=pkmnInst.moves.slice(), cp=pkmnInst.pp?JSON.parse(JSON.stringify(pkmnInst.pp)):{};
-        pkmnInst.dexId=pd.evo; var newPd=PKMN[pd.evo];
-        if(newPd){ newPd.moves.forEach(function(entry){ if(entry[0]<=pkmnInst.level&&MOVES[entry[1]]){ if(cm.indexOf(entry[1])<0){ if(cm.length>=4){var d2=cm.shift();delete cp[d2];} cm.push(entry[1]); cp[entry[1]]=ppMax(entry[1]); } } }); }
-        pkmnInst.moves=cm; pkmnInst.pp=cp;
-        msgs.push("✨ "+oldName+" entwickelt sich zu "+(newPd?newPd.name:"?")+"!");
+      // readyToEvolve statt Auto-Evolution
+      if(pd.evo && pd.evLv && pkmnInst.level >= pd.evLv && !pkmnInst.readyToEvolve) {
+        pkmnInst.readyToEvolve = pd.evo;
+        msgs.push("✨ "+(pkmnInst.nick||pd.name)+" ist bereit zur Entwicklung!");
       }
     }
   }catch(e){ console.warn("[applyXP]",e); }
@@ -166,8 +166,8 @@ function initNewGame(uid, trainerName, starterDexId) {
     currentZoneId: "alabastia",
     currentStage: 1,
     seen: {}, caught: {},
-    eventFlags: {},         // einmalige Events: rival-kämpfe, NPC-Dialoge
-    currentBuilding: null,  // aktuell betretenes Gebäude
+    eventFlags: {},
+    currentBuilding: null,
     lastSeen: Date.now(), version: 5,
   };
   STATE.caught[starterDexId] = true;
@@ -187,8 +187,8 @@ function loadGameState(uid, savedState) {
     if(!STATE.caught)           STATE.caught={};
     if(!STATE.party)            STATE.party=[];
     if(!STATE.box)              STATE.box=[];
-    if(!STATE.eventFlags)       STATE.eventFlags={};     // NEU
-    if(!STATE.currentBuilding)  STATE.currentBuilding=null; // NEU
+    if(!STATE.eventFlags)       STATE.eventFlags={};
+    if(!STATE.currentBuilding)  STATE.currentBuilding=null;
 
     STATE.party.forEach(function(p){ try{ fixPkmn(p); }catch(e){ console.warn("[load] party:",e); } });
     STATE.box.forEach(function(p){   try{ fixPkmn(p); }catch(e){ console.warn("[load] box:",e);   } });
@@ -196,15 +196,12 @@ function loadGameState(uid, savedState) {
     STATE.party.forEach(function(p){ if(p&&p.dexId){ STATE.caught[p.dexId]=true; STATE.seen[p.dexId]=true; } });
     STATE.box.forEach(function(p){   if(p&&p.dexId){ STATE.caught[p.dexId]=true; STATE.seen[p.dexId]=true; } });
 
-    // Besuchte Zonen rekonstruieren (nur Hauptzonen, keine Gebäude)
     var mainZones = WORLD.filter(function(z) { return z.type !== "building"; });
     var curIdx = mainZones.findIndex(function(z){ return z.id===STATE.currentZoneId; });
     if(curIdx<0){ STATE.currentZoneId="alabastia"; STATE.currentStage=1; curIdx=0; }
     for(var vi=0;vi<=curIdx;vi++){
       try{ STATE.visitedZones[mainZones[vi].id]=true; }catch(e){}
     }
-
-    // Building-State zurücksetzen (falls Absturz in Gebäude)
     STATE.currentBuilding = null;
 
   } catch(e) {
@@ -225,7 +222,7 @@ function loadGameState(uid, savedState) {
   return { state:STATE, awaySeconds:Math.floor(away) };
 }
 
-// ── Event-Flag Funktionen (neu) ───────────────────────────────
+// ── Event-Flags ───────────────────────────────────────────────
 function isEventFlagSet(flagId) {
   if(!flagId||!STATE||!STATE.eventFlags) return false;
   return !!STATE.eventFlags[flagId];
@@ -236,7 +233,7 @@ function setEventFlag(flagId) {
   STATE.eventFlags[flagId] = true;
 }
 
-// ── Condition-Check für Exits ─────────────────────────────────
+// ── Condition-Check ───────────────────────────────────────────
 function checkExitCondition(cond) {
   if(!cond||!STATE) return true;
   if(cond.minBadges && STATE.badges < cond.minBadges) return false;
@@ -246,7 +243,7 @@ function checkExitCondition(cond) {
   return true;
 }
 
-// ── Rival-Starter (konträres Starter-System) ──────────────────
+// ── Rival-Starter ─────────────────────────────────────────────
 function getRivalStarterDexId() {
   var map = { 1:4, 4:7, 7:1 };
   return map[STATE ? STATE.starter : 4] || 4;
@@ -289,4 +286,29 @@ function saveGame(){
   if(!window.dbSet||!window.playerPath) return;
   STATE.lastSeen=Date.now();
   dbSet(playerPath(STATE.uid),STATE).catch(function(e){ console.warn("[saveGame]",e); });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  findRecoveryCity — korrekte Ohnmacht-Zielstadt ermitteln
+//
+//  PROBLEM: Der WORLD-Array ist nicht geografisch sortiert.
+//  Route22 steht nach Zinnoberinsel im Array → Rückwärtslauf
+//  findet falsche Stadt. Diese Funktion prüft zuerst homeCity.
+// ══════════════════════════════════════════════════════════════
+function findRecoveryCity(zoneId) {
+  // 1. Explizite homeCity-Angabe hat Priorität (für Umwege wie Route 22)
+  var zone = getZone(zoneId);
+  if(zone && zone.homeCity) return zone.homeCity;
+
+  // 2. Rückwärtslauf durch Hauptzonen (exkl. Gebäude)
+  var mainZones = WORLD.filter(function(z){
+    return z.type==="city" || z.type==="route" ||
+           z.type==="dungeon" || z.type==="sea" || z.type==="gym";
+  });
+  var ci = mainZones.findIndex(function(z){ return z.id === zoneId; });
+  if(ci < 0) return "alabastia";
+  for(var i = ci; i >= 0; i--) {
+    if(mainZones[i].type === "city") return mainZones[i].id;
+  }
+  return "alabastia";
 }

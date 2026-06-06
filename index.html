@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/battle_items.css">
   <link rel="stylesheet" href="css/trainer_reveal.css">
+  <link rel="stylesheet" href="css/pokedex.css">
+  <link rel="stylesheet" href="css/trading.css">
   <style>[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -81,6 +83,11 @@
     <div id="enemySprite"></div>
     <div id="xpPopup"></div>
     <div id="toastZone"></div>
+    <!-- Encounter-Ladebar -->
+    <div id="ebWrap">
+      <div id="ebFill"></div>
+      <div id="ebIcon" class="eb-icon"></div>
+    </div>
   </div>
   <div id="battlePanel">
     <div id="battleLog"></div>
@@ -88,7 +95,6 @@
       <div id="moveButtons"></div>
       <div id="battleBtns">
         <div id="catchBalls"></div>
-        <!-- 🎒 Item-Button entfernt — Items über Tasche nutzbar -->
         <button id="autoFightBtn" class="btn-auto" onclick="toggleAutoFight()">⚡ Auto</button>
         <button id="fleeBtn"      class="btn-flee"  onclick="onFleeClick()">🏃 Fliehen</button>
       </div>
@@ -116,9 +122,9 @@
 </div>
 
 <div id="blackoutOverlay" style="
-  display:none; position:fixed; inset:0; z-index:9999;
-  align-items:center; justify-content:center; flex-direction:column;
-  background:#000; opacity:0; transition:opacity 0.3s ease; pointer-events:all;">
+  display:none;position:fixed;inset:0;z-index:9999;
+  align-items:center;justify-content:center;flex-direction:column;
+  background:#000;opacity:0;transition:opacity 0.3s ease;pointer-events:all;">
   <div class="bo-text" style="color:#fff;font-size:20px;font-weight:700;text-align:center;"></div>
 </div>
 
@@ -139,10 +145,13 @@
 <script src="js/app.js"></script>
 <script src="js/db.js"></script>
 <script src="js/pokedex.js"></script>
+<script src="js/evolution.js"></script>
+<script src="js/trading.js"></script>
 <!-- Patches: immer zuletzt -->
 <script src="js/patch.js"></script>
 <script src="js/renderer_patch.js"></script>
 <script src="js/bg_patch.js"></script>
 <script src="js/renderer_fixes.js"></script>
+<script src="js/encounter_bar.js"></script>
 </body>
 </html>

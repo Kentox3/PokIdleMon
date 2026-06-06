@@ -1,4 +1,51 @@
 /* ════════════════════════════════════════════════════════════
+   ENCOUNTER BAR — Ladebar für Begegnungen auf Routen
+   ════════════════════════════════════════════════════════════ */
+
+#ebWrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+#ebFill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 6px rgba(129,140,248,0.5);
+  /* transition wird per JS gesetzt */
+}
+
+/* Icon rechts neben dem Balken (im sceneView) */
+.eb-icon {
+  position: absolute;
+  right: 6px;
+  bottom: 8px;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
+  pointer-events: none;
+}
+.eb-hit {
+  opacity: 1 !important;
+  animation: ebIconPop 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes ebIconPop {
+  0%   { transform: scale(0.3) translateY(6px); opacity: 0; }
+  70%  { transform: scale(1.2) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════
    TRAINER-REVEAL — Trainer steht kurz an Pokémon-Stelle
    ════════════════════════════════════════════════════════════ */
 .trainer-reveal {
@@ -18,191 +65,132 @@
   to   { transform: translateX(0);    opacity: 1; }
 }
 .trainer-reveal-sprite {
-  width: 80px;
-  height: 80px;
+  width: 80px; height: 80px;
   image-rendering: pixelated;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
 }
 .trainer-reveal-name {
-  font-size: 12px;
-  color: #ccc;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  background: rgba(0,0,0,0.5);
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 12px; color: #ccc; font-weight: 600;
+  background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 4px;
 }
 
 /* ════════════════════════════════════════════════════════════
    PLAYER SPRITE — Info-Box (Name, Level, Typen, HP, XP)
    ════════════════════════════════════════════════════════════ */
-
-/* Walker-Container: Sprite links, Info rechts */
-.walker {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-}
-
-/* Info-Box rechts neben/unter dem Sprite */
+.walker { display: flex; align-items: flex-end; gap: 6px; }
 .walker-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 110px;
-  max-width: 150px;
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 110px; max-width: 150px;
   background: rgba(0,0,0,0.55);
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  padding: 5px 7px;
+  border-radius: 8px; padding: 5px 7px;
   backdrop-filter: blur(4px);
 }
+.walker-hprow { display: flex; align-items: center; gap: 5px; }
+.walker-hpbar { flex:1; height:6px; background:rgba(255,255,255,.15); border-radius:3px; overflow:hidden; }
+.walker-hpfill { height:100%; border-radius:3px; transition: width .3s, background .3s; }
+.walker-hptxt { font-size:10px; color:#ccc; white-space:nowrap; min-width:36px; text-align:right; }
+.walker-nameline { font-size:11px; color:#eee; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.walker-lv { font-size:10px; color:#aaa; }
+.walker-types { display:flex; gap:3px; flex-wrap:wrap; }
+.walker-xprow { display:flex; align-items:center; gap:5px; }
+.walker-xpbar { flex:1; height:4px; background:rgba(255,255,255,.10); border-radius:2px; overflow:hidden; }
+.walker-xpfill { height:100%; border-radius:2px; background:#818cf8; transition:width .4s; }
+.walker-xptxt { font-size:9px; color:#666; white-space:nowrap; min-width:36px; text-align:right; }
 
-/* HP-Zeile: Balken + Text */
-.walker-hprow {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+/* ════════════════════════════════════════════════════════════
+   TEAM-SCREEN — Aktions-Buttons + Evolution
+   ════════════════════════════════════════════════════════════ */
+.team-actions { display:flex; flex-direction:column; gap:4px; flex-shrink:0; min-width:36px; }
+.team-act-sm {
+  width:32px; height:30px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  border-radius:6px; color:#aaa; font-size:14px; cursor:pointer;
+  transition:background .15s,color .15s; display:flex; align-items:center; justify-content:center; padding:0;
 }
-.walker-hpbar {
-  flex: 1;
-  height: 6px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 3px;
-  overflow: hidden;
+.team-act-sm:hover:not(:disabled) { background:rgba(129,140,248,.25); color:#fff; border-color:rgba(129,140,248,.5); }
+.team-act-sm:disabled { opacity:.2; cursor:not-allowed; }
+.team-lead-badge {
+  font-size:9px; background:rgba(250,204,21,.2); color:#facc15;
+  border:1px solid rgba(250,204,21,.3); border-radius:3px; padding:0px 4px; margin-left:2px;
 }
-.walker-hpfill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s, background 0.3s;
-}
-.walker-hptxt {
-  font-size: 10px;
-  color: #ccc;
-  white-space: nowrap;
-  min-width: 36px;
-  text-align: right;
-}
+.team-xprow { display:flex; align-items:center; gap:5px; margin-top:2px; }
+.team-xpbar { flex:1; height:3px; background:rgba(255,255,255,.10); border-radius:2px; overflow:hidden; }
+.team-xpfill { height:100%; background:#818cf8; border-radius:2px; transition:width .3s; }
+.team-xptxt { font-size:9px; color:#555; white-space:nowrap; }
 
-/* Name + Level + Status */
-.walker-nameline {
-  font-size: 11px;
-  color: #eee;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
+.team-evo-ready {
+  border-color: rgba(250,204,21,0.5) !important;
+  background: rgba(250,204,21,0.05) !important;
+  animation: evoReadyPulse 2s ease-in-out infinite;
 }
-.walker-lv {
-  font-size: 10px;
-  color: #aaa;
+@keyframes evoReadyPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(250,204,21,0); }
+  50%     { box-shadow: 0 0 12px 3px rgba(250,204,21,0.25); }
 }
-
-/* Typ-Badges */
-.walker-types {
-  display: flex;
-  gap: 3px;
-  flex-wrap: wrap;
+.team-evo-badge {
+  font-size:10px; background:rgba(250,204,21,.25); color:#facc15;
+  border:1px solid rgba(250,204,21,.4); border-radius:4px; padding:1px 5px;
+  animation: evoBadgePulse 1.5s ease-in-out infinite;
 }
-
-/* XP-Zeile */
-.walker-xprow {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+@keyframes evoBadgePulse {
+  0%,100% { opacity:1; } 50% { opacity:0.5; }
 }
-.walker-xpbar {
-  flex: 1;
-  height: 4px;
-  background: rgba(255,255,255,0.10);
-  border-radius: 2px;
-  overflow: hidden;
+.team-evo-btn {
+  width: 100%; margin-top: 6px;
+  background: linear-gradient(135deg, #92400e, #f59e0b);
+  border: none; border-radius: 8px;
+  color: #fff; font-size: 12px; font-weight: 700;
+  padding: 7px 10px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: opacity .15s, transform .15s;
+  box-shadow: 0 2px 10px rgba(245,158,11,0.4);
 }
-.walker-xpfill {
-  height: 100%;
-  border-radius: 2px;
-  background: #818cf8;
-  transition: width 0.4s;
-}
-.walker-xptxt {
-  font-size: 9px;
-  color: #666;
-  white-space: nowrap;
-  min-width: 36px;
-  text-align: right;
+.team-evo-btn:hover { opacity: .9; transform: scale(1.02); }
+.team-evo-preview {
+  width: 28px; height: 28px;
+  image-rendering: pixelated; object-fit: contain; flex-shrink:0;
 }
 
 /* ════════════════════════════════════════════════════════════
-   TEAM-SCREEN — Neue Aktions-Buttons
+   EVOLUTIONS-OVERLAY
    ════════════════════════════════════════════════════════════ */
-.team-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex-shrink: 0;
-  min-width: 36px;
+#evoOverlay {
+  position: fixed; inset: 0; z-index: 9500;
+  background: #0a0a0f;
+  display: flex; align-items: center; justify-content: center;
+  animation: evoFadeIn 0.4s ease-out;
 }
-
-/* Kompakte Action-Buttons: ↑ ↓ ★ 📦 */
-.team-act-sm {
-  width: 32px;
-  height: 30px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px;
-  color: #aaa;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+#evoOverlay.evo-fadeout { animation: evoFadeOut 0.6s ease-in forwards; }
+@keyframes evoFadeIn  { from { opacity:0; } to { opacity:1; } }
+@keyframes evoFadeOut { from { opacity:1; } to { opacity:0; } }
+.evo-screen {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 20px; padding: 20px; position: relative; width: 100%; max-width: 340px;
 }
-.team-act-sm:hover:not(:disabled) {
-  background: rgba(129,140,248,0.25);
-  color: #fff;
-  border-color: rgba(129,140,248,0.5);
+.evo-label {
+  font-size: 18px; color: #fff; font-weight: 600; text-align: center;
+  text-shadow: 0 0 20px rgba(255,255,255,0.5); min-height: 50px;
+  display: flex; align-items: center; justify-content: center;
 }
-.team-act-sm:disabled {
-  opacity: 0.2;
-  cursor: not-allowed;
+.evo-label b { color: #fde68a; }
+.evo-sprites { position: relative; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
+.evo-sprite {
+  position: absolute; width: 160px; height: 160px; image-rendering: pixelated;
+  object-fit: contain; filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+  transition: opacity 0.4s; animation: evoFloatIn 0.6s ease-out;
 }
-
-/* Lead-Badge im Team-Screen */
-.team-lead-badge {
-  font-size: 9px;
-  background: rgba(250,204,21,0.2);
-  color: #facc15;
-  border: 1px solid rgba(250,204,21,0.3);
-  border-radius: 3px;
-  padding: 0px 4px;
-  margin-left: 2px;
+.evo-sprite-hidden { opacity: 0 !important; }
+.evo-shiny { filter: drop-shadow(0 0 15px rgba(250,204,21,0.6)); }
+@keyframes evoFloatIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
 }
-
-/* Team XP-Bar */
-.team-xprow {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 2px;
-}
-.team-xpbar {
-  flex: 1;
-  height: 3px;
-  background: rgba(255,255,255,0.10);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.team-xpfill {
-  height: 100%;
-  background: #818cf8;
-  border-radius: 2px;
-  transition: width 0.3s;
-}
-.team-xptxt {
-  font-size: 9px;
-  color: #555;
-  white-space: nowrap;
-}
+.evo-flash-overlay { position: fixed; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; z-index: 9501; }
+.evo-stats { display: flex; gap: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 16px; animation: evoStatsFadeIn 0.5s ease-out; }
+@keyframes evoStatsFadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.evo-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.evo-stat span { font-size: 9px; color: #888; text-transform: uppercase; }
+.evo-stat b    { font-size: 15px; color: #fde68a; font-weight: 700; }
+.evo-congrats { font-size: 24px; }

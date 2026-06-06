@@ -1,0 +1,239 @@
+/* ════════════════════════════════════════════════════════════
+   trading.css — Spieler-Tauschsystem
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Hub-Button (Azuria City) ─────────────────────────────── */
+.tc-hub-inject { margin-top: 2px; }
+.tc-hub-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  border: none; border-radius: 10px;
+  color: #fff; font-size: 14px; font-weight: 700;
+  padding: 12px 16px; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(59,130,246,0.4);
+  transition: opacity .15s, transform .15s;
+  display: flex; align-items: center; gap: 8px;
+  justify-content: center;
+}
+.tc-hub-btn:hover { opacity: .9; transform: scale(1.02); }
+
+/* ── Overlay ─────────────────────────────────────────────── */
+.tc-overlay {
+  position: fixed; inset: 0; z-index: 8000;
+  background: rgba(0,0,0,0.82);
+  display: flex; align-items: flex-start;
+  justify-content: center;
+  padding: 8px;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+  animation: tcFadeIn .2s ease-out;
+}
+@keyframes tcFadeIn { from { opacity:0; } to { opacity:1; } }
+
+.tc-box {
+  background: #12122a;
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: 16px;
+  width: 100%; max-width: 480px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+}
+
+.tc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+  background: rgba(99,102,241,0.12);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.tc-title { font-size: 16px; font-weight: 700; color: #eee; }
+.tc-close {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px; color: #888; width: 32px; height: 32px;
+  cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.tc-close:hover { background: rgba(239,68,68,.2); color: #f87171; }
+
+.tc-body { padding: 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.tc-btn {
+  padding: 10px 16px; border-radius: 10px; border: none;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.tc-btn:hover { opacity: .85; }
+.tc-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.tc-btn-primary {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.35); width: 100%;
+}
+.tc-btn-join {
+  background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.4);
+  color: #818cf8; font-size: 12px; padding: 6px 12px; white-space: nowrap;
+}
+.tc-btn-refresh {
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  color: #888; font-size: 12px; width: 100%;
+}
+.tc-btn-danger {
+  background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3);
+  color: #f87171; width: 100%;
+}
+.tc-btn-small {
+  background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.4);
+  color: #818cf8; padding: 6px 12px; flex-shrink: 0;
+}
+.tc-btn-confirm {
+  width: 100%; background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff; font-size: 15px; padding: 12px;
+  box-shadow: 0 2px 10px rgba(16,185,129,.35);
+}
+.tc-btn-waiting {
+  background: rgba(255,255,255,.08) !important;
+  color: #888 !important; box-shadow: none !important;
+}
+.tc-btn-go {
+  background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+  animation: pulse 1s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+
+.tc-divider {
+  text-align: center; color: #444; font-size: 12px;
+  border-top: 1px solid rgba(255,255,255,.06); padding-top: 10px;
+}
+
+/* ── Lobby ───────────────────────────────────────────────── */
+.tc-loading { color: #666; text-align: center; padding: 20px; }
+.tc-empty   { color: #555; text-align: center; padding: 16px; font-size: 13px; }
+.tc-room-card {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px; padding: 10px 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.tc-room-info { display: flex; flex-direction: column; gap: 2px; }
+.tc-room-name { font-size: 13px; color: #ddd; font-weight: 600; }
+.tc-room-age  { font-size: 10px; color: #555; }
+
+/* ── Waiting Screen ─────────────────────────────────────── */
+.tc-waiting { text-align: center; padding: 20px 0; }
+.tc-wait-anim {
+  font-size: 48px; display: block;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.tc-wait-text { font-size: 17px; color: #ddd; font-weight: 600; margin-top: 12px; }
+.tc-wait-sub  { font-size: 12px; color: #555; margin-top: 6px; }
+
+/* ── Tausch-Raum ─────────────────────────────────────────── */
+.tc-trade-area {
+  display: grid; grid-template-columns: 1fr 36px 1fr; gap: 6px;
+  align-items: center;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; padding: 12px;
+}
+.tc-trade-arrow { text-align: center; font-size: 22px; color: #818cf8; }
+.tc-slot-label  { font-size: 10px; color: #555; margin-bottom: 4px; text-align: center; }
+
+.tc-slot-empty {
+  background: rgba(255,255,255,.03); border: 2px dashed rgba(255,255,255,.12);
+  border-radius: 10px; padding: 10px; text-align: center;
+  font-size: 11px; color: #444; min-height: 60px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tc-slot-filled {
+  background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.25);
+  border-radius: 10px; padding: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  position: relative;
+}
+.tc-slot-confirmed {
+  border-color: rgba(16,185,129,.5) !important;
+  background: rgba(16,185,129,.08) !important;
+}
+.tc-slot-sprite {
+  width: 52px; height: 52px; image-rendering: pixelated; object-fit: contain;
+}
+.tc-slot-info { font-size: 11px; color: #ddd; line-height: 1.4; }
+.tc-confirmed-badge {
+  font-size: 10px; color: #10b981; font-weight: 700;
+  background: rgba(16,185,129,.15); border-radius: 4px; padding: 1px 5px;
+}
+.tc-evo-hint {
+  font-size: 10px; color: #f59e0b; margin-top: 2px;
+  background: rgba(245,158,11,.12); border-radius: 4px; padding: 1px 5px;
+}
+
+/* ── Party-Picker ─────────────────────────────────────────── */
+.tc-section-title {
+  font-size: 11px; font-weight: 700; color: #818cf8;
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px;
+}
+.tc-party-section { display: flex; flex-direction: column; }
+.tc-party-grid    { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.tc-party-card {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
+  border-radius: 10px; padding: 8px 4px; text-align: center; cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.tc-party-card:hover   { background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.4); }
+.tc-party-selected     { border-color: #6366f1 !important; background: rgba(99,102,241,.2) !important;
+                          box-shadow: 0 0 8px rgba(99,102,241,.4); }
+.tc-party-fainted      { opacity: .35; cursor: not-allowed; }
+.tc-party-card img     { width: 44px; height: 44px; image-rendering: pixelated; }
+.tc-party-name         { font-size: 10px; color: #ccc; margin-top: 2px;
+                          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tc-party-lv           { font-size: 9px; color: #555; }
+
+/* ── Status-Hint ────────────────────────────────────────── */
+.tc-status-hint { font-size: 11px; color: #555; text-align: center; margin-top: 4px; }
+
+/* ── Chat ──────────────────────────────────────────────── */
+.tc-chat-section { display: flex; flex-direction: column; gap: 6px; }
+.tc-chat-log {
+  background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px; padding: 8px; max-height: 120px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.tc-chat-empty { font-size: 11px; color: #333; text-align: center; padding: 8px 0; }
+.tc-chat-msg   { font-size: 12px; line-height: 1.4; max-width: 90%; }
+.tc-chat-me    { align-self: flex-end; color: #a5b4fc; }
+.tc-chat-them  { align-self: flex-start; color: #e2e8f0; }
+.tc-chat-name  { color: #818cf8; font-weight: 600; }
+.tc-chat-text  { }
+.tc-chat-input-row {
+  display: flex; gap: 6px;
+}
+.tc-chat-input {
+  flex: 1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px; color: #ddd; padding: 7px 10px; font-size: 13px; outline: none;
+}
+.tc-chat-input:focus { border-color: rgba(99,102,241,.5); }
+
+/* ── Fehler / Ergebnis ──────────────────────────────────── */
+.tc-error {
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3);
+  border-radius: 10px; padding: 14px; text-align: center;
+  color: #f87171; font-size: 14px;
+}
+.tc-result {
+  text-align: center; padding: 20px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.tc-result-ok  { }
+.tc-result-err { }
+.tc-result-icon { font-size: 48px; }
+.tc-result-msg  { font-size: 15px; color: #ddd; line-height: 1.5; }
+.tc-result-sprite {
+  width: 120px; height: 120px; image-rendering: pixelated; object-fit: contain;
+  filter: drop-shadow(0 2px 12px rgba(129,140,248,.5));
+  animation: resultBounce .5s ease-out;
+}
+@keyframes resultBounce {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.tc-party-section,
+.tc-trade-area { margin-top: 0; }

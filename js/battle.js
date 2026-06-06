@@ -239,7 +239,14 @@ function checkBattleEnd() {
       return { log: log, over: false };
     }
     BATTLE.over = true; BATTLE.result = "win";
-    if (BATTLE.trainerData) BATTLE.moneyGained = BATTLE.trainerData.reward || 0;
+    // ── Geldbelohnung ─────────────────────────────────────────
+    if (BATTLE.trainerData) {
+      // Trainer-Kampf: festes Reward
+      BATTLE.moneyGained = BATTLE.trainerData.reward || 0;
+    } else {
+      // Wildes Pokémon: halbes Level als Pokédollar (mind. 1)
+      BATTLE.moneyGained = Math.max(1, Math.floor(BATTLE.enemy.level / 2));
+    }
     log.push("Kampf gewonnen! +" + xp + " EP");
     return { log: log, over: true, result: "win" };
   }
@@ -272,7 +279,6 @@ function doCatchAttempt(ballType) {
     var copy = JSON.parse(JSON.stringify(BATTLE.enemy));
     copy.iid = genIid();
     fixPkmn(copy);
-    // ── Pokédex aktualisieren ──
     if (!STATE.caught) STATE.caught = {};
     if (!STATE.seen)   STATE.seen   = {};
     STATE.caught[copy.dexId] = true;
