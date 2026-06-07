@@ -1,0 +1,4 @@
+        choices:[
+          { item:"dome_fossil",  itemName:"Kuppelfossil",    desc:"Führt zu Kabuto",   dexId:140 },
+          { item:"helix_fossil", itemName:"Spiralenfossil",  desc:"Führt zu Amonitas", dexId:138 },
+        ]

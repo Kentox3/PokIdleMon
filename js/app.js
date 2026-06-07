@@ -10,6 +10,11 @@ var _waitingForInput = false;
 var _inCity          = false;
 var _animRunning     = false;
 
+// ── Auto-Fight Präferenz — bleibt über Kämpfe hinaus gesetzt ──
+// Wenn der Spieler auf "Manuell" wechselt, bleibt das auch beim
+// nächsten Kampf so — bis er wieder auf "Auto" stellt.
+var _autoFightEnabled = true;
+
 function showScreen(id) {
   ["starterScreen","gameScreen","loadScreen","authScreen"].forEach(function(sid) {
     var el=document.getElementById(sid); if(el) el.style.display=(sid===id)?"flex":"none";
@@ -50,6 +55,8 @@ function startGame(awaySeconds){
   if(awaySeconds>60)showOfflineReward(awaySeconds);
   if(zone&&zone.type==="city"){clearInterval(STAGE_INTERVAL);clearInterval(BATTLE_INTERVAL);_waitingForInput=true;_inCity=true;_animRunning=false;STATE.currentBuilding=null;hideBattleUI();renderEnemySprite(null,false);if(!isTrainerDefeated(zone.id,0)){markTrainerDefeated(zone.id,0);healPartyFully();renderPlayerSprites();updateHUD();}renderCityHub(zone);STAGE_INTERVAL=setInterval(processStage,STAGE_TICK_MS);}
   else{switchTab("World");renderWorldTab();startStageLoop();}
+  // Auto-Fight Button auf korrekten Stand bringen
+  _updateAutoFightBtn();
 }
 
 function startStageLoop(){clearInterval(STAGE_INTERVAL);clearInterval(BATTLE_INTERVAL);_waitingForInput=false;_inCity=false;_animRunning=false;STATE.currentBuilding=null;hideBattleUI();renderEnemySprite(null,false);var ms=(typeof getEffectiveTickMs==="function")?getEffectiveTickMs():STAGE_TICK_MS;STAGE_INTERVAL=setInterval(processStage,ms);}
@@ -72,14 +79,55 @@ function triggerWildBattle(wildPkmn) {
   startBattle("wild", wildPkmn);
   var epd=PKMN[wildPkmn.dexId];
   renderEnemySprite(BATTLE.enemy,true); showBattleUI(BATTLE.enemy); clearBattleLog();
-  var ename=(epd?epd.name:"?");
-  appendBattleLog("Ein wildes "+ename+" Lv."+wildPkmn.level+" erscheint!"+(wildPkmn.shiny?" ✨ Shiny!":""));
-  if(BATTLE.autoFight) startBattleLoop();
+  appendBattleLog("Ein wildes "+(epd?epd.name:"?")+" Lv."+wildPkmn.level+" erscheint!"+(wildPkmn.shiny?" ✨ Shiny!":""));
+  // Präferenz anwenden
+  if(_autoFightEnabled) startBattleLoop();
 }
 
-// ── Trainer / Gym (basis — wird in bg_patch überschrieben) ────
-function triggerTrainerBattle(trainer){clearInterval(STAGE_INTERVAL);_waitingForInput=true;startBattle("trainer",trainer);var epd=PKMN[BATTLE.enemy.dexId];renderEnemySprite(BATTLE.enemy,true);showBattleUI(BATTLE.enemy);clearBattleLog();var spr=getTrainerSprite(trainer);if(spr)renderTrainerPortrait(trainer.name,spr);appendBattleLog((trainer.isRival?"⚡ Rival: ":"")+trainer.name+" fordert dich heraus!");appendBattleLog("Er schickt "+(epd?epd.name:"?")+" Lv."+BATTLE.enemy.level+"!");if(BATTLE.autoFight)startBattleLoop();}
-function triggerGymLeader(zone){clearInterval(STAGE_INTERVAL);_waitingForInput=true;var gl=zone.gymLeader;startBattle("gym",{name:gl.name,party:gl.party,reward:gl.reward});var epd=PKMN[BATTLE.enemy.dexId];renderEnemySprite(BATTLE.enemy,true);showBattleUI(BATTLE.enemy);clearBattleLog();var spr=getGymLeaderSprite(gl.name);if(spr)renderTrainerPortrait(gl.name+" ("+gl.title+")",spr);appendBattleLog("⚔️ Arenaleiter "+gl.name+" tritt an!");appendBattleLog(gl.name+" schickt "+(epd?epd.name:"?")+" Lv."+BATTLE.enemy.level+"!");if(BATTLE.autoFight)startBattleLoop();}
+function triggerTrainerBattle(trainer){
+  clearInterval(STAGE_INTERVAL);_waitingForInput=true;
+  startBattle("trainer",trainer);
+  var epd=PKMN[BATTLE.enemy.dexId];
+  renderEnemySprite(BATTLE.enemy,true);showBattleUI(BATTLE.enemy);clearBattleLog();
+  var spr=getTrainerSprite(trainer);if(spr)renderTrainerPortrait(trainer.name,spr);
+  appendBattleLog((trainer.isRival?"⚡ Rival: ":"")+trainer.name+" fordert dich heraus!");
+  appendBattleLog("Er schickt "+(epd?epd.name:"?")+" Lv."+BATTLE.enemy.level+"!");
+  // Präferenz anwenden
+  if(_autoFightEnabled) startBattleLoop();
+}
+
+function triggerGymLeader(zone){
+  clearInterval(STAGE_INTERVAL);_waitingForInput=true;
+  var gl=zone.gymLeader;
+  startBattle("gym",{name:gl.name,party:gl.party,reward:gl.reward});
+  var epd=PKMN[BATTLE.enemy.dexId];
+  renderEnemySprite(BATTLE.enemy,true);showBattleUI(BATTLE.enemy);clearBattleLog();
+  var spr=getGymLeaderSprite(gl.name);if(spr)renderTrainerPortrait(gl.name+" ("+gl.title+")",spr);
+  appendBattleLog("⚔️ Arenaleiter "+gl.name+" tritt an!");
+  appendBattleLog(gl.name+" schickt "+(epd?epd.name:"?")+" Lv."+BATTLE.enemy.level+"!");
+  // Präferenz anwenden
+  if(_autoFightEnabled) startBattleLoop();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  AUTO/MANUELL TOGGLE — speichert Präferenz global
+// ══════════════════════════════════════════════════════════════
+function _updateAutoFightBtn() {
+  var btn=document.getElementById("autoFightBtn");
+  if(btn) btn.textContent = _autoFightEnabled ? "⚡ Auto" : "✋ Manuell";
+}
+
+function toggleAutoFight(){
+  _autoFightEnabled = !_autoFightEnabled;
+  // Auch das aktuelle BATTLE synchronisieren (falls gerade ein Kampf läuft)
+  if(BATTLE) BATTLE.autoFight = _autoFightEnabled;
+  _updateAutoFightBtn();
+  if(_autoFightEnabled && BATTLE && !BATTLE.over && !_animRunning) {
+    startBattleLoop();
+  } else {
+    clearInterval(BATTLE_INTERVAL);
+  }
+}
 
 // ══════════════════════════════════════════════════════════════
 //  AUTO-KAMPF-SCHLEIFE
@@ -111,29 +159,27 @@ function doAutoBattleTurn(){
         if(ec2&&ec2.over){_animRunning=false;onBattleEnd(ec2.result);return;}
         if(!BATTLE.over)renderEnemySprite(BATTLE.enemy,true);
         _animRunning=false;
-        if(BATTLE&&!BATTLE.over&&BATTLE.autoFight)startBattleLoop();
+        // Nur weiter-loopen wenn Auto noch aktiv
+        if(BATTLE&&!BATTLE.over&&_autoFightEnabled)startBattleLoop();
       });
     }else{_animRunning=false;}
   });
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MANUELL — FIX: _animRunning blockiert nur während EIGENER
-//  Animation. Nach Gegner-Angriff sofort wieder klickbar.
+//  MANUELL — onMoveClick
 // ══════════════════════════════════════════════════════════════
 function onMoveClick(moveId) {
   if(!BATTLE||BATTLE.over) return;
-  if(_animRunning) return; // Noch in Animation — warte kurz
+  if(_animRunning) return;
   clearInterval(BATTLE_INTERVAL);
   _animRunning=true;
 
   var player=getActivePkmn();
   if(!player){_animRunning=false;return;}
 
-  // Sicherheitsprüfung: hat der gewählte Move noch PP?
   if(!player.pp) player.pp=initPP(player.moves);
   if(moveId!=="struggle"&&!moveHasPP(player,moveId)&&hasPP(player)){
-    // Move hat 0 PP aber andere haben noch PP → Button sollte disabled sein, Fallback
     showToast("Keine AP mehr für diese Attacke!");
     _animRunning=false;return;
   }
@@ -149,7 +195,6 @@ function onMoveClick(moveId) {
     if(ec&&ec.playerSwitched){renderPlayerSprites();renderMoveButtons();}
     if(ec&&ec.over){_animRunning=false;onBattleEnd(ec.result);return;}
     if(!BATTLE.over){
-      // Gegner-Angriff
       var eMoveId=autoPickMove(BATTLE.enemy,getActivePkmn()),eMove=MOVES[eMoveId]||{type:"Normal"};
       doAttackAnimation(eMove.type,false,function(){
         var eLog=doEnemyAttack();eLog.forEach(function(l){appendBattleLog(l);});updatePlayerHp();renderEnemySprite(BATTLE.enemy,true);
@@ -159,15 +204,16 @@ function onMoveClick(moveId) {
         if(ec2&&ec2.playerSwitched){renderPlayerSprites();renderMoveButtons();}
         if(ec2&&ec2.over){_animRunning=false;onBattleEnd(ec2.result);return;}
         _animRunning=false;
-        renderMoveButtons(); // Move-Buttons refreshen (PP aktualisiert)
-        if(BATTLE&&!BATTLE.over&&BATTLE.autoFight)startBattleLoop();
+        renderMoveButtons();
+        // Nur loop wenn Auto noch aktiv
+        if(BATTLE&&!BATTLE.over&&_autoFightEnabled)startBattleLoop();
       });
     }else{_animRunning=false;}
   });
 }
 
 // ══════════════════════════════════════════════════════════════
-//  POKÉBALL-WURF — FIX: Animation + Count-Refresh
+//  POKÉBALL-WURF
 // ══════════════════════════════════════════════════════════════
 function onCatchClick(ballType) {
   if(!BATTLE||BATTLE.over||_animRunning) return;
@@ -177,11 +223,9 @@ function onCatchClick(ballType) {
   clearInterval(BATTLE_INTERVAL);
   _animRunning=true;
 
-  // Ball-Animation ZUERST, dann Fang-Versuch
   throwBallAnimation(ballType, function(){
     var result=doCatchAttempt(ballType);
     result.log.forEach(function(l){appendBattleLog(l);});
-    // Sofort Count aktualisieren
     renderCatchBalls(BATTLE&&BATTLE.canCatch&&!BATTLE.over);
 
     if(result.caught){
@@ -189,7 +233,6 @@ function onCatchClick(ballType) {
       showToast((pd?pd.name:"?")+" gefangen! "+(result.toParty?"→ Party":"→ Box"));
       _animRunning=false;onBattleEnd("catch");
     }else{
-      // Gegner-Angriff nach Fehlwurf
       var eMoveId=autoPickMove(BATTLE.enemy,getActivePkmn()),eMove=MOVES[eMoveId]||{type:"Normal"};
       doAttackAnimation(eMove.type,false,function(){
         var eLog=doEnemyAttack();eLog.forEach(function(l){appendBattleLog(l);});updatePlayerHp();
@@ -199,7 +242,7 @@ function onCatchClick(ballType) {
         if(ec&&ec.log)ec.log.forEach(function(l){appendBattleLog(l);});
         if(ec&&ec.over){onBattleEnd(ec.result);return;}
         renderCatchBalls(BATTLE&&BATTLE.canCatch&&!BATTLE.over);
-        if(BATTLE&&!BATTLE.over&&BATTLE.autoFight)startBattleLoop();
+        if(BATTLE&&!BATTLE.over&&_autoFightEnabled)startBattleLoop();
       });
     }
   });
@@ -208,11 +251,10 @@ function onCatchClick(ballType) {
 function onFleeClick(){if(!BATTLE||!BATTLE.canFlee||BATTLE.over){showToast("Flucht nicht möglich!");return;}clearInterval(BATTLE_INTERVAL);_animRunning=false;doFlee();onBattleEnd("flee");}
 
 function toggleAutoFight(){
-  if(!BATTLE)return;
-  BATTLE.autoFight=!BATTLE.autoFight;
-  var btn=document.getElementById("autoFightBtn");
-  if(btn)btn.textContent=BATTLE.autoFight?"⚡ Auto":"✋ Manuell";
-  if(BATTLE.autoFight&&!BATTLE.over&&!_animRunning)startBattleLoop();
+  _autoFightEnabled = !_autoFightEnabled;
+  if(BATTLE) BATTLE.autoFight = _autoFightEnabled;
+  _updateAutoFightBtn();
+  if(_autoFightEnabled && BATTLE && !BATTLE.over && !_animRunning) startBattleLoop();
   else clearInterval(BATTLE_INTERVAL);
 }
 

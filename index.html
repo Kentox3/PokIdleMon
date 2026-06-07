@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokIdleMon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/battle_items.css">
   <link rel="stylesheet" href="css/trainer_reveal.css">
@@ -14,23 +17,31 @@
 <body>
 
 <div id="loadScreen" style="display:flex">
-  <div class="load-box"><div class="load-pokeball">⚪</div><h2>PokIdleMon</h2><p id="loadStatus">Verbinde...</p></div>
+  <div class="load-box">
+    <div class="load-pokeball">⚪</div>
+    <h2>PokIdleMon</h2>
+    <p id="loadStatus">Verbinde...</p>
+  </div>
 </div>
 
 <div id="authScreen" style="display:none">
   <div class="auth-wrap">
-    <div class="auth-logo"><span class="auth-logo-ball">⚪</span><h1>PokIdleMon</h1><p>Kanto Side-Scroller RPG</p></div>
+    <div class="auth-logo">
+      <span class="auth-logo-ball">⚪</span>
+      <h1>PokIdleMon</h1>
+      <p>Kanto Idle RPG</p>
+    </div>
     <div id="loginCard" class="auth-card">
       <h2>Anmelden</h2>
       <label class="field-label">Nutzername</label>
       <input id="loginUsername" type="text" placeholder="Dein Nutzername" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off">
       <label class="field-label">PIN <span class="field-hint">(6 Ziffern)</span></label>
       <input id="loginPin" type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)" autocomplete="current-password">
-      <button class="btn-primary" onclick="doLogin()">🎮 Anmelden</button>
+      <button class="btn-primary" onclick="doLogin()">Anmelden</button>
       <p id="loginMsg" class="auth-msg"></p>
       <div class="auth-divider"></div>
       <p class="auth-switch-text">Noch kein Konto?</p>
-      <button class="btn-secondary" onclick="switchToRegister()">✨ Jetzt registrieren</button>
+      <button class="btn-secondary" onclick="switchToRegister()">Jetzt registrieren →</button>
     </div>
     <div id="registerCard" class="auth-card" style="display:none">
       <h2>Konto erstellen</h2>
@@ -40,7 +51,7 @@
       <input id="regPin"  type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)">
       <label class="field-label">PIN wiederholen</label>
       <input id="regPin2" type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)">
-      <button class="btn-primary" onclick="doRegister()">✨ Konto erstellen</button>
+      <button class="btn-primary" onclick="doRegister()">Konto erstellen</button>
       <p id="registerMsg" class="auth-msg"></p>
       <div class="auth-divider"></div>
       <button class="btn-secondary" onclick="switchToLogin()">← Zurück zum Login</button>
@@ -50,11 +61,11 @@
 
 <div id="starterScreen" style="display:none">
   <div class="starter-box">
-    <h2>🌟 Wähle deinen Starter!</h2>
-    <input id="trainerName" type="text" placeholder="👤 Deinen Namen eingeben..." maxlength="20" autocapitalize="words">
-    <p class="pinonly-hint">Bitte gib deinen Trainer-Namen ein</p>
+    <h2>Wähle deinen Starter!</h2>
+    <input id="trainerName" type="text" placeholder="Deinen Trainer-Namen eingeben..." maxlength="20" autocapitalize="words">
+    <p class="pinonly-hint">Bitte zuerst einen Namen eingeben</p>
     <div id="starterGrid"></div>
-    <p id="starterNameMsg" style="color:#ef4444;font-size:13px;min-height:18px;margin-top:8px"></p>
+    <p id="starterNameMsg" style="color:#e03030;font-size:13px;min-height:18px;margin-top:8px"></p>
   </div>
 </div>
 
@@ -84,23 +95,23 @@
       <div id="battleBtns">
         <div id="catchBalls"></div>
         <button id="autoFightBtn" class="btn-auto" onclick="toggleAutoFight()">⚡ Auto</button>
-        <button id="fleeBtn"      class="btn-flee"  onclick="onFleeClick()">🏃 Fliehen</button>
+        <button id="fleeBtn"      class="btn-flee"  onclick="onFleeClick()">Fliehen</button>
       </div>
     </div>
   </div>
 
   <nav id="tabs">
-    <button id="tabWorld" class="tab active" onclick="onTabWorld()">🌍 Route</button>
-    <button id="tabTeam"  class="tab"        onclick="onTabTeam()">👥 Team</button>
-    <button id="tabBag"   class="tab"        onclick="onTabBag()">🎒 Tasche</button>
-    <button id="tabMap"   class="tab"        onclick="onTabMap()">🗺️ Karte</button>
-    <button id="tabDex"   class="tab"        onclick="onTabDex()">📖 Dex</button>
+    <button id="tabWorld" class="tab active" onclick="onTabWorld()">Route</button>
+    <button id="tabTeam"  class="tab"        onclick="onTabTeam()">Team</button>
+    <button id="tabBag"   class="tab"        onclick="onTabBag()">Tasche</button>
+    <button id="tabMap"   class="tab"        onclick="onTabMap()">Karte</button>
+    <button id="tabDex"   class="tab"        onclick="onTabDex()">Dex</button>
   </nav>
 
   <div id="viewWorld" class="tab-view" style="display:block"></div>
   <div id="viewTeam"  class="tab-view" style="display:none">
     <h3>Party</h3><div id="teamList"></div>
-    <h3 style="margin-top:16px">Box</h3><div id="boxPreview" class="box-grid"></div>
+    <h3 style="margin-top:16px">Pokémon-Box</h3><div id="boxPreview" class="box-grid"></div>
   </div>
   <div id="viewBag"  class="tab-view" style="display:none"><h3>Tasche</h3><div id="bagList"></div></div>
   <div id="viewMap"  class="tab-view" style="display:none">
@@ -110,12 +121,12 @@
 </div>
 
 <div id="blackoutOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;flex-direction:column;background:#000;opacity:0;transition:opacity 0.3s ease;pointer-events:all;">
-  <div class="bo-text" style="color:#fff;font-size:20px;font-weight:700;text-align:center;"></div>
+  <div class="bo-text" style="color:#fff;font-size:20px;font-weight:700;text-align:center;font-family:'Rajdhani',sans-serif;letter-spacing:2px;"></div>
 </div>
 
-<div id="shopPopup"    class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>🏪 Shop</h3><button onclick="closeShop()">✕</button></div><div id="shopItemList"></div></div></div>
-<div id="gymPopup"     class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>⚔️ Arena</h3><button onclick="closeGymPopup()">✕</button></div><div id="gymContent"></div></div></div>
-<div id="offlineModal" class="popup-overlay" style="display:none"><div class="popup-box"><h3>⏰ Willkommen zurück!</h3><p id="offlineMsg"></p><button class="btn-primary" onclick="closeOfflineModal()">OK</button></div></div>
+<div id="shopPopup"    class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>Shop</h3><button onclick="closeShop()">✕</button></div><div id="shopItemList"></div></div></div>
+<div id="gymPopup"     class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>Arena</h3><button onclick="closeGymPopup()">✕</button></div><div id="gymContent"></div></div></div>
+<div id="offlineModal" class="popup-overlay" style="display:none"><div class="popup-box"><h3>Willkommen zurück!</h3><p id="offlineMsg"></p><button class="btn-primary" onclick="closeOfflineModal()">OK</button></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
