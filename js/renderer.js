@@ -1,11 +1,60 @@
 // ═══════════════════════════════════════════════════════════════
-//  renderer.js — Sprites, FX, Battle-UI (Overhaul)
+//  renderer.js — Sprites, FX, Battle-UI
 // ═══════════════════════════════════════════════════════════════
 
 var SD_FRONT = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/";
 var SD_BACK  = SD_FRONT + "back/";
 var PNG_FRONT = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 var PNG_BACK  = PNG_FRONT + "back/";
+
+// ══════════════════════════════════════════════════════════════
+//  TYPE_COLORS + Deutsche Typ-Namen
+//  (wird von renderMoveButtons, renderPlayerSprites,
+//   renderEnemySprite und anderen Funktionen verwendet)
+// ══════════════════════════════════════════════════════════════
+var TYPE_COLORS = {
+  Normal:   "#a8a77a",
+  Fire:     "#ee8130",
+  Water:    "#6390f0",
+  Electric: "#f7d02c",
+  Grass:    "#7ac74c",
+  Ice:      "#96d9d6",
+  Fighting: "#c22e28",
+  Poison:   "#a33ea1",
+  Ground:   "#e2bf65",
+  Flying:   "#a98ff3",
+  Psychic:  "#f95587",
+  Bug:      "#a6b91a",
+  Rock:     "#b6a136",
+  Ghost:    "#735797",
+  Dragon:   "#6f35fc",
+  Dark:     "#705746",
+  Steel:    "#b7b7ce",
+};
+
+// Deutsche Typ-Namen für die Anzeige in den Move-Buttons
+var TYPE_NAMES_DE = {
+  Normal:   "Normal",
+  Fire:     "Feuer",
+  Water:    "Wasser",
+  Electric: "Elektro",
+  Grass:    "Pflanze",
+  Ice:      "Eis",
+  Fighting: "Kampf",
+  Poison:   "Gift",
+  Ground:   "Boden",
+  Flying:   "Flug",
+  Psychic:  "Psycho",
+  Bug:      "Käfer",
+  Rock:     "Gestein",
+  Ghost:    "Geist",
+  Dragon:   "Drachen",
+  Dark:     "Unlicht",
+  Steel:    "Stahl",
+};
+
+function typeColor(type){ return TYPE_COLORS[type] || "#888"; }
+function typeName(type) { return TYPE_NAMES_DE[type] || type; }
 
 function spriteUrl(dexId, back, shiny) {
   var base = back ? (shiny ? SD_BACK.replace("/back/","/back/shiny/") : SD_BACK) : (shiny ? SD_FRONT+"shiny/" : SD_FRONT);
@@ -18,17 +67,14 @@ function spriteFallback(dexId, back, shiny) {
 
 // ── Canvas-Szenen ─────────────────────────────────────────────
 var _sceneCanvas=null,_sceneCtx=null,_sceneAnimId=null,_sceneT=0;
-var _bgImageCache={},_gymIndexMap=null;
 
 function getSceneCanvas(){var view=document.getElementById("sceneView");if(!view)return null;if(!_sceneCanvas){_sceneCanvas=document.createElement("canvas");_sceneCanvas.id="sceneCv";_sceneCanvas.style.cssText="position:absolute;inset:0;width:100%;height:100%;z-index:1";view.insertBefore(_sceneCanvas,view.firstChild);_sceneCtx=_sceneCanvas.getContext("2d");}_sceneCanvas.width=view.clientWidth||480;_sceneCanvas.height=view.clientHeight||220;return _sceneCanvas;}
-function _getGymImgKey(zone){if(!_gymIndexMap){_gymIndexMap={};var n=0;WORLD.forEach(function(z){if(z.type==="gym"){n++;_gymIndexMap[z.id]="gym"+n;}});}return _gymIndexMap[zone.id]||null;}
 
 function renderZoneBg(zone){if(!zone)return;if(_sceneAnimId)cancelAnimationFrame(_sceneAnimId);getSceneCanvas();if(!_sceneCtx)return;_sceneT=0;var drawFn;if(zone.type==="sea")drawFn=function(){drawSea(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT);};else if(zone.type==="gym"||zone.type==="building")drawFn=function(){drawGym(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT);};else if(zone.type==="city")drawFn=function(){drawCity(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT);};else if(zone.type==="dungeon"){if(zone.id.indexOf("forest")>=0)drawFn=function(){drawForest(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT);};else if(zone.id==="pokemon_tower")drawFn=function(){drawTower(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT);};else drawFn=function(){drawCave(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT);};}else drawFn=function(){drawRoute(_sceneCtx,_sceneCanvas.width,_sceneCanvas.height,_sceneT,zone);};function loop(){try{drawFn();}catch(e){}_sceneT++;_sceneAnimId=requestAnimationFrame(loop);}loop();}
 
 function px(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(x,y,w,h);}
 
-// Alle Zone-Renderer (unverändert von vorher)
-function drawRoute(c,W,H,t,zone){var sky=(zone&&zone.bgSky)||"#87ceeb",gnd=(zone&&zone.bgGround)||"#5aaa2a",mid=(zone&&zone.bgMid)||"#70b050";var grad=c.createLinearGradient(0,0,0,H);grad.addColorStop(0,sky);grad.addColorStop(0.55,sky);grad.addColorStop(0.75,mid);grad.addColorStop(1,gnd);c.fillStyle=grad;c.fillRect(0,0,W,H);c.fillStyle="rgba(180,210,180,0.6)";[[0,50,70],[80,42,90],[170,48,80],[260,38,100],[360,45,90],[430,40,80]].forEach(function(m){c.beginPath();c.moveTo(m[0],m[1]);c.lineTo(m[0]+m[2]/2,m[1]-35);c.lineTo(m[0]+m[2],m[1]);c.closePath();c.fill();});px(c,0,H*0.58,W,H*0.42,gnd);px(c,0,H*0.7,W,H*0.3,"#3a7a12");px(c,W*0.38,H*0.58,W*0.14,H*0.42,"#c8a878");px(c,W*0.39,H*0.58,4,H*0.42,"#b09060");px(c,W*0.50,H*0.58,4,H*0.42,"#b09060");for(var i=0;i<W;i+=5){var h2=Math.sin(i*0.8+t*0.08)*4+6;c.fillStyle=i%10<5?"#4aaa22":"#3a8a18";c.fillRect(i,H*0.58-h2,3,h2);}[[0.04,0.22,1.2],[0.15,0.25,1.0],[0.72,0.22,1.3],[0.85,0.24,1.1],[0.92,0.23,1.0]].forEach(function(tr){drawTree(c,tr[0]*W,tr[1]*H,tr[2]);});[[0.30,0.58],[0.55,0.56],[0.68,0.55]].forEach(function(b){drawBush(c,b[0]*W,b[1]*H);});["#ff6688","#ffcc22","#ff88aa","#fff"].forEach(function(col,i){c.fillStyle=col;c.fillRect(50+i*70,H*0.54,4,4);c.fillRect(52+i*70,H*0.52,4,4);});[[0.06,0.1,1],[0.38,0.08,0.8],[0.72,0.12,1.1]].forEach(function(cl){drawCloud(c,cl[0]*W+Math.sin(t*0.005)*8,cl[1]*H,cl[2]);});}
+function drawRoute(c,W,H,t,zone){var sky=(zone&&zone.bgSky)||"#87ceeb",gnd=(zone&&zone.bgGround)||"#5aaa2a",mid=(zone&&zone.bgMid)||"#70b050";var grad=c.createLinearGradient(0,0,0,H);grad.addColorStop(0,sky);grad.addColorStop(0.55,sky);grad.addColorStop(0.75,mid);grad.addColorStop(1,gnd);c.fillStyle=grad;c.fillRect(0,0,W,H);px(c,0,H*0.58,W,H*0.42,gnd);px(c,0,H*0.7,W,H*0.3,"#3a7a12");px(c,W*0.38,H*0.58,W*0.14,H*0.42,"#c8a878");[[0.04,0.22,1.2],[0.15,0.25,1.0],[0.72,0.22,1.3],[0.85,0.24,1.1],[0.92,0.23,1.0]].forEach(function(tr){drawTree(c,tr[0]*W,tr[1]*H,tr[2]);});[[0.06,0.1,1],[0.38,0.08,0.8],[0.72,0.12,1.1]].forEach(function(cl){drawCloud(c,cl[0]*W+Math.sin(t*0.005)*8,cl[1]*H,cl[2]);});}
 function drawTree(c,x,y,s){s=s||1;var tw=20*s,th=42*s;px(c,x+tw*0.3,y+th*0.67,tw*0.4,th*0.33,"#6b3a1f");c.fillStyle="#2d5a1b";c.fillRect(x,y+th*0.4,tw,th*0.35);c.fillRect(x+tw*0.1,y+th*0.2,tw*0.8,th*0.28);c.fillRect(x+tw*0.25,y,tw*0.5,th*0.25);}
 function drawBush(c,x,y){c.fillStyle="#3a7a22";c.fillRect(x,y+8,20,10);c.fillRect(x+3,y,14,12);}
 function drawCloud(c,x,y,s){s=s||1;c.fillStyle="rgba(255,255,255,0.85)";[[0,0,20,10],[10,-8,24,12],[28,-2,20,10],[6,6,36,8]].forEach(function(d){c.fillRect(x+d[0]*s,y+d[1]*s,d[2]*s,d[3]*s);});}
@@ -43,7 +89,7 @@ function drawSea(c,W,H,t){var ss=c.createLinearGradient(0,0,0,H);ss.addColorStop
 //  ANGRIFFS-ANIMATIONEN
 // ══════════════════════════════════════════════════════════════
 var _fxCanvas=null,_fxCtx=null;
-var TYPE_FX_MAP={"Normal":{col:"#aaa",glow:"#fff",style:"stars"},"Fire":{col:"#f62",glow:"#fa4",style:"fire"},"Water":{col:"#49f",glow:"#8cf",style:"water"},"Electric":{col:"#fc0",glow:"#fe8",style:"bolt"},"Grass":{col:"#4c4",glow:"#8f8",style:"leaves"},"Ice":{col:"#9ef",glow:"#cff",style:"ice"},"Fighting":{col:"#c32",glow:"#f65",style:"punch"},"Poison":{col:"#a4c",glow:"#c8f",style:"cloud"},"Ground":{col:"#c94",glow:"#eb6",style:"rocks"},"Flying":{col:"#8af",glow:"#bcf",style:"wind"},"Psychic":{col:"#f6a",glow:"#fac",style:"rings"},"Bug":{col:"#8c4",glow:"#af6",style:"swarm"},"Rock":{col:"#986",glow:"#ba8",style:"rocks"},"Ghost":{col:"#64a",glow:"#a8e",style:"wisp"},"Dragon":{col:"#63f",glow:"#a8f",style:"beam"},"Dark":{col:"#424",glow:"#848",style:"shadow"},"Steel":{col:"#9ac",glow:"#cdf",style:"spark"}};
+var TYPE_FX_MAP={"Normal":{col:"#a8a77a",glow:"#fff"},"Fire":{col:"#ee8130",glow:"#ffa060"},"Water":{col:"#6390f0",glow:"#90b8ff"},"Electric":{col:"#f7d02c",glow:"#ffe060"},"Grass":{col:"#7ac74c",glow:"#a0e070"},"Ice":{col:"#96d9d6",glow:"#c0f0ee"},"Fighting":{col:"#c22e28",glow:"#f06060"},"Poison":{col:"#a33ea1",glow:"#d070d0"},"Ground":{col:"#e2bf65",glow:"#f0d890"},"Flying":{col:"#a98ff3",glow:"#c0b0ff"},"Psychic":{col:"#f95587",glow:"#ffaabb"},"Bug":{col:"#a6b91a",glow:"#c8e030"},"Rock":{col:"#b6a136",glow:"#d8c060"},"Ghost":{col:"#735797",glow:"#a080c0"},"Dragon":{col:"#6f35fc",glow:"#a070ff"},"Dark":{col:"#705746",glow:"#a08070"},"Steel":{col:"#b7b7ce",glow:"#d0d0e8"}};
 
 function getFxCanvas(){var view=document.getElementById("sceneView");if(!view)return null;if(!_fxCanvas){_fxCanvas=document.createElement("canvas");_fxCanvas.id="fxCanvas";_fxCanvas.style.cssText="position:absolute;inset:0;width:100%;height:100%;z-index:25;pointer-events:none";view.appendChild(_fxCanvas);_fxCtx=_fxCanvas.getContext("2d");}_fxCanvas.width=view.clientWidth||480;_fxCanvas.height=view.clientHeight||220;return _fxCanvas;}
 function clearFxCanvas(){if(_fxCtx&&_fxCanvas)_fxCtx.clearRect(0,0,_fxCanvas.width,_fxCanvas.height);}
@@ -61,30 +107,24 @@ function doAttackAnimation(moveType,fromPlayer,onHit,onDone){
     if(elapsed<FLIGHT_MS){
       var p=elapsed/FLIGHT_MS,ease=p<0.5?2*p*p:-1+(4-2*p)*p;
       var cx2=srcX+(dstX-srcX)*ease,cy2=srcY+(dstY-srcY)*ease-Math.sin(p*Math.PI)*30;
-      drawProjectile(c,cx2,cy2,fx,p);requestAnimationFrame(loop);
+      var size=8+Math.sin(p*Math.PI)*4;var dg=c.createRadialGradient(cx2,cy2,0,cx2,cy2,size);dg.addColorStop(0,fx.glow);dg.addColorStop(0.6,fx.col);dg.addColorStop(1,"rgba(0,0,0,0)");c.fillStyle=dg;c.beginPath();c.arc(cx2,cy2,size,0,Math.PI*2);c.fill();
+      requestAnimationFrame(loop);
     }else{
       if(!hitCalled){hitCalled=true;if(onHit)onHit();}
       var ip=(elapsed-FLIGHT_MS)/IMPACT_MS;
-      if(ip<=1){drawImpact(c,dstX,dstY,fx,ip,W,H);requestAnimationFrame(loop);}
-      else{c.clearRect(0,0,W,H);if(!doneCalled){doneCalled=true;if(onDone)onDone();}}
+      if(ip<=1){
+        var ease2=ip<0.5?2*ip*ip:-1+(4-2*ip)*ip,fade=1-ip;c.globalAlpha=fade;
+        var dg2=c.createRadialGradient(dstX,dstY,0,dstX,dstY,ease2*40);dg2.addColorStop(0,fx.glow);dg2.addColorStop(0.5,fx.col);dg2.addColorStop(1,"rgba(0,0,0,0)");c.fillStyle=dg2;c.beginPath();c.arc(dstX,dstY,ease2*40,0,Math.PI*2);c.fill();
+        if(ip<0.2){c.globalAlpha=(0.2-ip)/0.2*0.3;c.fillStyle=fx.glow;c.fillRect(0,0,W,H);}c.globalAlpha=1;
+        requestAnimationFrame(loop);
+      }else{c.clearRect(0,0,W,H);if(!doneCalled){doneCalled=true;if(onDone)onDone();}}
     }
   }
   requestAnimationFrame(loop);
 }
 
-function drawProjectile(c,x,y,fx,p){
-  var size=8+Math.sin(p*Math.PI)*4;
-  var dg=c.createRadialGradient(x,y,0,x,y,size);dg.addColorStop(0,fx.glow);dg.addColorStop(0.6,fx.col);dg.addColorStop(1,"rgba(0,0,0,0)");c.fillStyle=dg;c.beginPath();c.arc(x,y,size,0,Math.PI*2);c.fill();
-}
-function drawImpact(c,x,y,fx,p,W,H){
-  var ease=p<0.5?2*p*p:-1+(4-2*p)*p,fade=1-p;c.globalAlpha=fade;
-  var dg2=c.createRadialGradient(x,y,0,x,y,ease*40);dg2.addColorStop(0,fx.glow);dg2.addColorStop(0.5,fx.col);dg2.addColorStop(1,"rgba(0,0,0,0)");c.fillStyle=dg2;c.beginPath();c.arc(x,y,ease*40,0,Math.PI*2);c.fill();
-  if(p<0.2){c.globalAlpha=(0.2-p)/0.2*0.3;c.fillStyle=fx.glow;c.fillRect(0,0,W,H);}
-  c.globalAlpha=1;
-}
-
 // ══════════════════════════════════════════════════════════════
-//  SPIELER-SPRITES — Kompakt wie Gegner-Info, mit Geschlecht + XP
+//  SPIELER-SPRITES
 // ══════════════════════════════════════════════════════════════
 function renderPlayerSprites(){
   var container=document.getElementById("playerSprites");if(!container||!STATE)return;
@@ -97,49 +137,36 @@ function renderPlayerSprites(){
   var xpPct=Math.min(100,Math.round(lead.xp/lead.xpToNext*100));
   var gender=lead.gender;
   var genderHtml=gender==="M"?"<span class='gender-m'>♂</span>":gender==="F"?"<span class='gender-f'>♀</span>":"";
-  var typeHtml=(pd?pd.types.map(function(t){return "<span class='type-badge type-badge-sm' style='background:"+(TYPE_COLORS[t]||"#aaa")+"'>"+t+"</span>";}).join(""):"");
+  var typeHtml=(pd?pd.types.map(function(t){return "<span class='type-badge type-badge-sm' style='background:"+typeColor(t)+"'>"+typeName(t)+"</span>";}).join(""):"");
   var statusHtml=lead.status?"<span class='status-badge status-"+lead.status+"'>"+statusText(lead.status)+"</span>":"";
-
   var div=document.createElement("div");
   div.className="walker walker-lead"+(shiny?" walker-shiny":"");
   div.innerHTML=
     "<img class='walker-sprite"+(shiny?" shiny-sprite":"")+"' src='"+spriteUrl(lead.dexId,true,shiny)+"' onerror='this.src=\""+spriteFallback(lead.dexId,true,shiny)+"\"'>"+
     "<div class='walker-info'>"+
-      "<div class='walker-nameline'>"+
-        "<b>"+(shiny?"✨":"")+name+"</b>"+genderHtml+
-        "<span class='walker-lv'>Lv."+lead.level+"</span>"+statusHtml+
-      "</div>"+
+      "<div class='walker-nameline'><b>"+(shiny?"✨":"")+name+"</b>"+genderHtml+"<span class='walker-lv'>Lv."+lead.level+"</span>"+statusHtml+"</div>"+
       "<div class='walker-types'>"+typeHtml+"</div>"+
-      "<div class='walker-hprow'>"+
-        "<div class='walker-hpbar'><div class='walker-hpfill' style='width:"+hpPct+"%;background:"+hpColor(lead.currentHP,lead.maxHP)+"'></div></div>"+
-        "<span class='walker-hptxt'>"+lead.currentHP+"/"+lead.maxHP+"</span>"+
-      "</div>"+
-      "<div class='walker-xprow'>"+
-        "<div class='walker-xpbar'><div class='walker-xpfill' style='width:"+xpPct+"%'></div></div>"+
-        "<span class='walker-xptxt'>EP</span>"+
-      "</div>"+
+      "<div class='walker-hprow'><div class='walker-hpbar'><div class='walker-hpfill' style='width:"+hpPct+"%;background:"+hpColor(lead.currentHP,lead.maxHP)+"'></div></div><span class='walker-hptxt'>"+lead.currentHP+"/"+lead.maxHP+"</span></div>"+
+      "<div class='walker-xprow'><div class='walker-xpbar'><div class='walker-xpfill' style='width:"+xpPct+"%'></div></div><span class='walker-xptxt'>EP</span></div>"+
     "</div>";
   container.appendChild(div);
 }
 
 // ══════════════════════════════════════════════════════════════
-//  GEGNER-SPRITE — mit Geschlecht
+//  GEGNER-SPRITE
 // ══════════════════════════════════════════════════════════════
 function renderEnemySprite(enemy,visible){
   var container=document.getElementById("enemySprite");if(!container)return;
   if(!enemy||!visible){container.innerHTML="";container.style.opacity="0";return;}
   var pd=PKMN[enemy.dexId],name=pd?pd.name:"?";
-  var typeHtml=pd?pd.types.map(function(t){return "<span class='type-badge type-badge-sm' style='background:"+(TYPE_COLORS[t]||"#aaa")+"'>"+t+"</span>";}).join(""):"";
+  var typeHtml=pd?pd.types.map(function(t){return "<span class='type-badge type-badge-sm' style='background:"+typeColor(t)+"'>"+typeName(t)+"</span>";}).join(""):"";
   var gender=enemy.gender;
   var genderHtml=gender==="M"?"<span class='gender-m'>♂</span>":gender==="F"?"<span class='gender-f'>♀</span>":"";
   container.style.opacity="1";
   container.innerHTML=
     "<div class='enemy-info'>"+
       "<div class='enemy-nameline'>"+name+genderHtml+" <span class='enemy-lv'>Lv."+enemy.level+"</span>"+typeHtml+"</div>"+
-      "<div class='enemy-hprow'>"+
-        "<div class='enemy-hpbar'><div class='enemy-hpfill' id='enemyHpFill' style='width:"+Math.max(0,Math.round(enemy.currentHP/enemy.maxHP*100))+"%;background:"+hpColor(enemy.currentHP,enemy.maxHP)+"'></div></div>"+
-        "<span class='enemy-hptxt' id='enemyHpTxt'>"+enemy.currentHP+"/"+enemy.maxHP+"</span>"+
-      "</div>"+
+      "<div class='enemy-hprow'><div class='enemy-hpbar'><div class='enemy-hpfill' id='enemyHpFill' style='width:"+Math.max(0,Math.round(enemy.currentHP/enemy.maxHP*100))+"%;background:"+hpColor(enemy.currentHP,enemy.maxHP)+"'></div></div><span class='enemy-hptxt' id='enemyHpTxt'>"+enemy.currentHP+"/"+enemy.maxHP+"</span></div>"+
       (enemy.status?"<span class='status-badge status-"+enemy.status+"'>"+statusText(enemy.status)+"</span>":"")+
     "</div>"+
     "<img class='enemy-img enemy-appear' src='"+spriteUrl(enemy.dexId,false)+"' onerror='this.src=\""+spriteFallback(enemy.dexId,false)+"\"'>";
@@ -148,7 +175,6 @@ function renderEnemySprite(enemy,visible){
 function updateEnemyHp(enemy){var fill=document.getElementById("enemyHpFill"),txt=document.getElementById("enemyHpTxt");if(!enemy)return;if(fill){fill.style.width=Math.max(0,Math.round(enemy.currentHP/enemy.maxHP*100))+"%";fill.style.background=hpColor(enemy.currentHP,enemy.maxHP);}if(txt)txt.textContent=enemy.currentHP+"/"+enemy.maxHP;}
 function updatePlayerHp(){var p=getActivePkmn();if(!p)return;var fill=document.querySelector(".walker-hpfill");if(fill){fill.style.width=Math.max(0,Math.round(p.currentHP/p.maxHP*100))+"%";fill.style.background=hpColor(p.currentHP,p.maxHP);}var txt=document.querySelector(".walker-hptxt");if(txt)txt.textContent=p.currentHP+"/"+p.maxHP;var xpF=document.querySelector(".walker-xpfill");if(xpF)xpF.style.width=Math.min(100,Math.round(p.xp/p.xpToNext*100))+"%";var tv=document.getElementById("viewTeam");if(tv&&tv.style.display!=="none"&&typeof renderTeamScreen==="function")renderTeamScreen();}
 
-// ── Trainer-Portrait ──────────────────────────────────────────
 function renderTrainerPortrait(name,url2){hideTrainerPortrait();var scene=document.getElementById("sceneView");if(!scene)return;var div=document.createElement("div");div.id="trainerPortrait";div.style.cssText="position:absolute;right:8px;top:8px;z-index:20;text-align:center";div.innerHTML="<img src='"+url2+"' style='width:52px;height:52px;image-rendering:pixelated;display:block;margin:0 auto;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.6)' onerror='this.parentNode.remove()'><div style='font-size:9px;color:#fff;background:rgba(0,0,0,.65);border-radius:3px;padding:1px 4px;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px'>"+name+"</div>";scene.appendChild(div);}
 function hideTrainerPortrait(){var el=document.getElementById("trainerPortrait");if(el&&el.parentNode)el.parentNode.removeChild(el);}
 
@@ -167,8 +193,9 @@ function hideBattleUI(){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MOVE-BUTTONS — PP-Anzeige, 0-PP disabled
-//  FIX: Kein autoPickMove — der geklickte Move wird verwendet
+//  MOVE-BUTTONS
+//  FIX: TYPE_COLORS jetzt definiert, PP-Werte als Integer
+//       Typ-Name auf Deutsch angezeigt (kein "Bug" mehr)
 // ══════════════════════════════════════════════════════════════
 function renderMoveButtons(){
   var container=document.getElementById("moveButtons");if(!container)return;
@@ -176,45 +203,44 @@ function renderMoveButtons(){
   container.innerHTML="";
   if(!player.pp)player.pp=initPP(player.moves);
   var allEmpty=!hasPP(player);
+
   player.moves.forEach(function(mid){
     var move=MOVES[mid];if(!move)return;
-    var curPP=player.pp[mid]||0;
-    var maxPP=ppMax(mid);
-    var noPP=curPP<=0&&!allEmpty; // 0 PP aber andere Moves noch voll
+    // PP als saubere Integer — kein Stk oder sonstiger Müll
+    var curPP=Math.max(0, parseInt(player.pp[mid], 10) || 0);
+    var maxPP=Math.max(1, parseInt(ppMax(mid), 10) || 10);
+    var noPP=curPP<=0&&!allEmpty;
+    var col=noPP?"#333":typeColor(move.type);
     var btn=document.createElement("button");
     btn.className="move-btn"+(noPP?" move-btn-empty":"");
-    btn.disabled=noPP; // Grayed out wenn PP=0
-    btn.style.borderColor=noPP?"#444":(TYPE_COLORS[move.type]||"#888");
+    btn.disabled=noPP;
+    btn.style.borderColor=noPP?"#444":col;
     btn.innerHTML=
       "<span class='move-name'>"+move.name+"</span>"+
-      "<span class='move-type' style='background:"+(noPP?"#333":(TYPE_COLORS[move.type]||"#888"))+"'>"+move.type+"</span>"+
+      "<span class='move-type' style='background:"+col+"'>"+typeName(move.type)+"</span>"+
       "<span class='move-pp "+(curPP===0?"move-pp-empty":curPP<=Math.floor(maxPP/4)?"move-pp-low":"")+"'>"+curPP+"/"+maxPP+"</span>";
-    if(!noPP){
-      (function(m){btn.onclick=function(){onMoveClick(m);};})(mid);
-    }
+    if(!noPP)(function(m){btn.onclick=function(){onMoveClick(m);};})(mid);
     container.appendChild(btn);
   });
-  // Wenn alle PP leer → Kräftemessen-Button
+
   if(allEmpty){
-    var struggleBtn=document.createElement("button");
-    struggleBtn.className="move-btn move-btn-struggle";
-    struggleBtn.innerHTML="<span class='move-name'>Kräftemessen</span><span class='move-type' style='background:#888'>Normal</span>";
-    struggleBtn.onclick=function(){onMoveClick("struggle");};
-    container.appendChild(struggleBtn);
+    var sb=document.createElement("button");
+    sb.className="move-btn move-btn-struggle";
+    sb.innerHTML="<span class='move-name'>Kräftemessen</span><span class='move-type' style='background:#888'>Normal</span>";
+    sb.onclick=function(){onMoveClick("struggle");};
+    container.appendChild(sb);
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-//  CATCH-BALLS — FIX: IMMER sichtbar in Wild-Kampf, Count sofort
+//  CATCH-BALLS
 // ══════════════════════════════════════════════════════════════
 function renderCatchBalls(visible){
   var container=document.getElementById("catchBalls");if(!container)return;
   container.innerHTML="";
-  if(!visible||!STATE||!BATTLE||!BATTLE.canCatch||BATTLE.over) return;
-  var anyBall=false;
+  if(!visible||!STATE||!BATTLE||!BATTLE.canCatch||BATTLE.over)return;
   ["pokeball","superball","hyperball","masterball"].forEach(function(type){
     var count=STATE.items[type]||0;if(count<=0)return;
-    anyBall=true;
     var btn=document.createElement("button");btn.className="ball-btn";
     btn.title=(ITEM_DEFS&&ITEM_DEFS[type]?ITEM_DEFS[type].name:type)+" (x"+count+")";
     var imgUrl=(typeof BALL_SPRITES!=="undefined"&&BALL_SPRITES[type])?BALL_SPRITES[type]:"";
@@ -222,17 +248,11 @@ function renderCatchBalls(visible){
     btn.onclick=(function(t){return function(){onCatchClick(t);};})(type);
     container.appendChild(btn);
   });
-  if(!anyBall){var msg=document.createElement("span");msg.style.cssText="font-size:11px;color:#555;padding:4px";msg.textContent="Keine Bälle";container.appendChild(msg);}
 }
-
-// updateCatchButton: Bälle immer zeigen wenn Wild-Kampf aktiv
-function updateCatchButton(enemy){
-  var canCatch=BATTLE&&BATTLE.canCatch&&!BATTLE.over;
-  renderCatchBalls(canCatch);
-}
+function updateCatchButton(enemy){renderCatchBalls(BATTLE&&BATTLE.canCatch&&!BATTLE.over);}
 
 // ══════════════════════════════════════════════════════════════
-//  BALL-ANIMATION (wird jetzt wirklich aufgerufen!)
+//  BALL-ANIMATION
 // ══════════════════════════════════════════════════════════════
 function throwBallAnimation(ballType,callback){
   var scene=document.getElementById("sceneView");
@@ -250,19 +270,15 @@ function throwBallAnimation(ballType,callback){
     img.style.transform="rotate("+(p*540)+"deg)";
     if(p<1){requestAnimationFrame(step);return;}
     img.style.transform="rotate(0deg)";
-    // Schüttelanimation
     var w=0,wd=1,wi=setInterval(function(){w++;wd=-wd;img.style.transform="rotate("+(wd*12)+"deg)";if(w>=5){clearInterval(wi);img.style.transform="rotate(0deg)";setTimeout(function(){if(img.parentNode)img.parentNode.removeChild(img);if(callback)callback();},150);}},140);
   }
   requestAnimationFrame(step);
 }
 
-// ── Battle-Log ────────────────────────────────────────────────
+// ── Diverses ──────────────────────────────────────────────────
 function appendBattleLog(lines){var log=document.getElementById("battleLog");if(!log)return;if(typeof lines==="string")lines=[lines];lines.forEach(function(line){if(!line)return;var p=document.createElement("p");p.textContent=line;log.appendChild(p);while(log.children.length>35)log.removeChild(log.firstChild);});log.scrollTop=log.scrollHeight;}
 function clearBattleLog(){var l=document.getElementById("battleLog");if(l)l.innerHTML="";}
-
-// ── Stage-Info ────────────────────────────────────────────────
 function renderStageInfo(){if(!STATE)return;var zone=getZone(STATE.currentZoneId);if(!zone)return;var zEl=document.getElementById("zoneName"),sEl=document.getElementById("stageInfo");if(zEl)zEl.textContent=zone.name;if(sEl){var icon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[zone.type]||"📍";sEl.textContent=icon+" Etappe "+STATE.currentStage+" / "+zone.stageCount;}var bar=document.getElementById("stageProgressFill");if(bar)bar.style.width=Math.round((STATE.currentStage-1)/zone.stageCount*100)+"%";}
-
 function hpColor(cur,max){var p=max>0?cur/max:0;return p>0.5?"#44cc44":p>0.25?"#ffbb22":"#ee4444";}
 function statusText(s){return{burn:"BRN",poison:"GIF",paralysis:"LAH",sleep:"SCH",freeze:"EIS",confuse:"VWR"}[s]||(s||"").toUpperCase().slice(0,3);}
 function showToast(msg,ms){var z=document.getElementById("toastZone");if(!z)return;var el=document.createElement("div");el.className="toast";el.textContent=msg;z.appendChild(el);setTimeout(function(){el.classList.add("toast-fade");setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},400);},ms||2500);}
