@@ -75,27 +75,101 @@ function applyXP(pkmnInst,xpGained,enemyDexId){
 
 function tryCatch(enemyInst,ballType){var pd=PKMN[enemyInst.dexId],catchRate=pd?pd.catchRate:45;var ballMult={pokeball:1,superball:1.5,hyperball:2,masterball:255}[ballType]||1;if(ballType==="masterball")return true;var hpFactor=(enemyInst.maxHP*3-enemyInst.currentHP*2)/(enemyInst.maxHP*3);var statusMult=(enemyInst.status==="sleep"||enemyInst.status==="freeze")?2:enemyInst.status?1.5:1;var eff=Math.max(1,Math.min(255,Math.floor(catchRate*hpFactor*ballMult*statusMult)));return Math.floor(Math.random()*256)<eff;}
 
-function initNewGame(uid,trainerName,starterDexId){var starter=createPkmnInstance(starterDexId,5);STATE={uid:uid,name:trainerName,starter:starterDexId,party:[starter],box:[],items:{pokeball:5,superball:0,hyperball:0,potion:3,superpotion:0},money:1000,badges:0,badgeIds:[],defeatedTrainers:{},visitedZones:{"alabastia":true},currentZoneId:"alabastia",currentStage:1,seen:{},caught:{},eventFlags:{},currentBuilding:null,lastSeen:Date.now(),version:5};STATE.caught[starterDexId]=true;STATE.seen[starterDexId]=true;return STATE;}
+// ── Version 6: visitedZones wird nicht mehr rekonstruiert ─────
+var GAME_VERSION = 6;
+
+function initNewGame(uid,trainerName,starterDexId){
+  var starter=createPkmnInstance(starterDexId,5);
+  STATE={
+    uid:uid, name:trainerName, starter:starterDexId,
+    party:[starter], box:[],
+    items:{pokeball:5,superball:0,hyperball:0,potion:3,superpotion:0},
+    money:1000, badges:0, badgeIds:[],
+    defeatedTrainers:{},
+    // Nur Alabastia ist von Anfang an besucht
+    visitedZones:{"alabastia":true},
+    currentZoneId:"alabastia", currentStage:1,
+    seen:{}, caught:{}, eventFlags:{},
+    currentBuilding:null, lastSeen:Date.now(),
+    version:GAME_VERSION
+  };
+  STATE.caught[starterDexId]=true;
+  STATE.seen[starterDexId]=true;
+  return STATE;
+}
 
 function loadGameState(uid,savedState){
   try{
-    STATE=savedState;STATE.uid=uid;
-    if(!STATE.items)STATE.items={pokeball:5};if(!STATE.badgeIds)STATE.badgeIds=[];if(!STATE.defeatedTrainers)STATE.defeatedTrainers={};if(!STATE.visitedZones)STATE.visitedZones={};if(!STATE.seen)STATE.seen={};if(!STATE.caught)STATE.caught={};if(!STATE.party)STATE.party=[];if(!STATE.box)STATE.box=[];if(!STATE.eventFlags)STATE.eventFlags={};if(!STATE.currentBuilding)STATE.currentBuilding=null;
+    STATE=savedState; STATE.uid=uid;
+    if(!STATE.items)STATE.items={pokeball:5};
+    if(!STATE.badgeIds)STATE.badgeIds=[];
+    if(!STATE.defeatedTrainers)STATE.defeatedTrainers={};
+    if(!STATE.seen)STATE.seen={};
+    if(!STATE.caught)STATE.caught={};
+    if(!STATE.party)STATE.party=[];
+    if(!STATE.box)STATE.box=[];
+    if(!STATE.eventFlags)STATE.eventFlags={};
+    if(!STATE.currentBuilding)STATE.currentBuilding=null;
+
     STATE.party.forEach(function(p){try{fixPkmn(p);}catch(e){console.warn("[load] party:",e);}});
     STATE.box.forEach(function(p){try{fixPkmn(p);}catch(e){console.warn("[load] box:",e);}});
     STATE.party.forEach(function(p){if(p&&p.dexId){STATE.caught[p.dexId]=true;STATE.seen[p.dexId]=true;}});
     STATE.box.forEach(function(p){if(p&&p.dexId){STATE.caught[p.dexId]=true;STATE.seen[p.dexId]=true;}});
-    var mainZones=WORLD.filter(function(z){return z.type!=="building";});
-    var curIdx=mainZones.findIndex(function(z){return z.id===STATE.currentZoneId;});
-    if(curIdx<0){STATE.currentZoneId="alabastia";STATE.currentStage=1;curIdx=0;}
-    for(var vi=0;vi<=curIdx;vi++){try{STATE.visitedZones[mainZones[vi].id]=true;}catch(e){}}
-    STATE.currentBuilding=null;
+
+    // ── FIX: visitedZones korrekt behandeln ──────────────────
+    // VORHER: Alle Zonen von Index 0 bis aktueller Zone wurden
+    //         markiert — das hat 90% der Karte freigeschaltet!
+    //
+    // JETZT: visitedZones aus Firebase wird direkt genutzt.
+    //        Nur Alabastia + aktuelle Zone werden garantiert gesetzt.
+    //        Alte Saves (version < 6) bekommen saubere visitedZones.
+    if(!STATE.visitedZones) STATE.visitedZones = {};
+
+    if(!STATE.version || STATE.version < 6){
+      // Migration alter Saves: visitedZones zurücksetzen
+      // Nur die echte aktuell besuchte Zone + Startstadt behalten
+      var cleanVisited = {"alabastia": true};
+      if(STATE.currentZoneId) cleanVisited[STATE.currentZoneId] = true;
+      // Auch die Stadt der aktuellen Zone als besucht markieren
+      // (damit der Spieler nicht in einer Route feststeckt)
+      if(STATE.currentZoneId) {
+        var curZ = (typeof WORLD !== "undefined") ? WORLD.find(function(z){return z.id===STATE.currentZoneId;}) : null;
+        if(curZ && curZ.parentCity) cleanVisited[curZ.parentCity] = true;
+      }
+      STATE.visitedZones = cleanVisited;
+      STATE.version = GAME_VERSION;
+    }
+
+    // Sicherstellen: aktuelle Zone ist immer besucht
+    STATE.visitedZones["alabastia"] = true;
+    if(STATE.currentZoneId) STATE.visitedZones[STATE.currentZoneId] = true;
+
+    // Gültige Zone prüfen
+    if(typeof WORLD !== "undefined"){
+      var validZone = WORLD.find(function(z){return z.id===STATE.currentZoneId;});
+      if(!validZone){STATE.currentZoneId="alabastia";STATE.currentStage=1;}
+    }
+    STATE.currentBuilding = null;
+
   }catch(e){
     console.error("[loadGameState]",e);
-    if(!STATE)STATE=savedState||{};STATE.uid=uid;
-    if(!STATE.party)STATE.party=[];if(!STATE.box)STATE.box=[];if(!STATE.items)STATE.items={pokeball:5};if(!STATE.seen)STATE.seen={};if(!STATE.caught)STATE.caught={};if(!STATE.eventFlags)STATE.eventFlags={};if(!STATE.currentBuilding)STATE.currentBuilding=null;if(!STATE.currentZoneId){STATE.currentZoneId="alabastia";STATE.currentStage=1;}if(!STATE.visitedZones)STATE.visitedZones={"alabastia":true};
+    if(!STATE)STATE=savedState||{};
+    STATE.uid=uid;
+    if(!STATE.party)STATE.party=[];
+    if(!STATE.box)STATE.box=[];
+    if(!STATE.items)STATE.items={pokeball:5};
+    if(!STATE.seen)STATE.seen={};
+    if(!STATE.caught)STATE.caught={};
+    if(!STATE.eventFlags)STATE.eventFlags={};
+    if(!STATE.currentBuilding)STATE.currentBuilding=null;
+    if(!STATE.currentZoneId){STATE.currentZoneId="alabastia";STATE.currentStage=1;}
+    if(!STATE.visitedZones)STATE.visitedZones={"alabastia":true};
+    STATE.visitedZones["alabastia"]=true;
+    if(STATE.currentZoneId)STATE.visitedZones[STATE.currentZoneId]=true;
+    STATE.version=GAME_VERSION;
   }
-  var now=Date.now(),away=Math.min((now-(STATE.lastSeen||now))/1000,8*3600);STATE.lastSeen=now;
+  var now=Date.now(),away=Math.min((now-(STATE.lastSeen||now))/1000,8*3600);
+  STATE.lastSeen=now;
   return{state:STATE,awaySeconds:Math.floor(away)};
 }
 
@@ -108,14 +182,12 @@ function getPartyAlive(){if(!STATE)return 0;return STATE.party.filter(function(p
 function healPartyFully(){if(!STATE)return;STATE.party.forEach(function(p){try{fixPkmn(p);p.currentHP=p.maxHP;p.status=null;p.statusTurns=0;p._faintAnnounced=false;if(!p.pp)p.pp=initPP(p.moves||[]);p.moves.forEach(function(mid){p.pp[mid]=ppMax(mid);});}catch(e){}});}
 function addToBox(pkmnInst){if(!STATE.box)STATE.box=[];STATE.box.push(pkmnInst);if(STATE.box.length>240)STATE.box.shift();}
 function addToParty(pkmnInst){if(!STATE.party)STATE.party=[];if(STATE.party.length<6){STATE.party.push(pkmnInst);return true;}return false;}
-
 function getWildPokemon(zone){if(!zone.wildPokemon||zone.wildPokemon.length===0)return null;var total=zone.wildPokemon.reduce(function(s,e){return s+e.weight;},0),roll=Math.random()*total,cum=0;for(var i=0;i<zone.wildPokemon.length;i++){cum+=zone.wildPokemon[i].weight;if(roll<cum){var e=zone.wildPokemon[i],lv=e.minLv+Math.floor(Math.random()*(e.maxLv-e.minLv+1));var p=createPkmnInstance(e.dexId,lv);p.shiny=Math.random()<(1/250);return p;}}return null;}
 function getTrainerAtStage(zone,stage){if(!zone.trainers)return null;return zone.trainers.find(function(t){return t.stage===stage;})||null;}
 function isGymLeaderStage(zone,stage){return zone.gymLeader&&zone.gymLeader.stage===stage;}
 function isTrainerDefeated(zoneId,stage){return!!(STATE.defeatedTrainers&&STATE.defeatedTrainers[zoneId+":"+stage]);}
 function markTrainerDefeated(zoneId,stage){if(!STATE.defeatedTrainers)STATE.defeatedTrainers={};STATE.defeatedTrainers[zoneId+":"+stage]=true;}
-function markZoneVisited(zoneId){if(!STATE.visitedZones)STATE.visitedZones={};STATE.visitedZones[zoneId]=true;}
-function isZoneVisited(zoneId){return!!(STATE.visitedZones&&STATE.visitedZones[zoneId]);}
+function markZoneVisited(zoneId){if(!STATE||!STATE.visitedZones)return;STATE.visitedZones[zoneId]=true;}
+function isZoneVisited(zoneId){return!!(STATE&&STATE.visitedZones&&STATE.visitedZones[zoneId]);}
 function saveGame(){if(!STATE||!STATE.uid)return;if(!window.dbSet||!window.playerPath)return;STATE.lastSeen=Date.now();dbSet(playerPath(STATE.uid),STATE).catch(function(e){console.warn("[saveGame]",e);});}
-
-function findRecoveryCity(zoneId){var zone=getZone(zoneId);if(zone&&zone.homeCity)return zone.homeCity;var mainZones=WORLD.filter(function(z){return z.type==="city"||z.type==="route"||z.type==="dungeon"||z.type==="sea"||z.type==="gym";});var ci=mainZones.findIndex(function(z){return z.id===zoneId;});if(ci<0)return"alabastia";for(var i=ci;i>=0;i--){if(mainZones[i].type==="city")return mainZones[i].id;}return"alabastia";}
+function findRecoveryCity(zoneId){var zone=(typeof getZone==="function")?getZone(zoneId):null;if(zone&&zone.homeCity)return zone.homeCity;if(typeof WORLD==="undefined")return"alabastia";var mainZones=WORLD.filter(function(z){return z.type==="city"||z.type==="route"||z.type==="dungeon"||z.type==="sea"||z.type==="gym";});var ci=mainZones.findIndex(function(z){return z.id===zoneId;});if(ci<0)return"alabastia";for(var i=ci;i>=0;i--){if(mainZones[i].type==="city")return mainZones[i].id;}return"alabastia";}

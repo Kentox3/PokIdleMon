@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  patch.js — diverse Bugfixes & System-Patches
+//  patch.js — Bugfixes & System-Patches
 // ═══════════════════════════════════════════════════════════════
 
 // ── Rad-Coupon zu ITEM_DEFS ───────────────────────────────────
@@ -12,44 +12,45 @@
 // ══════════════════════════════════════════════════════════════
 //  BIDIREKTIONALES ROUTEN-SYSTEM
 //
-//  Jede Route hat:
-//    terminus      → Ziel beim normalen Vorwärtslaufen
-//    terminus_back → Ziel beim Zurücklaufen
-//
-//  _backTravel = true: nächste Terminus-Auflösung nutzt terminus_back
-//  Wird automatisch zurückgesetzt wenn eine Stadt betreten wird.
+//  _backTravel bleibt TRUE bis eine STADT betreten wird.
+//  Es wird NICHT zwischen Routen zurückgesetzt!
+//  Mehrstufige Rückreisen (Route3→Wald→Route2→Stadt) funktionieren so.
 // ══════════════════════════════════════════════════════════════
 var _backTravel = false;
 
-// Rückreise-Exit starten (aus Stadthub)
 window.travelBack = function(exitId){
-  _backTravel = true;
-  var zone = getZone(STATE.currentZoneId);
-  var exit = null;
-  if(zone && zone.exits) exit = zone.exits.find(function(e){ return e.id===exitId; });
-  if(exit && exit.condition && !checkExitCondition(exit.condition)){
+  var zone=getZone(STATE.currentZoneId);
+  var exit=zone&&zone.exits?zone.exits.find(function(e){return e.id===exitId;}):null;
+  if(exit&&exit.condition&&!checkExitCondition(exit.condition)){
     showToast(exit.lockedMsg||"Zugang gesperrt!",4000);
-    _backTravel = false;
     return;
   }
+  _backTravel=true;
   navigateTo(exitId);
 };
 
-// handleTerminus-Patch: nutzt terminus_back wenn _backTravel
+// handleTerminus-Patch
+// _backTravel wird hier NICHT zurückgesetzt (bleibt bis zur Stadt!)
 (function patchHandleTerminus(){
   if(typeof handleTerminus!=="function"){setTimeout(patchHandleTerminus,300);return;}
   var _orig=handleTerminus;
   handleTerminus=function(zone){
     if(!zone)return;
-    // Rückreise-Modus: terminus_back nutzen falls vorhanden
-    if(_backTravel && zone.terminus_back){
-      _backTravel=false; // Reset nach erstem Schritt (neue Route setzt neu)
+    if(_backTravel&&zone.terminus_back){
       var exits=zone.terminus_back.exits;
-      if(!exits||exits.length===0){showToast("Kein Weg zurück.");return;}
+      if(!exits||exits.length===0){
+        showToast("Kein Weg zurück — Ende der Route.");
+        _backTravel=false;_orig(zone);return;
+      }
       if(exits.length===1){
         var target=getZone(exits[0].id);
-        if(target&&target.type==="city"){_backTravel=false;goToCity(exits[0].id);}
-        else{navigateTo(exits[0].id);}
+        if(target&&target.type==="city"){
+          // Stadt erreicht → goToCity setzt _backTravel=false
+          goToCity(exits[0].id);
+        }else{
+          // Weitere Route → _backTravel bleibt true
+          navigateTo(exits[0].id);
+        }
       }else{
         clearInterval(STAGE_INTERVAL);_waitingForInput=true;
         renderRouteChoice(zone,exits);
@@ -60,93 +61,102 @@ window.travelBack = function(exitId){
   };
 })();
 
-// goToCity-Patch: _backTravel beim Stadteintritt zurücksetzen
+// goToCity: setzt _backTravel=false wenn Stadt betreten
 (function patchGoToCity(){
   if(typeof goToCity!=="function"){setTimeout(patchGoToCity,300);return;}
   var _orig=goToCity;
   goToCity=function(cityId){
-    _backTravel=false; // In Stadt angekommen → Richtung zurücksetzen
+    _backTravel=false;
     _orig(cityId);
   };
 })();
 
 // ══════════════════════════════════════════════════════════════
-//  terminus_back zu allen Routen hinzufügen
-//  (in world_patch.js wird das auf die Zonen-Objekte angewandt)
+//  terminus_back — Rückwärts-Ziele aller Routen
 // ══════════════════════════════════════════════════════════════
 (function addTerminiBack(){
-  var map={
-    // Route → wohin beim Zurücklaufen
-    "route1":        { exits:[{id:"alabastia"}] },
-    "route2":        { exits:[{id:"viridian_city"}] },
-    "viridian_forest":{ exits:[{id:"route2"}] },
-    "route3_west":   { exits:[{id:"viridian_forest"}] },
-    "route3_east":   { exits:[{id:"pewter_city"}] },
-    "route4":        { exits:[{id:"mt_moon"}] },
-    "mt_moon":       { exits:[{id:"route3_east"}] },
-    "route5_6":      { exits:[{id:"cerulean_city"}] },
-    "route9":        { exits:[{id:"cerulean_city"}] },
-    "rock_tunnel":   { exits:[{id:"route9"}] },
-    "route10_south": { exits:[{id:"rock_tunnel"}] },
-    "route11_12":    { exits:[{id:"vermilion_city"}] },
-    "route7_8":      { exits:[{id:"lavender_town"}] },
-    "route16_18":    { exits:[{id:"celadon_city"}] },
-    "route15":       { exits:[{id:"fuchsia_city"}] },
-    "route19_20":    { exits:[{id:"fuchsia_city"}] },
-    "route21_return":{ exits:[{id:"cinnabar_island"}] },
-    "route22":       { exits:[{id:"viridian_city"}] },
-    "route23":       { exits:[{id:"viridian_city"}] },
-    "victory_road":  { exits:[{id:"route23"}] },
-    "route24_25":    { exits:[{id:"cerulean_city"}] },
-    "cerulean_cave": { exits:[{id:"cerulean_city"}] },
-  };
   if(typeof WORLD==="undefined")return;
+  var map={
+    "route1":         {exits:[{id:"alabastia"}]},
+    "route2":         {exits:[{id:"viridian_city"}]},
+    "viridian_forest":{exits:[{id:"route2"}]},
+    "route3_west":    {exits:[{id:"viridian_forest"}]},
+    "route3_east":    {exits:[{id:"pewter_city"}]},
+    "route4":         {exits:[{id:"mt_moon"}]},
+    "mt_moon":        {exits:[{id:"route3_east"}]},
+    "route5_6":       {exits:[{id:"cerulean_city"}]},
+    "route9":         {exits:[{id:"cerulean_city"}]},
+    "rock_tunnel":    {exits:[{id:"route9"}]},
+    "route10_south":  {exits:[{id:"rock_tunnel"}]},
+    "route11_12":     {exits:[{id:"vermilion_city"}]},
+    "route7_8":       {exits:[{id:"lavender_town"}]},
+    "route16_18":     {exits:[{id:"celadon_city"}]},
+    "route15":        {exits:[{id:"fuchsia_city"}]},
+    "route19_20":     {exits:[{id:"fuchsia_city"}]},
+    "route21_return": {exits:[{id:"cinnabar_island"}]},
+    "route22":        {exits:[{id:"viridian_city"}]},
+    "route23":        {exits:[{id:"viridian_city"}]},
+    "victory_road":   {exits:[{id:"route23"}]},
+    "route24_25":     {exits:[{id:"cerulean_city"}]},
+    "cerulean_cave":  {exits:[{id:"cerulean_city"}]},
+  };
   Object.keys(map).forEach(function(id){
-    var zone=WORLD.find(function(z){return z.id===id;});
-    if(zone&&!zone.terminus_back)zone.terminus_back=map[id];
+    var z=WORLD.find(function(z){return z.id===id;});
+    if(z&&!z.terminus_back)z.terminus_back=map[id];
   });
 })();
 
 // ══════════════════════════════════════════════════════════════
-//  Rückreise-Exits zu Städten hinzufügen
-//  Format: exits mit _back:true → wird als travelBack() aufgerufen
+//  Rückreise-Exits zu Städten
+//  FIX: viridian_city jetzt enthalten!
 // ══════════════════════════════════════════════════════════════
 (function addBackExits(){
   if(typeof WORLD==="undefined")return;
   var backExits={
-    // Stadt-ID → [back-exits]
+    // ── Vertania City → Route 1 → Alabastia ────────────────
+    "viridian_city":[
+      {id:"route1",label:"← Route 1 Süd / Alabastia",desc:"Zurück nach Alabastia",direction:"south",_back:true}
+    ],
+    // ── Marmoria City → Route 3 West → Wald → Vertania ─────
     "pewter_city":[
-      {id:"route3_west", label:"← Route 3 / Vertania-Wald", desc:"Zurück Richtung Vertania City", direction:"west", _back:true}
+      {id:"route3_west",label:"← Route 3 / Vertania-Wald",desc:"Zurück Richtung Vertania City",direction:"west",_back:true}
     ],
+    // ── Azuria City → Route 4 → Rotes Gebirge → Marmoria ───
     "cerulean_city":[
-      {id:"route4", label:"← Route 4 / Rotes Gebirge", desc:"Zurück Richtung Marmoria City", direction:"north", _back:true}
+      {id:"route4",label:"← Route 4 / Rotes Gebirge",desc:"Zurück Richtung Marmoria City",direction:"north",_back:true}
     ],
+    // ── Zinnia City → Route 5-6 → Azuria ───────────────────
     "vermilion_city":[
-      {id:"route5_6", label:"← Route 5-6 / Azuria City", desc:"Zurück Richtung Azuria City", direction:"north", _back:true}
+      {id:"route5_6",label:"← Route 5-6 / Azuria City",desc:"Zurück Richtung Azuria City",direction:"north",_back:true}
     ],
+    // ── Lavendeldorf → Route 11-12 → Zinnia ────────────────
     "lavender_town":[
-      {id:"route11_12", label:"← Route 11-12 / Zinnia City", desc:"Zurück Richtung Zinnia City", direction:"south", _back:true}
+      {id:"route11_12",label:"← Route 11-12 / Zinnia City",desc:"Zurück Richtung Zinnia City",direction:"south",_back:true}
     ],
+    // ── Prismania City → Route 7-8 → Lavendeldorf ──────────
     "celadon_city":[
-      {id:"route7_8", label:"← Route 7-8 / Lavendeldorf", desc:"Zurück Richtung Lavendeldorf", direction:"east", _back:true}
+      {id:"route7_8",label:"← Route 7-8 / Lavendeldorf",desc:"Zurück Richtung Lavendeldorf",direction:"east",_back:true}
     ],
+    // ── Pokérosia City → Fahrradroute → Prismania ──────────
     "fuchsia_city":[
-      {id:"route16_18", label:"← Fahrradroute / Prismania City", desc:"Zurück Richtung Prismania City", direction:"east", _back:true}
+      {id:"route16_18",label:"← Fahrradroute / Prismania City",desc:"Zurück Richtung Prismania City",direction:"east",_back:true}
     ],
+    // ── Saffronia City → Route 15 → Pokérosia ──────────────
     "saffron_city":[
-      {id:"route15", label:"← Route 15 / Pokérosia City", desc:"Zurück Richtung Pokérosia City", direction:"west", _back:true}
+      {id:"route15",label:"← Route 15 / Pokérosia City",desc:"Zurück Richtung Pokérosia City",direction:"west",_back:true}
     ],
+    // ── Zinnoberinsel → Meer → Saffronia / Pokérosia ───────
     "cinnabar_island":[
-      {id:"route19_20", label:"← Route 19-20 / Meer", desc:"Zurück Richtung Pokérosia / Saffronia", direction:"north", _back:true}
+      {id:"route19_20",label:"← Route 19-20 / Meer",desc:"Zurück Richtung Pokérosia / Saffronia",direction:"north",_back:true}
     ],
   };
   Object.keys(backExits).forEach(function(cityId){
     var city=WORLD.find(function(z){return z.id===cityId;});
     if(!city)return;
     if(!city.exits)city.exits=[];
-    backExits[cityId].forEach(function(backExit){
-      if(!city.exits.find(function(e){return e.id===backExit.id;}))
-        city.exits.push(backExit);
+    backExits[cityId].forEach(function(be){
+      if(!city.exits.find(function(e){return e.id===be.id;}))
+        city.exits.push(be);
     });
   });
 })();
@@ -160,39 +170,36 @@ window.travelBack = function(exitId){
   renderCityHub=function(zone){
     _orig(zone);
     if(!zone||!zone.exits)return;
-    // Rückreise-Exits nachträglich als "travelBack()" verlinken
-    // (renderer_patch.js hat sie schon gerendert, aber mit falschem onclick)
-    // Neues Rendering: füge separaten Rückreise-Block ein
     var backExits=zone.exits.filter(function(e){return e._back;});
     if(!backExits.length)return;
-    var container=document.getElementById("viewWorld");
-    if(!container)return;
-    var cityView=container.querySelector(".city-view");
-    if(!cityView)return;
-    var section=document.createElement("div");
-    section.innerHTML="<div class='hub-section-title'>↩ Zurückgehen</div><div class='hub-exits hub-exits-back'>";
+    var container=document.getElementById("viewWorld");if(!container)return;
+    var cityView=container.querySelector(".city-view");if(!cityView)return;
+    var wrap=document.createElement("div");
+    wrap.style.cssText="margin-top:8px;border-top:1px solid rgba(255,255,255,.07);padding-top:8px";
+    var title=document.createElement("div");title.className="hub-section-title";title.textContent="↩ Zurückgehen";
+    wrap.appendChild(title);
+    var grid=document.createElement("div");grid.className="hub-exits hub-exits-back";
     backExits.forEach(function(exit){
-      var card=document.createElement("div");
-      card.className="hub-exit-card hub-exit-back";
-      card.innerHTML=
-        "<div class='hub-exit-label'>"+exit.label+"</div>"+
+      var card=document.createElement("div");card.className="hub-exit-card hub-exit-back";
+      card.innerHTML="<div class='hub-exit-label'>"+exit.label+"</div>"+
         (exit.desc?"<div class='hub-exit-desc'>"+exit.desc+"</div>":"");
       card.onclick=(function(id){return function(){travelBack(id);};})(exit.id);
-      section.querySelector(".hub-exits-back").appendChild(card);
+      grid.appendChild(card);
     });
-    section.style.cssText="margin-top:8px;border-top:1px solid rgba(255,255,255,.07);padding-top:8px";
-    cityView.appendChild(section);
+    wrap.appendChild(grid);
+    cityView.appendChild(wrap);
   };
 })();
 
 // ══════════════════════════════════════════════════════════════
-//  fastTravelTo — NUR mit VM02 Fliegen erlaubt
+//  fastTravelTo — NUR mit VM02 Fliegen
 // ══════════════════════════════════════════════════════════════
 function fastTravelTo(zoneId){
   if(!STATE)return;
   if(BATTLE&&!BATTLE.over){showToast("Im Kampf nicht möglich!");return;}
-  var hasFly=(STATE.items&&(STATE.items["hm_fly"]||0)>0);
-  if(!hasFly){showToast("✈️ Schnellreise erfordert VM02 Fliegen!",3500);return;}
+  if(!(STATE.items&&(STATE.items["hm_fly"]||0)>0)){
+    showToast("✈️ Schnellreise erfordert VM02 Fliegen!",3500);return;
+  }
   if(!isZoneVisited(zoneId)){showToast("Diese Stadt noch nicht besucht!");return;}
   clearInterval(STAGE_INTERVAL);clearInterval(BATTLE_INTERVAL);
   _waitingForInput=false;_inCity=false;_animRunning=false;_backTravel=false;
@@ -222,66 +229,79 @@ function checkExitCondition(cond){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  renderMapScreen
+//  renderMapScreen — sequential zone discovery
 // ══════════════════════════════════════════════════════════════
 function renderMapScreen(){
   var container=document.getElementById("mapList");if(!container||!STATE)return;
   container.innerHTML="";
+  // Orden
   var br=document.getElementById("badgeRow");
   if(br){
-    var badgeIds=["stone","cascade","thunder","rainbow","soul","marsh","volcano","earth"];
-    br.innerHTML=badgeIds.map(function(b,i){
-      var earned=STATE.badgeIds&&STATE.badgeIds.indexOf(b)>=0;
-      return "<span class='badge-icon"+(earned?" badge-earned":"")+"'>🏅</span>";
+    var bids=["stone","cascade","thunder","rainbow","soul","marsh","volcano","earth"];
+    br.innerHTML=bids.map(function(b){
+      return "<span class='badge-icon"+(STATE.badgeIds&&STATE.badgeIds.indexOf(b)>=0?" badge-earned":"")+"'>🏅</span>";
     }).join("");
   }
-  var curZone=getZone(STATE.currentZoneId);
-  if(curZone){
-    var curDiv=document.createElement("div");curDiv.className="map-current-loc";
-    var zIcon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[curZone.type]||"📍";
-    curDiv.innerHTML="<b>📍 Hier:</b> "+zIcon+" <b>"+curZone.name+"</b>"+
-      (curZone.stageCount?" — Etappe "+STATE.currentStage+"/"+curZone.stageCount:"");
-    container.appendChild(curDiv);
+  // Aktueller Standort
+  var cur=getZone(STATE.currentZoneId);
+  if(cur){
+    var d=document.createElement("div");d.className="map-current-loc";
+    var zi={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[cur.type]||"📍";
+    d.innerHTML="<b>📍 Hier:</b> "+zi+" <b>"+cur.name+"</b>"+(cur.stageCount?" — Etappe "+STATE.currentStage+"/"+cur.stageCount:"");
+    container.appendChild(d);
   }
+  // Schnellreise
   var hasFly=STATE.items&&(STATE.items["hm_fly"]||0)>0;
-  var flySection=document.createElement("div");flySection.className="map-section-title";flySection.style.marginTop="14px";
+  var fs=document.createElement("div");fs.className="map-section-title";fs.style.marginTop="14px";
   if(hasFly){
-    flySection.innerHTML="✈️ Schnellreise (VM02 Fliegen)";container.appendChild(flySection);
-    var visited=WORLD.filter(function(z){return z.type==="city"&&isZoneVisited(z.id)&&z.id!==STATE.currentZoneId;});
-    if(visited.length){
-      var grid=document.createElement("div");grid.className="city-travel-grid";
-      visited.forEach(function(zone){
+    fs.textContent="✈️ Schnellreise (VM02 Fliegen)";container.appendChild(fs);
+    var cities=WORLD.filter(function(z){return z.type==="city"&&isZoneVisited(z.id)&&z.id!==STATE.currentZoneId;});
+    if(cities.length){
+      var g=document.createElement("div");g.className="city-travel-grid";
+      cities.forEach(function(zone){
         var btn=document.createElement("button");btn.className="city-travel-btn";
-        btn.innerHTML="🏙️ "+zone.name;
+        btn.textContent="🏙️ "+zone.name;
         btn.onclick=(function(zid){return function(){fastTravelTo(zid);};})(zone.id);
-        grid.appendChild(btn);
+        g.appendChild(btn);
       });
-      container.appendChild(grid);
+      container.appendChild(g);
+    }else{
+      var nc=document.createElement("p");nc.className="map-no-travel";
+      nc.textContent="Noch keine weiteren Städte freigeschaltet.";container.appendChild(nc);
     }
   }else{
-    flySection.innerHTML="✈️ Schnellreise";container.appendChild(flySection);
+    fs.textContent="✈️ Schnellreise";container.appendChild(fs);
     var hint=document.createElement("div");
     hint.style.cssText="font-size:12px;color:#556070;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.6";
-    hint.innerHTML="🔒 Kein VM02 Fliegen. Zu finden auf Route 16 westlich von Prismania City.";
+    hint.innerHTML="🔒 Kein VM02 Fliegen.<br>Zu finden auf <b>Route 16</b> westlich von Prismania City.";
     container.appendChild(hint);
   }
+  // Kanto-Fortschritt — nur besuchte Zonen sichtbar
   var ph=document.createElement("div");ph.className="map-section-title";ph.style.marginTop="14px";
   ph.textContent="🗺️ Kanto-Fortschritt";container.appendChild(ph);
+  var visited=0,total=0;
   WORLD.forEach(function(zone){
     if(zone.type==="building")return;
-    var isCurrent=(zone.id===STATE.currentZoneId),isVisited=isZoneVisited(zone.id);
+    total++;
+    if(isZoneVisited(zone.id))visited++;
+    var isCurrent=(zone.id===STATE.currentZoneId);
+    var isVis=isZoneVisited(zone.id);
     var row=document.createElement("div");
-    var cls="map-zone map-compact"+(isCurrent?" map-current":isVisited?" map-unlocked":" map-locked");
-    row.className=cls;
-    var zIcon={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[zone.type]||"📍";
-    var badgeHtml=zone.gymLeader&&isVisited?"<span class='map-badge'>"+(STATE.badgeIds&&STATE.badgeIds.indexOf(zone.gymLeader.badgeId)>=0?"🏅":"⬜")+"</span>":"";
-    row.innerHTML=zIcon+" "+zone.name+(isCurrent?" <span class='map-here'>← hier</span>":"")+(!isVisited?"<span style='margin-left:auto;color:#444;font-size:11px'>🔒</span>":"")+badgeHtml;
+    row.className="map-zone map-compact"+(isCurrent?" map-current":isVis?" map-unlocked":" map-locked");
+    var zi={route:"🌿",dungeon:"🕳️",city:"🏙️",gym:"⚔️",sea:"🌊"}[zone.type]||"📍";
+    var bh=zone.gymLeader&&isVis?"<span class='map-badge'>"+(STATE.badgeIds&&STATE.badgeIds.indexOf(zone.gymLeader.badgeId)>=0?"🏅":"⬜")+"</span>":"";
+    row.innerHTML=zi+" "+zone.name+(isCurrent?" <span class='map-here'>← hier</span>":"")+(!isVis?"<span style='margin-left:auto;color:#444;font-size:11px'>🔒</span>":"")+bh;
     container.appendChild(row);
   });
+  // Fortschrittsanzeige
+  var prog=document.createElement("div");
+  prog.style.cssText="font-size:11px;color:#556070;text-align:center;margin-top:10px;padding:6px;border-top:1px solid rgba(255,255,255,.06)";
+  prog.textContent="Erkundet: "+visited+" / "+total+" Gebiete";
+  container.appendChild(prog);
 }
 
 // ══════════════════════════════════════════════════════════════
-//  renderMoveButtons — PATCH: entfernt "Stk"-Suffix
+//  renderMoveButtons — kein "Stk"-Suffix, dt. Typ-Namen
 // ══════════════════════════════════════════════════════════════
 (function patchRenderMoveButtons(){
   window.addEventListener("load",function(){
@@ -319,19 +339,13 @@ function renderMapScreen(){
   });
 })();
 
-// CSS für Rückreise-Exits
-(function injectBackCss(){
+// CSS
+(function(){
   var s=document.createElement("style");
   s.textContent=`
-    .hub-exit-back {
-      border-color: rgba(99,102,241,.3) !important;
-      background: rgba(99,102,241,.06) !important;
-    }
-    .hub-exit-back:hover {
-      background: rgba(99,102,241,.15) !important;
-      border-color: rgba(99,102,241,.5) !important;
-    }
-    .hub-exit-back .hub-exit-label::before { content: '↩ '; }
+    .hub-exit-back{border-color:rgba(99,102,241,.3)!important;background:rgba(99,102,241,.06)!important;}
+    .hub-exit-back:hover{background:rgba(99,102,241,.15)!important;border-color:rgba(99,102,241,.5)!important;}
+    .hub-exit-back .hub-exit-label::before{content:'↩ ';}
   `;
   document.head.appendChild(s);
 })();
