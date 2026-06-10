@@ -2,154 +2,182 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PokIdleMon</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/battle_items.css">
-  <link rel="stylesheet" href="css/trainer_reveal.css">
-  <link rel="stylesheet" href="css/pokedex.css">
-  <link rel="stylesheet" href="css/trading.css">
-  <style>[hidden]{display:none!important}</style>
 </head>
 <body>
 
-<div id="loadScreen" style="display:flex">
+<!-- ═══════════════ LADE-SCREEN ═══════════════ -->
+<div id="loadScreen">
   <div class="load-box">
-    <div class="load-pokeball">⚪</div>
+    <span class="load-pokeball">⚪</span>
     <h2>PokIdleMon</h2>
-    <p id="loadStatus">Verbinde...</p>
+    <p id="loadStatus">Lade Daten...</p>
   </div>
 </div>
 
+<!-- ═══════════════ AUTH-SCREEN ═══════════════ -->
 <div id="authScreen" style="display:none">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="auth-logo-ball">⚪</span>
       <h1>PokIdleMon</h1>
-      <p>Kanto Idle RPG</p>
+      <p>Gen 1 · Idle RPG</p>
     </div>
-    <div id="loginCard" class="auth-card">
+
+    <div class="auth-card" id="loginCard">
       <h2>Anmelden</h2>
-      <label class="field-label">Nutzername</label>
-      <input id="loginUsername" type="text" placeholder="Dein Nutzername" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off">
+      <label class="field-label">Trainer-Name</label>
+      <input type="text" id="loginUsername" placeholder="Dein Name" autocomplete="username" maxlength="16">
       <label class="field-label">PIN <span class="field-hint">(6 Ziffern)</span></label>
-      <input id="loginPin" type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)" autocomplete="current-password">
-      <button class="btn-primary" onclick="doLogin()">Anmelden</button>
-      <p id="loginMsg" class="auth-msg"></p>
+      <input type="password" id="loginPin" placeholder="••••••" inputmode="numeric" oninput="pinOnly(this)" autocomplete="current-password">
+      <div class="auth-msg" id="loginMsg"></div>
+      <button class="btn-primary" onclick="doLogin()">Spielen ▶</button>
       <div class="auth-divider"></div>
-      <p class="auth-switch-text">Noch kein Konto?</p>
-      <button class="btn-secondary" onclick="switchToRegister()">Jetzt registrieren →</button>
+      <div class="auth-switch-text">Noch kein Konto?</div>
+      <button class="btn-secondary" onclick="switchToRegister()">Jetzt registrieren</button>
     </div>
-    <div id="registerCard" class="auth-card" style="display:none">
-      <h2>Konto erstellen</h2>
-      <label class="field-label">Nutzername <span class="field-hint">(3–16 Zeichen)</span></label>
-      <input id="regUsername" type="text" placeholder="z. B. AshKetchum" maxlength="16" autocapitalize="off" autocorrect="off">
-      <label class="field-label">PIN wählen <span class="field-hint">(genau 6 Ziffern)</span></label>
-      <input id="regPin"  type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)">
+
+    <div class="auth-card" id="registerCard" style="display:none">
+      <h2>Registrieren</h2>
+      <label class="field-label">Trainer-Name <span class="field-hint">(3–16 Zeichen)</span></label>
+      <input type="text" id="regUsername" placeholder="Dein Name" autocomplete="username" maxlength="16">
+      <label class="field-label">PIN <span class="field-hint">(6 Ziffern)</span></label>
+      <input type="password" id="regPin" placeholder="••••••" inputmode="numeric" oninput="pinOnly(this)" autocomplete="new-password">
       <label class="field-label">PIN wiederholen</label>
-      <input id="regPin2" type="password" placeholder="••••••" maxlength="6" inputmode="numeric" oninput="pinOnly(this)">
+      <input type="password" id="regPin2" placeholder="••••••" inputmode="numeric" oninput="pinOnly(this)" autocomplete="new-password">
+      <div class="auth-msg" id="registerMsg"></div>
       <button class="btn-primary" onclick="doRegister()">Konto erstellen</button>
-      <p id="registerMsg" class="auth-msg"></p>
       <div class="auth-divider"></div>
       <button class="btn-secondary" onclick="switchToLogin()">← Zurück zum Login</button>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════ STARTER-SCREEN ═══════════════ -->
 <div id="starterScreen" style="display:none">
   <div class="starter-box">
     <h2>Wähle deinen Starter!</h2>
-    <input id="trainerName" type="text" placeholder="Deinen Trainer-Namen eingeben..." maxlength="20" autocapitalize="words">
-    <p class="pinonly-hint">Bitte zuerst einen Namen eingeben</p>
+    <input type="text" id="trainerName" placeholder="Dein Trainer-Name" maxlength="16">
+    <div id="starterNameMsg" style="color:#ef4444;font-size:12px;margin:-20px 0 16px;min-height:16px;text-align:center"></div>
     <div id="starterGrid"></div>
-    <p id="starterNameMsg" style="color:#e03030;font-size:13px;min-height:18px;margin-top:8px"></p>
   </div>
 </div>
 
+<!-- ═══════════════ SPIEL-SCREEN ═══════════════ -->
 <div id="gameScreen" style="display:none">
+
+  <!-- HUD -->
   <div id="hud">
-    <span id="hudPlayer">Trainer</span>
-    <span id="hudMoney">0 ₽</span>
-    <span id="hudBadges">0/8 🏅</span>
-    <button class="btn-logout" onclick="doLogout()">Abmelden</button>
+    <span id="hudSpieler">Trainer</span>
+    <span id="hudGeld">0 ₽</span>
+    <span id="hudOrden">0/8 🏅</span>
+    <button class="btn-logout" onclick="doLogout()">⎋</button>
   </div>
+
+  <!-- Zone-Info -->
   <div id="zoneInfoBar">
-    <span id="zoneName">Route 1</span>
-    <span id="stageInfo">Etappe 1 / 10</span>
-    <div id="stageProgressBar"><div id="stageProgressFill"></div></div>
+    <span id="zoneName">Lade...</span>
+    <span id="stageInfo"></span>
+    <div id="stageProgressBar"><div id="stageProgressFill" style="width:0%"></div></div>
+    <button class="btn-auto" id="autoKampfBtn" onclick="toggleAutoKampf()">⚡ Auto</button>
   </div>
+
+  <!-- Szene -->
   <div id="sceneView">
     <div id="playerSprites"></div>
-    <div id="enemySprite"></div>
+    <div id="enemySprite" style="opacity:0"></div>
     <div id="xpPopup"></div>
     <div id="toastZone"></div>
-    <div id="ebWrap"><div id="ebFill"></div><div id="ebIcon" class="eb-icon"></div></div>
   </div>
+
+  <!-- Kampf-Panel -->
   <div id="battlePanel">
     <div id="battleLog"></div>
     <div id="battleActions">
       <div id="moveButtons"></div>
       <div id="battleBtns">
         <div id="catchBalls"></div>
-        <button id="autoFightBtn" class="btn-auto" onclick="toggleAutoFight()">⚡ Auto</button>
-        <button id="fleeBtn"      class="btn-flee"  onclick="onFleeClick()">Fliehen</button>
+        <button class="btn-flee" onclick="onFluchtKlick()">🏃 Flucht</button>
       </div>
     </div>
   </div>
 
+  <!-- Tab-Navigation -->
   <nav id="tabs">
-    <button id="tabWorld" class="tab active" onclick="onTabWorld()">Route</button>
-    <button id="tabTeam"  class="tab"        onclick="onTabTeam()">Team</button>
-    <button id="tabBag"   class="tab"        onclick="onTabBag()">Tasche</button>
-    <button id="tabMap"   class="tab"        onclick="onTabMap()">Karte</button>
-    <button id="tabDex"   class="tab"        onclick="onTabDex()">Dex</button>
+    <button class="tab active" id="tabWelt"   onclick="onTabWelt()">🌿 Welt</button>
+    <button class="tab"        id="tabTeam"   onclick="onTabTeam()">👥 Team</button>
+    <button class="tab"        id="tabTasche" onclick="onTabTasche()">🎒 Tasche</button>
+    <button class="tab"        id="tabKarte"  onclick="onTabKarte()">🗺️ Karte</button>
+    <button class="tab"        id="tabDex"    onclick="onTabDex()">📖 Dex</button>
   </nav>
 
-  <div id="viewWorld" class="tab-view" style="display:block"></div>
-  <div id="viewTeam"  class="tab-view" style="display:none">
-    <h3>Party</h3><div id="teamList"></div>
-    <h3 style="margin-top:16px">Pokémon-Box</h3><div id="boxPreview" class="box-grid"></div>
+  <!-- Tab-Views -->
+  <div id="viewWorld"  class="tab-view"></div>
+
+  <div id="viewTeam"   class="tab-view" style="display:none">
+    <div id="teamList"></div>
+    <h3 style="margin-top:14px">📦 Box</h3>
+    <div id="boxPreview" class="box-grid"></div>
   </div>
-  <div id="viewBag"  class="tab-view" style="display:none"><h3>Tasche</h3><div id="bagList"></div></div>
-  <div id="viewMap"  class="tab-view" style="display:none">
-    <h3>Kanto-Karte</h3><div id="badgeRow" class="badge-row"></div><div id="mapList"></div>
+
+  <div id="viewBag"    class="tab-view" style="display:none">
+    <div id="bagList"></div>
   </div>
-  <div id="viewDex"  class="tab-view" style="display:none"></div>
+
+  <div id="viewMap"    class="tab-view" style="display:none">
+    <div class="badge-row" id="badgeRow"></div>
+    <div id="mapList"></div>
+  </div>
+
+  <div id="viewDex"    class="tab-view" style="display:none">
+    <div id="dexContent">
+      <p style="color:var(--text-3);text-align:center;padding:20px">Pokédex — coming soon</p>
+    </div>
+  </div>
+
+</div><!-- /#gameScreen -->
+
+<!-- ═══════════════ POPUPS ═══════════════ -->
+<!-- Shop -->
+<div id="shopPopup" class="popup-overlay" style="display:none">
+  <div class="popup-box">
+    <div class="popup-header">
+      <h3>🛒 Supermarkt</h3>
+      <button onclick="schliesseShop()">✕</button>
+    </div>
+    <div id="shopItemList"></div>
+  </div>
 </div>
 
-<div id="blackoutOverlay" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;flex-direction:column;background:#000;opacity:0;transition:opacity 0.3s ease;pointer-events:all;">
-  <div class="bo-text" style="color:#fff;font-size:20px;font-weight:700;text-align:center;font-family:'Rajdhani',sans-serif;letter-spacing:2px;"></div>
+<!-- Offline-Bonus -->
+<div id="offlineModal">
+  <div class="offline-box">
+    <h3>⏰ Willkommen zurück!</h3>
+    <div id="offlineMsg"></div>
+    <button class="btn-primary" onclick="schliesseOfflineModal()">Weiterspielen ▶</button>
+  </div>
 </div>
 
-<div id="shopPopup"    class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>Shop</h3><button onclick="closeShop()">✕</button></div><div id="shopItemList"></div></div></div>
-<div id="gymPopup"     class="popup-overlay" style="display:none"><div class="popup-box"><div class="popup-header"><h3>Arena</h3><button onclick="closeGymPopup()">✕</button></div><div id="gymContent"></div></div></div>
-<div id="offlineModal" class="popup-overlay" style="display:none"><div class="popup-box"><h3>Willkommen zurück!</h3><p id="offlineMsg"></p><button class="btn-primary" onclick="closeOfflineModal()">OK</button></div></div>
-
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="js/pkmn.js"></script>
-<script src="js/moves.js"></script>
-<script src="js/world.js"></script>
+
+<!-- Daten & Engine -->
+<script src="js/db.js"></script>
+<script src="js/loader.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/battle.js"></script>
+
+<!-- UI & Rendering -->
 <script src="js/renderer.js"></script>
 <script src="js/ui.js"></script>
+
+<!-- Auth & App-Controller -->
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
-<script src="js/db.js"></script>
-<script src="js/pokedex.js"></script>
-<script src="js/evolution.js"></script>
-<script src="js/trading.js"></script>
-<!-- Patches: immer zuletzt -->
-<script src="js/patch.js"></script>
-<script src="js/renderer_patch.js"></script>
-<script src="js/bg_patch.js"></script>
-<script src="js/world_patch.js"></script>
-<script src="js/renderer_fixes.js"></script>
-<script src="js/encounter_bar.js"></script>
-<script src="js/buildings_extra.js"></script>
+
 </body>
 </html>
