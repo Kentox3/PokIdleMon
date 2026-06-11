@@ -33,33 +33,69 @@ var TYPE_CHART = {
   Drachen: {Drachen:2}
 };
 
-async function loadAllData() {
-  const base = "./data/";
-  const [world, buildings, pokemon, moves, items] = await Promise.all([
-    fetch(base + "world.json").then(r => r.json()),
-    fetch(base + "buildings.json").then(r => r.json()),
-    fetch(base + "pokemon.json").then(r => r.json()),
-    fetch(base + "moves.json").then(r => r.json()),
-    fetch(base + "items.json").then(r => r.json()),
-  ]);
+// ── Ladefunktion ──────────────────────────────────────────────
+function _setLadeStatus(text) {
+  var el = document.getElementById("loadStatus");
+  if (el) el.textContent = text;
+  console.log("[Loader]", text);
+}
 
-  WORLD = world; BUILDINGS = buildings;
-  PKMN  = pokemon; MOVES = moves; ITEM_DEFS = items;
+async function loadAllData() {
+  _setLadeStatus("Lade Spieldaten...");
+
+  const base = "./data/";
+  const dateien = [
+    { name: "world.json",     key: "world" },
+    { name: "buildings.json", key: "buildings" },
+    { name: "pokemon.json",   key: "pokemon" },
+    { name: "moves.json",     key: "moves" },
+    { name: "items.json",     key: "items" },
+  ];
+
+  const ergebnisse = {};
+  for (const d of dateien) {
+    try {
+      _setLadeStatus("Lade " + d.name + "...");
+      const resp = await fetch(base + d.name);
+      if (!resp.ok) throw new Error("HTTP " + resp.status + " für " + d.name);
+      ergebnisse[d.key] = await resp.json();
+      console.log("[Loader] ✅ " + d.name + " geladen");
+    } catch (err) {
+      console.error("[Loader] ❌ Fehler bei " + d.name + ":", err);
+      _setLadeStatus("❌ Fehler beim Laden: " + d.name + "\n" + err.message);
+      // Nicht abbrechen – mit leeren Daten weitermachen
+      ergebnisse[d.key] = d.key === "world" ? [] : {};
+    }
+  }
+
+  WORLD     = ergebnisse.world;
+  BUILDINGS = ergebnisse.buildings;
+  PKMN      = ergebnisse.pokemon;
+  MOVES     = ergebnisse.moves;
+  ITEM_DEFS = ergebnisse.items;
 
   _resolveBuildings();
 
-  console.log("[Loader] ✅", WORLD.length, "Zonen |",
+  console.log("[Loader] ✅ Fertig:", WORLD.length, "Zonen |",
     Object.keys(PKMN).length, "Pokémon |",
     Object.keys(MOVES).length, "Attacken");
 
+  _setLadeStatus("Bereit!");
   document.dispatchEvent(new CustomEvent("dataReady"));
 }
 
+// ── Gebäude-IDs auflösen ──────────────────────────────────────
 function _resolveBuildings() {
   WORLD.forEach(zone => {
     if (!zone.gebaeude || zone.gebaeude.length === 0) return;
     zone._gebaeudeDaten = zone.gebaeude
-      .map(id => BUILDINGS[id] ? { _id: id, ...BUILDINGS[id] } : null)
+      .map(id => {
+        if (!BUILDINGS[id]) {
+          console.warn("[Loader] Unbekanntes Gebäude:", id, "in Zone", zone.id);
+          return null;
+        }
+        return { _id: id, ...BUILDINGS[id] };
+      })
       .filter(Boolean);
     zone._shopItems = [];
     zone._gebaeudeDaten.forEach(b => {
@@ -73,12 +109,12 @@ function _resolveBuildings() {
   });
 }
 
+// ── Hilfsfunktionen ───────────────────────────────────────────
 function getZone(id) { return WORLD.find(z => z.id === id) || null; }
 function getPkmn(id) { return PKMN[String(id)] || null; }
 function getMove(id) { return MOVES[id] || null; }
 function getItem(id) { return ITEM_DEFS[id] || null; }
 
-// FIX: state.flags statt state.eventFlags
 function checkBedingung(cond, state) {
   if (!cond || !state) return true;
   if (cond.minBadges !== undefined && state.orden < cond.minBadges) return false;
@@ -95,7 +131,7 @@ function getEffektivitaet(angriffTyp, vertTypen) {
   return mult;
 }
 
-// FIX: Kein doppelter Encounter-Check — app.js macht den Rate-Check bereits
+// Kein doppelter Encounter-Check — app.js macht den Rate-Check
 function rollWildPkmn(zone) {
   if (!zone.wildePkmn || zone.wildePkmn.length === 0) return null;
   return rollPkmnAusTabelle(zone.wildePkmn);

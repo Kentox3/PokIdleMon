@@ -1,4 +1,4 @@
-﻿// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 //  app.js — Hauptcontroller: Navigation, Kampf-Loop, Tabs
 // ═══════════════════════════════════════════════════════════════
 
@@ -40,6 +40,7 @@ function spielStarten(wegSekunden) {
   markiereBesucht(STATE.zone);
   var zone = getZone(STATE.zone);
   if (!zone) { STATE.zone = "alabastia"; STATE.etappe = 1; zone = getZone("alabastia"); }
+  if (!zone) { console.error("[app] Alabastia nicht in WORLD – world.json geladen?"); return; }
   rendereZoneBg(zone);
   rendereSpielerSprites();
   rendereStufenInfo();
@@ -64,10 +65,7 @@ function navigiereZu(zoneId) {
   STATE.prevZone = vorigeZone;
   markiereBesucht(zoneId);
   var zone = getZone(zoneId);
-  if (zone && zone.manualBattle) {
-    _autoKampf = false;
-    _updateAutoKampfBtn();
-  }
+  if (zone && zone.manualBattle) { _autoKampf = false; _updateAutoKampfBtn(); }
   if (zone) rendereZoneBg(zone);
   rendereSpielerSprites();
   rendereStufenInfo();
@@ -96,6 +94,7 @@ function stadtBetreten(zone) {
     rendereSpielerSprites();
     aktualisiereHUD();
   }
+  wechsleTab("Welt");
   rendereStadtHub(zone);
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   STAGE_INTERVALL = setInterval(verarbeiteEtappe, STAGE_TICK_MS);
@@ -123,10 +122,7 @@ function stufenLoopStarten() {
   rendereGegnerSprite(null, false);
   var ms = (typeof getEffektivenTick === "function") ? getEffektivenTick() : STAGE_TICK_MS;
   var zone = getZone(STATE.zone);
-  if (zone && zone.manualBattle) {
-    _autoKampf = false;
-    _updateAutoKampfBtn();
-  }
+  if (zone && zone.manualBattle) { _autoKampf = false; _updateAutoKampfBtn(); }
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   STAGE_INTERVALL = setInterval(verarbeiteEtappe, ms);
 }
@@ -148,28 +144,17 @@ function verarbeiteEtappe() {
     var wp = zone.waypoints.find(w => w.etappe === STATE.etappe && !flagGesetzt(w.flagId));
     if (wp) {
       switch (wp.typ) {
-        case "rival_fight":
-          triggereRivalKampf(zone, wp); return;
-        case "fossil_choice":
-          clearInterval(STAGE_INTERVALL); _wartetAufInput = true;
-          rendereFossilWahl(zone, wp); return;
-        case "relaxo_block":
-          clearInterval(STAGE_INTERVALL); _wartetAufInput = true;
-          rendereRelaxoBlock(zone, wp); return;
-        case "mewtu_encounter":
-          clearInterval(STAGE_INTERVALL); _wartetAufInput = true;
-          triggereMewtu(zone, wp); return;
+        case "rival_fight":     triggereRivalKampf(zone, wp); return;
+        case "fossil_choice":   clearInterval(STAGE_INTERVALL); _wartetAufInput=true; rendereFossilWahl(zone, wp); return;
+        case "relaxo_block":    clearInterval(STAGE_INTERVALL); _wartetAufInput=true; rendereRelaxoBlock(zone, wp); return;
+        case "mewtu_encounter": clearInterval(STAGE_INTERVALL); _wartetAufInput=true; triggereMewtu(zone, wp); return;
         case "hm_geschenk":
           STATE.items[wp.item] = (STATE.items[wp.item]||0) + 1;
-          setzeFlag(wp.flagId);
-          zeigToast("📀 " + wp.itemName + " erhalten!", 4000);
-          speichern(); break;
+          setzeFlag(wp.flagId); zeigToast("📀 " + wp.itemName + " erhalten!", 4000); speichern(); break;
         case "event":
           if (wp.geld) { STATE.geld += wp.geld; aktualisiereHUD(); }
           if (wp.item) STATE.items[wp.item] = (STATE.items[wp.item]||0) + 1;
-          setzeFlag(wp.flagId);
-          if (wp.text) zeigToast(wp.text, 4000);
-          speichern(); break;
+          setzeFlag(wp.flagId); if (wp.text) zeigToast(wp.text, 4000); speichern(); break;
       }
     }
   }
@@ -180,11 +165,12 @@ function verarbeiteEtappe() {
     triggereTrainerKampf(trainer, zone); return;
   }
 
+  // Gym-Boss
   if (zone.boss && zone.boss.etappe === STATE.etappe && !trainerBesiegt(zone.id, "boss")) {
     triggereGymBoss(zone); return;
   }
 
-  // FIX: Encounter-Rate nur einmal prüfen (rollWildPkmn macht keine eigene Rate-Prüfung mehr)
+  // Wild encounter (rate check here, rollWildPkmn hat keinen eigenen check)
   if (zone.wildePkmn && zone.wildePkmn.length > 0 && Math.random() < (zone.begegnung / 100)) {
     var wild = rollWildPkmn(zone);
     if (wild) { triggereWildKampf(wild, zone); return; }
@@ -198,20 +184,17 @@ function naechsteEtappe(zone) {
   rendereStufenInfo();
   if (STATE.etappe > zone.etappen) {
     STATE.etappe = 1;
-    if (zone.typ === "gym" && zone.returnTo) {
-      navigiereZu(zone.returnTo);
-      return;
-    }
+    if (zone.typ === "gym" && zone.returnTo) { navigiereZu(zone.returnTo); return; }
     var verbindungen = zone.verbindungen || [];
-    var autoNextId = zone.autoNext && zone.autoNext[STATE.prevZone || ""];
+    var autoNextId   = zone.autoNext && zone.autoNext[STATE.prevZone || ""];
     var ziel = autoNextId ? verbindungen.find(v => v.zoneId === autoNextId) : null;
-    var moegliche = verbindungen.filter(v =>
-      v.zoneId !== STATE.prevZone && (!v.bedingung || checkBedingung(v.bedingung, STATE))
-    );
     if (ziel && ziel.bedingung && !checkBedingung(ziel.bedingung, STATE)) ziel = null;
-    ziel = ziel || moegliche[0] || verbindungen.find(v =>
-      v.zoneId !== STATE.prevZone
-    ) || verbindungen[0];
+    if (!ziel) {
+      var moegliche = verbindungen.filter(v =>
+        v.zoneId !== STATE.prevZone && (!v.bedingung || checkBedingung(v.bedingung, STATE))
+      );
+      ziel = moegliche[0] || verbindungen.find(v => v.zoneId !== STATE.prevZone) || verbindungen[0];
+    }
     if (ziel && ziel.bedingung && !checkBedingung(ziel.bedingung, STATE)) {
       zeigToast((ziel.gesperrtText || "Gesperrt!").replace("{badges}", STATE.orden || 0), 4000);
       return;
@@ -225,13 +208,20 @@ function triggereWildKampf(wildData, zone) {
   clearInterval(STAGE_INTERVALL);
   _wartetAufInput = true;
   kampfStarten("wild", wildData);
+  // GUARD: Wenn Pokémon-Daten nicht geladen, Kampf überspringen
+  if (!KAMPF || !KAMPF.gegner) {
+    console.warn("[app] Wild-Begegnung: kein Gegner (pokemon.json geladen?)");
+    _wartetAufInput = false;
+    stufenLoopStarten();
+    return;
+  }
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   STATE.gesehen[wildData.dexId] = true;
   rendereGegnerSprite(KAMPF.gegner, true);
   zeigKampfUI(KAMPF.gegner);
   clearKampfLog();
   var pd = getPkmn(wildData.dexId);
-  fuegeKampfLogHinzu("Ein wildes " + (pd ? pd.name : "?") + " Lv." + wildData.level +
+  fuegeKampfLogHinzu("Ein wildes " + (pd ? pd.name : "#" + wildData.dexId) + " Lv." + wildData.level +
     " erscheint!" + (wildData.shiny ? " ✨ Shiny!" : ""));
   if (_autoKampf) kampfLoopStarten();
 }
@@ -240,6 +230,13 @@ function triggereTrainerKampf(trainer, zone) {
   clearInterval(STAGE_INTERVALL);
   _wartetAufInput = true;
   kampfStarten("trainer", trainer);
+  if (!KAMPF || !KAMPF.gegner) {
+    console.warn("[app] Trainer-Kampf: kein Gegner (pokemon.json geladen?)");
+    markiereTrainerBesiegt(zone.id, trainer.etappe);
+    _wartetAufInput = false;
+    stufenLoopStarten();
+    return;
+  }
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   var pd = getPkmn(KAMPF.gegner.dexId);
   rendereGegnerSprite(KAMPF.gegner, true);
@@ -259,6 +256,13 @@ function triggereGymBoss(zone) {
     belohnung: gl.belohnung, _ordenId: gl.ordenId, _orden: gl.orden,
     _arenaZone: zone.id, _completedFlag: zone.completedFlag, _returnTo: zone.returnTo
   });
+  if (!KAMPF || !KAMPF.gegner) {
+    console.warn("[app] Gym-Boss: kein Gegner (pokemon.json geladen?)");
+    markiereTrainerBesiegt(zone.id, "boss");
+    _wartetAufInput = false;
+    stufenLoopStarten();
+    return;
+  }
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   var pd = getPkmn(KAMPF.gegner.dexId);
   rendereGegnerSprite(KAMPF.gegner, true);
@@ -269,11 +273,9 @@ function triggereGymBoss(zone) {
   if (_autoKampf) kampfLoopStarten();
 }
 
-// FIX: Rival-Team korrekt berechnen
 function triggereRivalKampf(zone, wp) {
   clearInterval(STAGE_INTERVALL);
   _wartetAufInput = true;
-  // Rival hat den Starter-Typ-Vorteil gegenüber Spieler
   var rivalStarterMap = { 1: 4, 4: 7, 7: 1 };
   var rivalStarterId = rivalStarterMap[STATE.starter] || 4;
   var rivalLevel = Math.max(5, STATE.party[0] ? STATE.party[0].level + 1 : 5);
@@ -281,6 +283,12 @@ function triggereRivalKampf(zone, wp) {
     name: "Gary", isRival: true, belohnung: 500,
     team: [{ id: rivalStarterId, lv: rivalLevel }]
   });
+  if (!KAMPF || !KAMPF.gegner) {
+    setzeFlag(wp.flagId);
+    _wartetAufInput = false;
+    stufenLoopStarten();
+    return;
+  }
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   if (wp.text) fuegeKampfLogHinzu(wp.text);
   rendereGegnerSprite(KAMPF.gegner, true);
@@ -313,11 +321,9 @@ function fuehreAutoKampfRunde() {
     var ende = pruefeKampfende();
     if (ende) { _animLaeuft = false; kampfBeenden(ende); return; }
     var gMoveId = waehleKIAttacke(KAMPF.gegner, spieler);
-    var gMove = MOVES[gMoveId] || { typ: "Normal" };
-    fuehreAngriffAnimation(gMove.typ, false, function() {
+    fuehreAngriffAnimation((MOVES[gMoveId]||{typ:"Normal"}).typ, false, function() {
       fuehreAngriffAus(KAMPF.gegner, spieler, gMoveId).forEach(m => fuegeKampfLogHinzu(m));
-      aktualisiereSpielerKP();
-      rendereSpielerSprites();
+      aktualisiereSpielerKP(); rendereSpielerSprites();
     }, function() {
       var ende2 = pruefeKampfende();
       if (ende2) { _animLaeuft = false; kampfBeenden(ende2); return; }
@@ -333,11 +339,9 @@ window.onAttackeKlick = function(moveId) {
   clearInterval(KAMPF_INTERVALL);
   _animLaeuft = true;
   var spieler = aktivePkmn(); if (!spieler) { _animLaeuft = false; return; }
-  var move = MOVES[moveId] || { typ: "Normal" };
-  fuehreAngriffAnimation(move.typ, true, function() {
+  fuehreAngriffAnimation((MOVES[moveId]||{typ:"Normal"}).typ, true, function() {
     fuehreAngriffAus(spieler, KAMPF.gegner, moveId).forEach(t => fuegeKampfLogHinzu(t));
-    aktualisiereGegnerKP(KAMPF.gegner);
-    aktualisiereSpielerKP();
+    aktualisiereGegnerKP(KAMPF.gegner); aktualisiereSpielerKP();
   }, function() {
     var ende = pruefeKampfende();
     if (ende) { _animLaeuft = false; kampfBeenden(ende); return; }
@@ -361,13 +365,11 @@ window.onBallKlick = function(ballTyp) {
   clearInterval(KAMPF_INTERVALL);
   _animLaeuft = true;
   STATE.items[ballTyp]--;
-
   werfeBallAnimation(ballTyp, function() {
     if (versucheFangen(KAMPF.gegner, ballTyp)) {
       var neuPkmn = KAMPF.gegner;
       var pd = getPkmn(neuPkmn.dexId);
-      STATE.gefangen[neuPkmn.dexId] = true;
-      STATE.gesehen[neuPkmn.dexId]  = true;
+      STATE.gefangen[neuPkmn.dexId] = true; STATE.gesehen[neuPkmn.dexId] = true;
       fuegeKampfLogHinzu("🎉 " + (pd ? pd.name : "?") + (neuPkmn.shiny ? " ✨" : "") + " gefangen!");
       if (!inParty(neuPkmn)) inBox(neuPkmn);
       zeigToast((pd ? pd.name : "?") + " gefangen!", 3000);
@@ -382,8 +384,7 @@ window.onBallKlick = function(ballTyp) {
       }, function() {
         var ende = pruefeKampfende();
         if (ende) { _animLaeuft = false; kampfBeenden(ende); return; }
-        rendereWurfBaelle(true);
-        _animLaeuft = false;
+        rendereWurfBaelle(true); _animLaeuft = false;
         if (_autoKampf) kampfLoopStarten();
       });
     }
@@ -393,108 +394,70 @@ window.onBallKlick = function(ballTyp) {
 window.onFluchtKlick = function() {
   if (!KAMPF || KAMPF.vorbei) { zeigToast("Flucht nicht möglich!"); return; }
   if (!versucheFlucht()) { zeigToast("Flucht nicht möglich!"); return; }
-  clearInterval(KAMPF_INTERVALL);
-  _animLaeuft = false;
+  clearInterval(KAMPF_INTERVALL); _animLaeuft = false;
   kampfBeenden({ ergebnis: "flucht" });
 };
 
 // ── Kampf beenden ─────────────────────────────────────────────
 function kampfBeenden(ende) {
-  clearInterval(KAMPF_INTERVALL);
-  _animLaeuft = false;
+  clearInterval(KAMPF_INTERVALL); _animLaeuft = false;
   if (!ende) return;
-
   switch (ende.ergebnis) {
     case "sieg":
       if (ende.xpMeldungen) ende.xpMeldungen.forEach(m => fuegeKampfLogHinzu(m));
       if (ende.xp) zeigXPPopup(ende.xp);
-
       if (KAMPF.istTrainer) {
         if (KAMPF.trainerDaten && KAMPF.trainerDaten.belohnung) {
           STATE.geld += KAMPF.trainerDaten.belohnung;
           fuegeKampfLogHinzu("+" + KAMPF.trainerDaten.belohnung + " ₽!");
           aktualisiereHUD();
         }
-        // FIX: Orden nur für Arenen, Trainer nur auf Route
         if (KAMPF.trainerDaten && KAMPF.trainerDaten._ordenId) {
           var ordenId = KAMPF.trainerDaten._ordenId;
           if (!STATE.ordenIds.includes(ordenId)) {
-            STATE.ordenIds.push(ordenId);
-            STATE.orden = STATE.ordenIds.length;
-            fuegeKampfLogHinzu("🏅 " + KAMPF.trainerDaten._orden + " erhalten!");
-            aktualisiereHUD();
+            STATE.ordenIds.push(ordenId); STATE.orden = STATE.ordenIds.length;
+            fuegeKampfLogHinzu("🏅 " + KAMPF.trainerDaten._orden + " erhalten!"); aktualisiereHUD();
           }
-          // FIX: Arena-Beaten mit "arena"-Schlüssel markieren
-          if (KAMPF.trainerDaten._arenaZone) {
-            markiereTrainerBesiegt(KAMPF.trainerDaten._arenaZone, "boss");
-          }
-          if (KAMPF.trainerDaten._completedFlag) {
-            setzeFlag(KAMPF.trainerDaten._completedFlag);
-          }
+          if (KAMPF.trainerDaten._arenaZone) markiereTrainerBesiegt(KAMPF.trainerDaten._arenaZone, "boss");
+          if (KAMPF.trainerDaten._completedFlag) setzeFlag(KAMPF.trainerDaten._completedFlag);
         } else {
-          // Normaler Trainer auf Route
           markiereTrainerBesiegt(STATE.zone, STATE.etappe);
         }
       }
-
-      rendereSpielerSprites();
-      speichern();
+      rendereSpielerSprites(); speichern();
       setTimeout(function() {
-        versteckeKampfUI();
-        rendereGegnerSprite(null, false);
-        _wartetAufInput = false;
-        // FIX: Nach Arena-Kampf in Stadt → City-Hub neu rendern statt naechsteEtappe
+        versteckeKampfUI(); rendereGegnerSprite(null, false); _wartetAufInput = false;
         var curZone = getZone(STATE.zone);
-        if (KAMPF.trainerDaten && KAMPF.trainerDaten._returnTo) {
-          navigiereZu(KAMPF.trainerDaten._returnTo);
-          return;
-        }
-        if (curZone && (curZone.typ === "stadt" || curZone.typ === "wachposten")) {
-          stadtBetreten(curZone);
-        } else {
-          naechsteEtappe(curZone);
-        }
+        if (KAMPF.trainerDaten && KAMPF.trainerDaten._returnTo) { navigiereZu(KAMPF.trainerDaten._returnTo); return; }
+        if (curZone && (curZone.typ === "stadt" || curZone.typ === "wachposten")) stadtBetreten(curZone);
+        else naechsteEtappe(curZone);
       }, 2500);
       break;
-
     case "niederlage":
       fuegeKampfLogHinzu("💀 K.O.! In der Heilstation aufgewacht...");
-      rendereSpielerSprites();
-      speichern();
+      rendereSpielerSprites(); speichern();
       setTimeout(function() {
-        versteckeKampfUI();
-        rendereGegnerSprite(null, false);
-        vollHeilen();
-        STATE.etappe = 1;
+        versteckeKampfUI(); rendereGegnerSprite(null, false);
+        vollHeilen(); STATE.etappe = 1;
         var zone = getZone(STATE.zone);
-        var rueck = zone && zone.verbindungen &&
-          zone.verbindungen.find(v => v.richtung === "sued" || v.richtung === "west");
+        var rueck = zone && zone.verbindungen && zone.verbindungen.find(v => v.richtung === "sued" || v.richtung === "west");
         navigiereZu(rueck ? rueck.zoneId : "alabastia");
       }, 3000);
       break;
-
     case "gefangen":
     case "flucht":
       setTimeout(function() {
-        versteckeKampfUI();
-        rendereGegnerSprite(null, false);
-        _wartetAufInput = false;
+        versteckeKampfUI(); rendereGegnerSprite(null, false); _wartetAufInput = false;
         var curZone = getZone(STATE.zone);
-        if (curZone && (curZone.typ === "stadt" || curZone.typ === "wachposten")) {
-          stadtBetreten(curZone);
-        } else {
-          stufenLoopStarten();
-        }
+        if (curZone && (curZone.typ === "stadt" || curZone.typ === "wachposten")) stadtBetreten(curZone);
+        else stufenLoopStarten();
       }, 1500);
       break;
-
     case "naechstes":
       if (ende.xpMeldungen) ende.xpMeldungen.forEach(m => fuegeKampfLogHinzu(m));
       if (ende.xp) zeigXPPopup(ende.xp);
-      fuegeKampfLogHinzu("Trainer schickt " + ((getPkmn(KAMPF.gegner.dexId)||{}).name||"?") +
-        " Lv." + KAMPF.gegner.level + "!");
-      rendereGegnerSprite(KAMPF.gegner, true);
-      aktualisiereGegnerKP(KAMPF.gegner);
+      fuegeKampfLogHinzu("Trainer schickt " + ((getPkmn(KAMPF.gegner.dexId)||{}).name||"?") + " Lv." + KAMPF.gegner.level + "!");
+      rendereGegnerSprite(KAMPF.gegner, true); aktualisiereGegnerKP(KAMPF.gegner);
       if (_autoKampf) kampfLoopStarten();
       break;
   }
@@ -506,8 +469,7 @@ function _updateAutoKampfBtn() {
   if (btn) btn.textContent = _autoKampf ? "⚡ Auto" : "✋ Manuell";
 }
 window.toggleAutoKampf = function() {
-  _autoKampf = !_autoKampf;
-  _updateAutoKampfBtn();
+  _autoKampf = !_autoKampf; _updateAutoKampfBtn();
   if (_autoKampf && KAMPF && !KAMPF.vorbei && !_animLaeuft) kampfLoopStarten();
   else clearInterval(KAMPF_INTERVALL);
 };
@@ -525,7 +487,7 @@ window.schnellReiseTo = function(zoneId) {
 // ── Tabs ──────────────────────────────────────────────────────
 window.onTabWelt   = function() { wechsleTab("Welt"); };
 window.onTabAngeln = function() {
-  aktualisiereAngelTabStatus();
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   var btn = document.getElementById("tabAngeln");
   if (btn && btn.disabled) { zeigToast(btn.dataset.reason || "Hier kannst du gerade nicht angeln."); return; }
   wechsleTab("Angeln");
@@ -540,8 +502,7 @@ function getEffektivenTick() {
   if (!STATE) return STAGE_TICK_MS;
   var zone = getZone(STATE.zone);
   if (!zone || zone.typ === "stadt" || zone.typ === "gym") return STAGE_TICK_MS;
-  return itemAktiv("fahrrad")
-    ? Math.floor(STAGE_TICK_MS / 2) : STAGE_TICK_MS;
+  return itemAktiv("fahrrad") ? Math.floor(STAGE_TICK_MS / 2) : STAGE_TICK_MS;
 }
 
 function zeigOfflineBonus(sekunden) {
@@ -555,5 +516,3 @@ function zeigOfflineBonus(sekunden) {
 window.schliesseOfflineModal = function() {
   var m = document.getElementById("offlineModal"); if (m) m.style.display = "none";
 };
-
-
