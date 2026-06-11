@@ -206,7 +206,7 @@
         "bedingung": {
           "hasItem": "rad_coupon"
         },
-        "gesperrtText": "Du brauchst einen Rad-Coupon! Hol ihn im Pokémon Fan-Klub in Zinnia City.",
+        "gesperrtText": "Du brauchst einen Rad-Coupon! Hol ihn im Pokémon Fan-Klub in Orania City.",
         "text": "Händler: 'Ein Rad-Coupon! Hier ist dein nagelneues Fahrrad — kostenlos!'"
       }
     ],
@@ -218,22 +218,29 @@
     ]
   },
   "bills_haus": {
-    "name": "Bills Haus",
+    "name": "Bills Küstenhaus",
     "typ": "komplex",
     "features": [
       {
-        "id": "bills_lore",
+        "id": "bill_intro",
         "typ": "lore",
-        "label": "Bill ansprechen",
-        "text": "Bill: 'Ich bin Bill — Pokémon-Forscher! Ich habe versehentlich mit dem Teleporter experimentiert...'"
+        "label": "Das sprechende Pokémon ansprechen",
+        "flagId": "bill_seen_transformed",
+        "text": "Das Pokémon spricht: 'Hey! Ich bin kein Pokémon. Ich bin Bill! Bei einem Experiment mit meinem Teleporter ist etwas schiefgelaufen.'"
       },
       {
         "id": "bill_rescue",
-        "typ": "bill_rescue",
-        "label": "Bill befreien",
-        "beschr": "Aktiviere den Teleporter!",
+        "typ": "item_geschenk",
+        "label": "Teleporter bedienen",
+        "beschr": "Aktiviere Bills Zellentrenner am PC.",
+        "item": "bootsticket",
+        "itemName": "Bootsticket",
         "flagId": "bill_rescued",
-        "text": "Bill: 'Danke! Als Dankeschön bekommst du das Bootsticket!'"
+        "bedingung": {
+          "eventFlag": "bill_seen_transformed"
+        },
+        "gesperrtText": "Sprich zuerst mit Bill.",
+        "text": "Bill: 'Danke! Jetzt bin ich wieder ich selbst. Als Dank bekommst du ein Ticket fuer die S.S. Anne!'"
       }
     ]
   },
@@ -723,7 +730,7 @@
     "rechallenge": false
   },
   "vermilion_gym_building": {
-    "name": "Zinnia Arena",
+    "name": "Orania Arena",
     "typ": "gym",
     "targetZone": "vermilion_gym",
     "bedingung": {
@@ -731,7 +738,7 @@
     },
     "gesperrtText": "VM01 Zerschneider nötig!",
     "completedFlag": "gym_thunder_cleared",
-    "completedText": "Zinnia Arena ist abgeschlossen.",
+    "completedText": "Orania Arena ist abgeschlossen.",
     "rechallenge": false
   },
   "celadon_gym_building": {
@@ -743,11 +750,11 @@
     "rechallenge": false
   },
   "fuchsia_gym_building": {
-    "name": "Pokérosia Arena",
+    "name": "Fuchsania Arena",
     "typ": "gym",
     "targetZone": "fuchsia_gym",
     "completedFlag": "gym_soul_cleared",
-    "completedText": "Pokérosia Arena ist abgeschlossen.",
+    "completedText": "Fuchsania Arena ist abgeschlossen.",
     "rechallenge": false
   },
   "saffron_gym_building": {
@@ -781,5 +788,84 @@
     "completedFlag": "gym_earth_cleared",
     "completedText": "Vertania Arena ist abgeschlossen.",
     "rechallenge": false
+  },
+  "route16_fly_house": {
+    "name": "Verstecktes Haus",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "fly_house_lore",
+        "typ": "lore",
+        "label": "Bewohnerin ansprechen",
+        "flagId": "fly_house_seen",
+        "bedingung": {
+          "hasItem": "hm_cut"
+        },
+        "gesperrtText": "Der Weg zum Haus ist von einem Busch versperrt. Du brauchst VM01 Zerschneider.",
+        "text": "Bewohnerin: 'Bitte verrate niemandem, dass ich hier wohne.'"
+      },
+      {
+        "id": "hm_fly_gift",
+        "typ": "item_geschenk",
+        "label": "VM02 Fliegen erhalten",
+        "item": "hm_fly",
+        "itemName": "VM02 Fliegen",
+        "flagId": "r16_hm_fly",
+        "bedingung": {
+          "eventFlag": "fly_house_seen",
+          "hasItem": "hm_cut"
+        },
+        "gesperrtText": "Sprich zuerst mit der Bewohnerin. Du brauchst außerdem VM01 Zerschneider.",
+        "text": "Bewohnerin: 'Hier, nimm VM02 Fliegen. Aber sag niemandem, dass du sie von mir hast!'"
+      }
+    ]
+  },
+  "angelhaus_orania": {
+    "name": "Haus des Anglers",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "old_rod_gift",
+        "typ": "item_geschenk",
+        "label": "Angler ansprechen",
+        "beschr": "Der Angler gibt dir die einfache Angel.",
+        "item": "angel",
+        "itemName": "Angel",
+        "flagId": "got_old_rod",
+        "text": "Angler: 'Ich liebe Angeln! Hier, nimm diese Angel und probier es am Wasser.'"
+      }
+    ]
+  },
+  "angelhaus_fuchsania": {
+    "name": "Haus des Angelprofis",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "good_rod_gift",
+        "typ": "item_geschenk",
+        "label": "Angelprofi ansprechen",
+        "beschr": "Der Angelprofi gibt dir die bessere Angel.",
+        "item": "profiangel",
+        "itemName": "Profiangel",
+        "flagId": "got_good_rod",
+        "text": "Angelprofi: 'Du siehst aus, als w?rdest du gern angeln. Nimm diese Profiangel!'"
+      }
+    ]
+  },
+  "angelhaus_route12": {
+    "name": "Anglerh?tte",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "super_rod_gift",
+        "typ": "item_geschenk",
+        "label": "Angelguru ansprechen",
+        "beschr": "Der Angelguru gibt dir die beste Angel.",
+        "item": "superangel",
+        "itemName": "Superangel",
+        "flagId": "got_super_rod",
+        "text": "Angelguru: 'Ich bin der Angelguru! Mit dieser Superangel holst du die st?rksten Wasser-Pok?mon an Land.'"
+      }
+    ]
   }
 }

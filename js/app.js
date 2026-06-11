@@ -1,6 +1,6 @@
-﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  app.js â€” Hauptcontroller: Navigation, Kampf-Loop, Tabs
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+﻿// ═══════════════════════════════════════════════════════════════
+//  app.js — Hauptcontroller: Navigation, Kampf-Loop, Tabs
+// ═══════════════════════════════════════════════════════════════
 
 var STAGE_INTERVALL = null;
 var KAMPF_INTERVALL = null;
@@ -11,7 +11,7 @@ var _inStadt        = false;
 var _animLaeuft     = false;
 var _autoKampf      = true;
 
-// â”€â”€ Spiel starten â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Spiel starten ─────────────────────────────────────────────
 document.addEventListener("dataReady", function() { auth_init(); });
 
 document.addEventListener("gameReady", function(e) {
@@ -29,7 +29,7 @@ document.addEventListener("gameReady", function(e) {
 function onStarterGewaehlt(trainerName, starterDexId) {
   var uid = localStorage.getItem("pokidlemon_uid") || ("u" + Date.now());
   neuesSpiel(uid, trainerName, starterDexId);
-  zeigToast("Du hast " + ((getPkmn(starterDexId)||{}).name||"?") + " als Starter gewÃ¤hlt!");
+  zeigToast("Du hast " + ((getPkmn(starterDexId)||{}).name||"?") + " als Starter gewählt!");
   speichern();
   spielStarten(0);
 }
@@ -47,17 +47,21 @@ function spielStarten(wegSekunden) {
   if (zone.typ === "stadt" || zone.typ === "wachposten") stadtBetreten(zone);
   else stufenLoopStarten();
   _updateAutoKampfBtn();
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
 }
 
-// â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Navigation ────────────────────────────────────────────────
 function navigiereZu(zoneId) {
   clearInterval(STAGE_INTERVALL);
   clearInterval(KAMPF_INTERVALL);
+  if (typeof setzeAngelSzene === "function") setzeAngelSzene(false);
   _wartetAufInput = false; _inStadt = false; _animLaeuft = false;
   STATE.gebaeude = null;
   versteckeKampfUI();
   rendereGegnerSprite(null, false);
+  var vorigeZone = STATE.zone || null;
   STATE.zone = zoneId; STATE.etappe = 1;
+  STATE.prevZone = vorigeZone;
   markiereBesucht(zoneId);
   var zone = getZone(zoneId);
   if (zone && zone.manualBattle) {
@@ -75,11 +79,13 @@ function navigiereZu(zoneId) {
     rendereWeltTab();
     stufenLoopStarten();
   }
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
 }
 
 function stadtBetreten(zone) {
   clearInterval(STAGE_INTERVALL);
   clearInterval(KAMPF_INTERVALL);
+  if (typeof setzeAngelSzene === "function") setzeAngelSzene(false);
   _wartetAufInput = true; _inStadt = true; _animLaeuft = false;
   STATE.gebaeude = null;
   versteckeKampfUI();
@@ -91,6 +97,7 @@ function stadtBetreten(zone) {
     aktualisiereHUD();
   }
   rendereStadtHub(zone);
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   STAGE_INTERVALL = setInterval(verarbeiteEtappe, STAGE_TICK_MS);
 }
 
@@ -105,10 +112,11 @@ window.verbindungBetreten = function(zoneId) {
   navigiereZu(zoneId);
 };
 
-// â”€â”€ Stufen-Loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Stufen-Loop ───────────────────────────────────────────────
 function stufenLoopStarten() {
   clearInterval(STAGE_INTERVALL);
   clearInterval(KAMPF_INTERVALL);
+  if (typeof setzeAngelSzene === "function") setzeAngelSzene(false);
   _wartetAufInput = false; _inStadt = false; _animLaeuft = false;
   STATE.gebaeude = null;
   versteckeKampfUI();
@@ -119,6 +127,7 @@ function stufenLoopStarten() {
     _autoKampf = false;
     _updateAutoKampfBtn();
   }
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   STAGE_INTERVALL = setInterval(verarbeiteEtappe, ms);
 }
 
@@ -153,7 +162,7 @@ function verarbeiteEtappe() {
         case "hm_geschenk":
           STATE.items[wp.item] = (STATE.items[wp.item]||0) + 1;
           setzeFlag(wp.flagId);
-          zeigToast("ðŸ“€ " + wp.itemName + " erhalten!", 4000);
+          zeigToast("📀 " + wp.itemName + " erhalten!", 4000);
           speichern(); break;
         case "event":
           if (wp.geld) { STATE.geld += wp.geld; aktualisiereHUD(); }
@@ -175,7 +184,7 @@ function verarbeiteEtappe() {
     triggereGymBoss(zone); return;
   }
 
-  // FIX: Encounter-Rate nur einmal prÃ¼fen (rollWildPkmn macht keine eigene Rate-PrÃ¼fung mehr)
+  // FIX: Encounter-Rate nur einmal prüfen (rollWildPkmn macht keine eigene Rate-Prüfung mehr)
   if (zone.wildePkmn && zone.wildePkmn.length > 0 && Math.random() < (zone.begegnung / 100)) {
     var wild = rollWildPkmn(zone);
     if (wild) { triggereWildKampf(wild, zone); return; }
@@ -193,27 +202,37 @@ function naechsteEtappe(zone) {
       navigiereZu(zone.returnTo);
       return;
     }
-    var vorwaerts = zone.verbindungen && zone.verbindungen.find(v =>
-      v.richtung !== "sued" && v.richtung !== "west"
+    var verbindungen = zone.verbindungen || [];
+    var autoNextId = zone.autoNext && zone.autoNext[STATE.prevZone || ""];
+    var ziel = autoNextId ? verbindungen.find(v => v.zoneId === autoNextId) : null;
+    var moegliche = verbindungen.filter(v =>
+      v.zoneId !== STATE.prevZone && (!v.bedingung || checkBedingung(v.bedingung, STATE))
     );
-    if (vorwaerts) navigiereZu(vorwaerts.zoneId);
-    else if (zone.verbindungen && zone.verbindungen.length > 0)
-      navigiereZu(zone.verbindungen[0].zoneId);
+    if (ziel && ziel.bedingung && !checkBedingung(ziel.bedingung, STATE)) ziel = null;
+    ziel = ziel || moegliche[0] || verbindungen.find(v =>
+      v.zoneId !== STATE.prevZone
+    ) || verbindungen[0];
+    if (ziel && ziel.bedingung && !checkBedingung(ziel.bedingung, STATE)) {
+      zeigToast((ziel.gesperrtText || "Gesperrt!").replace("{badges}", STATE.orden || 0), 4000);
+      return;
+    }
+    if (ziel) navigiereZu(ziel.zoneId);
   }
 }
 
-// â”€â”€ Kampf-Trigger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Kampf-Trigger ─────────────────────────────────────────────
 function triggereWildKampf(wildData, zone) {
   clearInterval(STAGE_INTERVALL);
   _wartetAufInput = true;
   kampfStarten("wild", wildData);
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   STATE.gesehen[wildData.dexId] = true;
   rendereGegnerSprite(KAMPF.gegner, true);
   zeigKampfUI(KAMPF.gegner);
   clearKampfLog();
   var pd = getPkmn(wildData.dexId);
   fuegeKampfLogHinzu("Ein wildes " + (pd ? pd.name : "?") + " Lv." + wildData.level +
-    " erscheint!" + (wildData.shiny ? " âœ¨ Shiny!" : ""));
+    " erscheint!" + (wildData.shiny ? " ✨ Shiny!" : ""));
   if (_autoKampf) kampfLoopStarten();
 }
 
@@ -221,11 +240,12 @@ function triggereTrainerKampf(trainer, zone) {
   clearInterval(STAGE_INTERVALL);
   _wartetAufInput = true;
   kampfStarten("trainer", trainer);
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   var pd = getPkmn(KAMPF.gegner.dexId);
   rendereGegnerSprite(KAMPF.gegner, true);
   zeigKampfUI(KAMPF.gegner);
   clearKampfLog();
-  fuegeKampfLogHinzu((trainer.isRival ? "âš¡ Rival " : "") + trainer.name + " fordert dich heraus!");
+  fuegeKampfLogHinzu((trainer.isRival ? "⚡ Rival " : "") + trainer.name + " fordert dich heraus!");
   fuegeKampfLogHinzu("Er schickt " + (pd ? pd.name : "?") + " Lv." + KAMPF.gegner.level + "!");
   if (_autoKampf) kampfLoopStarten();
 }
@@ -239,6 +259,7 @@ function triggereGymBoss(zone) {
     belohnung: gl.belohnung, _ordenId: gl.ordenId, _orden: gl.orden,
     _arenaZone: zone.id, _completedFlag: zone.completedFlag, _returnTo: zone.returnTo
   });
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   var pd = getPkmn(KAMPF.gegner.dexId);
   rendereGegnerSprite(KAMPF.gegner, true);
   zeigKampfUI(KAMPF.gegner);
@@ -252,7 +273,7 @@ function triggereGymBoss(zone) {
 function triggereRivalKampf(zone, wp) {
   clearInterval(STAGE_INTERVALL);
   _wartetAufInput = true;
-  // Rival hat den Starter-Typ-Vorteil gegenÃ¼ber Spieler
+  // Rival hat den Starter-Typ-Vorteil gegenüber Spieler
   var rivalStarterMap = { 1: 4, 4: 7, 7: 1 };
   var rivalStarterId = rivalStarterMap[STATE.starter] || 4;
   var rivalLevel = Math.max(5, STATE.party[0] ? STATE.party[0].level + 1 : 5);
@@ -260,13 +281,14 @@ function triggereRivalKampf(zone, wp) {
     name: "Gary", isRival: true, belohnung: 500,
     team: [{ id: rivalStarterId, lv: rivalLevel }]
   });
+  if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
   if (wp.text) fuegeKampfLogHinzu(wp.text);
   rendereGegnerSprite(KAMPF.gegner, true);
   zeigKampfUI(KAMPF.gegner);
   if (_autoKampf) kampfLoopStarten();
 }
 
-// â”€â”€ Auto-Kampf-Loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Auto-Kampf-Loop ───────────────────────────────────────────
 function kampfLoopStarten() {
   clearInterval(KAMPF_INTERVALL);
   KAMPF_INTERVALL = setInterval(function() {
@@ -346,7 +368,7 @@ window.onBallKlick = function(ballTyp) {
       var pd = getPkmn(neuPkmn.dexId);
       STATE.gefangen[neuPkmn.dexId] = true;
       STATE.gesehen[neuPkmn.dexId]  = true;
-      fuegeKampfLogHinzu("ðŸŽ‰ " + (pd ? pd.name : "?") + (neuPkmn.shiny ? " âœ¨" : "") + " gefangen!");
+      fuegeKampfLogHinzu("🎉 " + (pd ? pd.name : "?") + (neuPkmn.shiny ? " ✨" : "") + " gefangen!");
       if (!inParty(neuPkmn)) inBox(neuPkmn);
       zeigToast((pd ? pd.name : "?") + " gefangen!", 3000);
       _animLaeuft = false;
@@ -369,14 +391,14 @@ window.onBallKlick = function(ballTyp) {
 };
 
 window.onFluchtKlick = function() {
-  if (!KAMPF || KAMPF.vorbei) { zeigToast("Flucht nicht mÃ¶glich!"); return; }
-  if (!versucheFlucht()) { zeigToast("Flucht nicht mÃ¶glich!"); return; }
+  if (!KAMPF || KAMPF.vorbei) { zeigToast("Flucht nicht möglich!"); return; }
+  if (!versucheFlucht()) { zeigToast("Flucht nicht möglich!"); return; }
   clearInterval(KAMPF_INTERVALL);
   _animLaeuft = false;
   kampfBeenden({ ergebnis: "flucht" });
 };
 
-// â”€â”€ Kampf beenden â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Kampf beenden ─────────────────────────────────────────────
 function kampfBeenden(ende) {
   clearInterval(KAMPF_INTERVALL);
   _animLaeuft = false;
@@ -390,19 +412,19 @@ function kampfBeenden(ende) {
       if (KAMPF.istTrainer) {
         if (KAMPF.trainerDaten && KAMPF.trainerDaten.belohnung) {
           STATE.geld += KAMPF.trainerDaten.belohnung;
-          fuegeKampfLogHinzu("+" + KAMPF.trainerDaten.belohnung + " â‚½!");
+          fuegeKampfLogHinzu("+" + KAMPF.trainerDaten.belohnung + " ₽!");
           aktualisiereHUD();
         }
-        // FIX: Orden nur fÃ¼r Arenen, Trainer nur auf Route
+        // FIX: Orden nur für Arenen, Trainer nur auf Route
         if (KAMPF.trainerDaten && KAMPF.trainerDaten._ordenId) {
           var ordenId = KAMPF.trainerDaten._ordenId;
           if (!STATE.ordenIds.includes(ordenId)) {
             STATE.ordenIds.push(ordenId);
             STATE.orden = STATE.ordenIds.length;
-            fuegeKampfLogHinzu("ðŸ… " + KAMPF.trainerDaten._orden + " erhalten!");
+            fuegeKampfLogHinzu("🏅 " + KAMPF.trainerDaten._orden + " erhalten!");
             aktualisiereHUD();
           }
-          // FIX: Arena-Beaten mit "arena"-SchlÃ¼ssel markieren
+          // FIX: Arena-Beaten mit "arena"-Schlüssel markieren
           if (KAMPF.trainerDaten._arenaZone) {
             markiereTrainerBesiegt(KAMPF.trainerDaten._arenaZone, "boss");
           }
@@ -421,7 +443,7 @@ function kampfBeenden(ende) {
         versteckeKampfUI();
         rendereGegnerSprite(null, false);
         _wartetAufInput = false;
-        // FIX: Nach Arena-Kampf in Stadt â†’ City-Hub neu rendern statt naechsteEtappe
+        // FIX: Nach Arena-Kampf in Stadt → City-Hub neu rendern statt naechsteEtappe
         var curZone = getZone(STATE.zone);
         if (KAMPF.trainerDaten && KAMPF.trainerDaten._returnTo) {
           navigiereZu(KAMPF.trainerDaten._returnTo);
@@ -436,7 +458,7 @@ function kampfBeenden(ende) {
       break;
 
     case "niederlage":
-      fuegeKampfLogHinzu("ðŸ’€ K.O.! In der Heilstation aufgewacht...");
+      fuegeKampfLogHinzu("💀 K.O.! In der Heilstation aufgewacht...");
       rendereSpielerSprites();
       speichern();
       setTimeout(function() {
@@ -457,11 +479,18 @@ function kampfBeenden(ende) {
         versteckeKampfUI();
         rendereGegnerSprite(null, false);
         _wartetAufInput = false;
-        stufenLoopStarten();
+        var curZone = getZone(STATE.zone);
+        if (curZone && (curZone.typ === "stadt" || curZone.typ === "wachposten")) {
+          stadtBetreten(curZone);
+        } else {
+          stufenLoopStarten();
+        }
       }, 1500);
       break;
 
     case "naechstes":
+      if (ende.xpMeldungen) ende.xpMeldungen.forEach(m => fuegeKampfLogHinzu(m));
+      if (ende.xp) zeigXPPopup(ende.xp);
       fuegeKampfLogHinzu("Trainer schickt " + ((getPkmn(KAMPF.gegner.dexId)||{}).name||"?") +
         " Lv." + KAMPF.gegner.level + "!");
       rendereGegnerSprite(KAMPF.gegner, true);
@@ -471,10 +500,10 @@ function kampfBeenden(ende) {
   }
 }
 
-// â”€â”€ Auto/Manuell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Auto/Manuell ──────────────────────────────────────────────
 function _updateAutoKampfBtn() {
   var btn = document.getElementById("autoKampfBtn");
-  if (btn) btn.textContent = _autoKampf ? "âš¡ Auto" : "âœ‹ Manuell";
+  if (btn) btn.textContent = _autoKampf ? "⚡ Auto" : "✋ Manuell";
 }
 window.toggleAutoKampf = function() {
   _autoKampf = !_autoKampf;
@@ -483,29 +512,35 @@ window.toggleAutoKampf = function() {
   else clearInterval(KAMPF_INTERVALL);
 };
 
-// â”€â”€ Schnellreise â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Schnellreise ──────────────────────────────────────────────
 window.schnellReiseTo = function(zoneId) {
   if (!STATE) return;
-  if (KAMPF && !KAMPF.vorbei) { zeigToast("Im Kampf nicht mÃ¶glich!"); return; }
-  if (!(STATE.items["hm_fly"] > 0)) { zeigToast("âœˆï¸ Schnellreise erfordert VM02 Fliegen!", 3500); return; }
+  if (KAMPF && !KAMPF.vorbei) { zeigToast("Im Kampf nicht möglich!"); return; }
+  if (!(STATE.items["hm_fly"] > 0)) { zeigToast("✈️ Schnellreise erfordert VM02 Fliegen!", 3500); return; }
   if (!zonenBesucht(zoneId)) { zeigToast("Diese Stadt noch nicht besucht!"); return; }
   navigiereZu(zoneId);
-  zeigToast("âœˆï¸ Fliege nach " + ((getZone(zoneId)||{}).name||zoneId) + "!", 3000);
+  zeigToast("✈️ Fliege nach " + ((getZone(zoneId)||{}).name||zoneId) + "!", 3000);
 };
 
-// â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Tabs ──────────────────────────────────────────────────────
 window.onTabWelt   = function() { wechsleTab("Welt"); };
+window.onTabAngeln = function() {
+  aktualisiereAngelTabStatus();
+  var btn = document.getElementById("tabAngeln");
+  if (btn && btn.disabled) { zeigToast(btn.dataset.reason || "Hier kannst du gerade nicht angeln."); return; }
+  wechsleTab("Angeln");
+};
 window.onTabTeam   = function() { wechsleTab("Team"); };
 window.onTabTasche = function() { wechsleTab("Tasche"); };
 window.onTabKarte  = function() { wechsleTab("Karte"); rendereKarte(); };
 window.onTabDex    = function() { wechsleTab("Dex"); };
 
-// â”€â”€ Hilfsfunktionen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Hilfsfunktionen ───────────────────────────────────────────
 function getEffektivenTick() {
   if (!STATE) return STAGE_TICK_MS;
   var zone = getZone(STATE.zone);
   if (!zone || zone.typ === "stadt" || zone.typ === "gym") return STAGE_TICK_MS;
-  return (STATE.items && STATE.items["fahrrad"] > 0)
+  return itemAktiv("fahrrad")
     ? Math.floor(STAGE_TICK_MS / 2) : STAGE_TICK_MS;
 }
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PokIdleMon</title>
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/hub.css">
 </head>
 <body>
 
@@ -107,6 +108,7 @@
   <!-- Tab-Navigation -->
   <nav id="tabs">
     <button class="tab active" id="tabWelt"   onclick="onTabWelt()">🌿 Welt</button>
+    <button class="tab"        id="tabAngeln" onclick="onTabAngeln()">🎣 Angeln</button>
     <button class="tab"        id="tabTeam"   onclick="onTabTeam()">👥 Team</button>
     <button class="tab"        id="tabTasche" onclick="onTabTasche()">🎒 Tasche</button>
     <button class="tab"        id="tabKarte"  onclick="onTabKarte()">🗺️ Karte</button>
@@ -116,9 +118,13 @@
   <!-- Tab-Views -->
   <div id="viewWorld"  class="tab-view"></div>
 
+  <div id="viewFishing" class="tab-view" style="display:none">
+    <div id="fishingContent"></div>
+  </div>
+
   <div id="viewTeam"   class="tab-view" style="display:none">
     <div id="teamList"></div>
-    <h3 style="margin-top:14px">📦 Box</h3>
+    <h3 style="margin-top:14px;font-family:var(--font-title);font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:1px solid var(--border)">📦 Box</h3>
     <div id="boxPreview" class="box-grid"></div>
   </div>
 

@@ -1,7 +1,7 @@
-﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  renderer.js â€” Sprites, Animationen, Kampf-UI
+﻿// ═══════════════════════════════════════════════════════════════
+//  renderer.js — Sprites, Animationen, Kampf-UI
 //  Nativ: deutsche Typ-Namen, kp/ang/vert Stats
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════
 
 var PKM_URL  = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 var SD_FRONT = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/";
@@ -17,10 +17,10 @@ function spriteFallback(dexId, shiny) {
   return PKM_URL + (shiny ? "shiny/" : "") + dexId + ".png";
 }
 
-// â”€â”€ Typ-Name + Farbe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Typ-Name + Farbe ──────────────────────────────────────────
 function typFarbe(typ) { return TYPE_COLORS[typ] || "#888"; }
 
-// â”€â”€ Canvas-Szene â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Canvas-Szene ──────────────────────────────────────────────
 var _sceneCanvas = null, _sceneCtx = null, _sceneAnimId = null, _sceneT = 0;
 
 function rendereZoneBg(zone) {
@@ -50,11 +50,40 @@ function px(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(x,y,w,h);}
 function zeichneRoute(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#87ceeb");g.addColorStop(0.6,"#87ceeb");g.addColorStop(1,"#5aaa2a");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*0.58,W,H*0.42,"#5aaa2a");px(c,0,H*0.7,W,H*0.3,"#3a7a12");px(c,W*0.38,H*0.58,W*0.14,H*0.42,"#c8a878");[[0.04,0.22],[0.72,0.22],[0.88,0.24]].forEach(([x,y])=>zeichneBaum(c,x*W,y*H,1.1));[[0.06,0.10],[0.72,0.12]].forEach(([x,y])=>{var wx=x*W+Math.sin(t*0.005)*8;c.fillStyle="rgba(255,255,255,.8)";c.fillRect(wx,y*H,30,12);c.fillRect(wx+5,y*H-7,20,10);});}
 function zeichneHoehle(c,W,H,t){px(c,0,0,W,H,"#0a0810");px(c,0,H*0.75,W,H*0.25,"#1a1020");for(var i=0;i<12;i++){c.fillStyle="#1a1520";c.beginPath();c.moveTo(i*42,0);c.lineTo(i*42+10,0);c.lineTo(i*42+5,15+Math.sin(i*1.7)*10);c.closePath();c.fill();}[W*.12,W*.38,W*.62,W*.88].forEach(tx=>{px(c,tx,H*.5,5,26,"#5a3a18");c.fillStyle="#ff8800";c.fillRect(tx-3+Math.sin(t*.15+tx)*2,H*.5-14,12,16);});}
 function zeichneMeer(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1a5fa0");g.addColorStop(1,"#3a9de0");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*.4,W,H*.6,"#1a5090");for(var i=0;i<5;i++){c.fillStyle=`rgba(${30+i*15},${100+i*20},${180+i*10},.5)`;var wy=H*.42+i*H*.11;c.beginPath();c.moveTo(0,wy);for(var x=0;x<=W;x+=4)c.lineTo(x,wy+Math.sin(x/80+t*(5-i)*.06)*(7-i));c.lineTo(W,H);c.lineTo(0,H);c.closePath();c.fill();}}
+function setzeAngelSzene(aktiv) {
+  var view = document.getElementById("sceneView"); if (!view) return;
+  view.classList.toggle("fishing-scene", !!aktiv);
+  if (!aktiv) {
+    var zone = getZone(STATE && STATE.zone);
+    if (zone) rendereZoneBg(zone);
+    return;
+  }
+  if (_sceneAnimId) cancelAnimationFrame(_sceneAnimId);
+  if (!_sceneCanvas) {
+    _sceneCanvas = document.createElement("canvas");
+    _sceneCanvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;z-index:1";
+    view.insertBefore(_sceneCanvas, view.firstChild);
+    _sceneCtx = _sceneCanvas.getContext("2d");
+  }
+  _sceneCanvas.width  = view.clientWidth  || 480;
+  _sceneCanvas.height = view.clientHeight || 220;
+  _sceneT = 0;
+  function loop() {
+    var c = _sceneCtx, W = _sceneCanvas.width, H = _sceneCanvas.height;
+    zeichneMeer(c, W, H, _sceneT);
+    c.strokeStyle = "#d7c08a"; c.lineWidth = 4; c.beginPath(); c.moveTo(W*.18,H*.72); c.lineTo(W*.34,H*.34); c.stroke();
+    c.strokeStyle = "rgba(255,255,255,.85)"; c.lineWidth = 1; c.beginPath(); c.moveTo(W*.34,H*.34); c.lineTo(W*.58,H*.56 + Math.sin(_sceneT*.12)*4); c.stroke();
+    c.fillStyle = "#f04f4f"; c.beginPath(); c.arc(W*.58,H*.56 + Math.sin(_sceneT*.12)*4,5,0,Math.PI*2); c.fill();
+    _sceneT++;
+    _sceneAnimId = requestAnimationFrame(loop);
+  }
+  loop();
+}
 function zeichneStadt(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#7aadca");g.addColorStop(1,"#c0d8e0");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*.73,W,H*.27,"#9a8878");[[0,50,68,90,"#8899aa"],[68,35,78,110,"#99aacc"],[204,25,88,115,"#aabbcc"],[360,40,58,105,"#8899bb"]].forEach(b=>px(c,b[0],b[1],b[2],b[3],b[4]));}
 function zeichneArena(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#2a1040");g.addColorStop(1,"#4a2060");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*.75,W,H*.25,"#2a1535");}
 function zeichneBaum(c,x,y,s){s=s||1;var tw=20*s,th=42*s;px(c,x+tw*.3,y+th*.67,tw*.4,th*.33,"#6b3a1f");c.fillStyle="#2d5a1b";c.fillRect(x,y+th*.4,tw,th*.35);c.fillRect(x+tw*.1,y+th*.2,tw*.8,th*.28);c.fillRect(x+tw*.25,y,tw*.5,th*.25);}
 
-// â”€â”€ Angriffs-Animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Angriffs-Animation ────────────────────────────────────────
 var TYPE_FX = {
   Normal:{col:"#a8a77a",glow:"#fff"},   Feuer:{col:"#ee8130",glow:"#ffa060"},
   Wasser:{col:"#6390f0",glow:"#90b8ff"},Elektro:{col:"#f7d02c",glow:"#ffe060"},
@@ -85,7 +114,7 @@ function fuehreAngriffAnimation(moveTyp, vonSpieler, onTreffer, onFertig) {
   requestAnimationFrame(loop);
 }
 
-// â”€â”€ Spieler-Sprite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Spieler-Sprite ────────────────────────────────────────────
 function rendereSpielerSprites() {
   var container=document.getElementById("playerSprites"); if(!container||!STATE)return;
   container.innerHTML="";
@@ -95,14 +124,14 @@ function rendereSpielerSprites() {
   var kpPct=Math.max(0,Math.round(lead.kp/lead.maxKP*100));
   var xpPct=Math.min(100,Math.round(lead.xp/lead.xpBis*100));
   var typenHtml=(pd?pd.typen.map(t=>`<span class="typ-badge typ-badge-sm" style="background:${typFarbe(t)}">${t}</span>`).join(""):"");
-  var gescHtml=lead.geschlecht==="M"?`<span class="geschlecht-m">â™‚</span>`:lead.geschlecht==="W"?`<span class="geschlecht-w">â™€</span>`:"";
+  var gescHtml=lead.geschlecht==="M"?`<span class="geschlecht-m">♂</span>`:lead.geschlecht==="W"?`<span class="geschlecht-w">♀</span>`:"";
   var statusHtml=lead.status?`<span class="status-badge status-${lead.status}">${statusText(lead.status)}</span>`:"";
   var div=document.createElement("div");
   div.className="walker walker-lead"+(shiny?" walker-shiny":"");
   div.innerHTML=
     `<img class="walker-sprite${shiny?" sprite-shiny":""}" src="${spriteUrl(lead.dexId,true,shiny)}" onerror="this.src='${spriteFallback(lead.dexId,shiny)}'">` +
     `<div class="walker-info">` +
-      `<div class="walker-nameline"><b>${shiny?"âœ¨":""} ${name}</b>${gescHtml}<span class="walker-lv">Lv.${lead.level}</span>${statusHtml}</div>` +
+      `<div class="walker-nameline"><b>${shiny?"✨":""} ${name}</b>${gescHtml}<span class="walker-lv">Lv.${lead.level}</span>${statusHtml}</div>` +
       `<div class="walker-typen">${typenHtml}</div>` +
       `<div class="walker-hprow"><div class="walker-hpbar"><div class="walker-hpfill" style="width:${kpPct}%;background:${kpFarbe(lead.kp,lead.maxKP)}"></div></div><span class="walker-hptxt">${lead.kp}/${lead.maxKP}</span></div>` +
       `<div class="walker-xprow"><div class="walker-xpbar"><div class="walker-xpfill" style="width:${xpPct}%"></div></div><span class="walker-xptxt">EP</span></div>` +
@@ -110,13 +139,13 @@ function rendereSpielerSprites() {
   container.appendChild(div);
 }
 
-// â”€â”€ Gegner-Sprite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Gegner-Sprite ─────────────────────────────────────────────
 function rendereGegnerSprite(gegner, sichtbar) {
   var container=document.getElementById("enemySprite"); if(!container)return;
   if(!gegner||!sichtbar){container.innerHTML="";container.style.opacity="0";return;}
   var pd=getPkmn(gegner.dexId),name=pd?pd.name:"?";
   var typenHtml=(pd?pd.typen.map(t=>`<span class="typ-badge typ-badge-sm" style="background:${typFarbe(t)}">${t}</span>`).join(""):"");
-  var gescHtml=gegner.geschlecht==="M"?`<span class="geschlecht-m">â™‚</span>`:gegner.geschlecht==="W"?`<span class="geschlecht-w">â™€</span>`:"";
+  var gescHtml=gegner.geschlecht==="M"?`<span class="geschlecht-m">♂</span>`:gegner.geschlecht==="W"?`<span class="geschlecht-w">♀</span>`:"";
   var kpPct=Math.max(0,Math.round(gegner.kp/gegner.maxKP*100));
   container.style.opacity="1";
   container.innerHTML=
@@ -143,7 +172,7 @@ function aktualisiereSpielerKP() {
   if(xpF)xpF.style.width=Math.min(100,Math.round(p.xp/p.xpBis*100))+"%";
 }
 
-// â”€â”€ Attacken-Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Attacken-Buttons ──────────────────────────────────────────
 function rendereAttackenButtons() {
   var container=document.getElementById("moveButtons"); if(!container)return;
   var spieler=aktivePkmn(); if(!spieler){container.innerHTML="";return;}
@@ -172,14 +201,14 @@ function rendereAttackenButtons() {
   if(alleAP){
     var sb=document.createElement("button");
     sb.className="move-btn move-btn-struggle";
-    var krBewMove = MOVES["struggle"]||{name:"KrÃ¤ftemessen"};
+    var krBewMove = MOVES["struggle"]||{name:"Kräftemessen"};
     sb.innerHTML=`<span class="move-name">${krBewMove.name}</span><span class="move-typ" style="background:#888">Normal</span>`;
     sb.onclick=()=>onAttackeKlick("struggle");
     container.appendChild(sb);
   }
 }
 
-// â”€â”€ Wurfball-Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Wurfball-Buttons ──────────────────────────────────────────
 function rendereWurfBaelle(sichtbar) {
   var container=document.getElementById("catchBalls"); if(!container)return;
   container.innerHTML="";
@@ -194,7 +223,7 @@ function rendereWurfBaelle(sichtbar) {
   });
 }
 
-// â”€â”€ Ball-Animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Ball-Animation ────────────────────────────────────────────
 function werfeBallAnimation(ballTyp, callback) {
   var BALLS={pokeball:"poke-ball",superball:"great-ball",hyperball:"ultra-ball",masterball:"master-ball"};
   var url=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${BALLS[ballTyp]||"poke-ball"}.png`;
@@ -215,7 +244,7 @@ function werfeBallAnimation(ballTyp, callback) {
   requestAnimationFrame(step);
 }
 
-// â”€â”€ Kampf-UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Kampf-UI ─────────────────────────────────────────────────
 function zeigKampfUI(gegner) {
   var ui=document.getElementById("battlePanel"); if(ui)ui.classList.add("battle-active");
   rendereAttackenButtons();
@@ -227,7 +256,7 @@ function versteckeKampfUI() {
   rendereWurfBaelle(false);
 }
 
-// â”€â”€ Trainer-Portrait â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Trainer-Portrait ──────────────────────────────────────────
 function zeigTrainerPortrait(name, url) {
   versteckeTrainerPortrait();
   var scene=document.getElementById("sceneView"); if(!scene)return;
@@ -238,7 +267,7 @@ function zeigTrainerPortrait(name, url) {
 }
 function versteckeTrainerPortrait(){var el=document.getElementById("trainerPortrait");if(el&&el.parentNode)el.parentNode.removeChild(el);}
 
-// â”€â”€ Kampf-Log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Kampf-Log ─────────────────────────────────────────────────
 function fuegeKampfLogHinzu(zeilen) {
   var log=document.getElementById("battleLog"); if(!log)return;
   if(typeof zeilen==="string")zeilen=[zeilen];
@@ -247,33 +276,34 @@ function fuegeKampfLogHinzu(zeilen) {
 }
 function clearKampfLog(){var l=document.getElementById("battleLog");if(l)l.innerHTML="";}
 
-// â”€â”€ HUD / Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── HUD / Info ────────────────────────────────────────────────
 function rendereStufenInfo() {
   if(!STATE)return;
   var zone=getZone(STATE.zone); if(!zone)return;
   var zEl=document.getElementById("zoneName"),sEl=document.getElementById("stageInfo");
   if(zEl)zEl.textContent=zone.name;
-  if(sEl&&zone.etappen){var icon={route:"ðŸŒ¿",dungeon:"ðŸ•³ï¸",see:"ðŸŒŠ",wachposten:"ðŸš§",stadt:"ðŸ™ï¸",gym:"âš”ï¸"}[zone.typ]||"ðŸ“";sEl.textContent=icon+" Etappe "+STATE.etappe+" / "+zone.etappen;}
+  if(sEl&&zone.etappen){var icon={route:"🌿",dungeon:"🕳️",see:"🌊",wachposten:"🚧",stadt:"🏙️",gym:"⚔️"}[zone.typ]||"📍";sEl.textContent=icon+" Etappe "+STATE.etappe+" / "+zone.etappen;}
   var bar=document.getElementById("stageProgressFill");
   if(bar&&zone.etappen)bar.style.width=Math.round((STATE.etappe-1)/zone.etappen*100)+"%";
 }
 
-// â”€â”€ Diverse Helfer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Diverse Helfer ────────────────────────────────────────────
 function kpFarbe(kp,max){var p=max>0?kp/max:0;return p>.5?"#44cc44":p>.25?"#ffbb22":"#ee4444";}
-function statusText(s){return{verbrennung:"VBR",vergiftung:"GIF",laehme:"LÃ„H",schlaf:"SCH",einfriere:"EIS",verwirre:"VWR"}[s]||(s||"").slice(0,3).toUpperCase();}
+function statusText(s){return{verbrennung:"VBR",vergiftung:"GIF",laehme:"LÄH",schlaf:"SCH",einfriere:"EIS",verwirre:"VWR"}[s]||(s||"").slice(0,3).toUpperCase();}
 function zeigToast(text,ms){var z=document.getElementById("toastZone");if(!z)return;var el=document.createElement("div");el.className="toast";el.textContent=text;z.appendChild(el);setTimeout(()=>{el.classList.add("toast-fade");setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},400);},ms||2500);}
 function zeigXPPopup(xp){var el=document.getElementById("xpPopup");if(!el)return;el.textContent="+"+xp+" EP";el.style.opacity="1";el.style.transform="translateY(-30px)";setTimeout(()=>{el.style.opacity="0";el.style.transform="translateY(-60px)";},1800);}
 function zeigScreen(id){["starterScreen","gameScreen","loadScreen","authScreen"].forEach(sid=>{var el=document.getElementById(sid);if(el)el.style.display=sid===id?"flex":"none";});}
 function wechsleTab(name){
-  var tabMap={"Welt":"viewWorld","Team":"viewTeam","Tasche":"viewBag","Karte":"viewMap","Dex":"viewDex"};
-  var btnMap={"Welt":"tabWelt","Team":"tabTeam","Tasche":"tabTasche","Karte":"tabKarte","Dex":"tabDex"};
+  var tabMap={"Welt":"viewWorld","Angeln":"viewFishing","Team":"viewTeam","Tasche":"viewBag","Karte":"viewMap","Dex":"viewDex"};
+  var btnMap={"Welt":"tabWelt","Angeln":"tabAngeln","Team":"tabTeam","Tasche":"tabTasche","Karte":"tabKarte","Dex":"tabDex"};
   Object.values(tabMap).forEach(id=>{var el=document.getElementById(id);if(el)el.style.display="none";});
   Object.values(btnMap).forEach(id=>{var el=document.getElementById(id);if(el)el.classList.remove("active");});
   var view=document.getElementById(tabMap[name]),btn=document.getElementById(btnMap[name]);
   if(view)view.style.display="block";
   if(btn)btn.classList.add("active");
+  if(typeof aktualisiereAngelTabStatus==="function")aktualisiereAngelTabStatus();
+  if(name==="Angeln")rendereAngelTab();
   if(name==="Team")rendereTeamScreen();
   if(name==="Tasche")rendereTascheScreen();
   if(name==="Welt"&&!_inStadt)rendereWeltTab();
 }
-

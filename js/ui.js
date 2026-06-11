@@ -98,9 +98,162 @@ function rendereWeltTab() {
       '</div></div>';
   }
 
+  if (zone._gebaeudeDaten && zone._gebaeudeDaten.length > 0) {
+    html += '<div class="trainer-section"><div class="encounter-title">🏠 Orte</div>';
+    zone._gebaeudeDaten.forEach(b => {
+      if (b.typ === "heilen") return;
+      var onclick = "zeigGebaeudeById(" + JSON.stringify(b._id) + "," + JSON.stringify(zone.id) + ")";
+      html += '<div class="trainer-row" onclick="' + onclick + '" style="cursor:pointer">' +
+        '<div class="trainer-row-info"><b>' + gebaeudeName(b) + '</b></div>' +
+        '<span class="trainer-status">→</span>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  if (zone.verbindungen && zone.verbindungen.length > 0) {
+    html += '<div class="trainer-section"><div class="encounter-title">🗺️ Wege</div>';
+    zone.verbindungen.forEach(v => {
+      var ziel = getZone(v.zoneId);
+      var gesperrt = v.bedingung && !checkBedingung(v.bedingung, STATE);
+      var onclick = gesperrt ? "" : ' onclick="verbindungBetreten(' + JSON.stringify(v.zoneId) + ')" style="cursor:pointer"';
+      html += '<div class="trainer-row ' + (gesperrt ? "trainer-besiegt" : "") + '"' + onclick + '>' +
+        '<div class="trainer-row-info"><b>' + (v.label || (ziel ? ziel.name : v.zoneId)) + '</b>' +
+        (gesperrt ? '<span class="trainer-etappe"> - ' + (v.gesperrtText || "Gesperrt").replace("{badges}", STATE.orden || 0) + '</span>' : '') +
+        '</div><span class="trainer-status">' + (gesperrt ? "🔒" : "→") + '</span></div>';
+    });
+    html += '</div>';
+  }
+
   html += '</div>';
   container.innerHTML = html;
 }
+
+
+var _angelAuswahl = "angel";
+var _angelWurfLaeuft = false;
+
+function angelStatus() {
+  var zone = STATE && getZone(STATE.zone);
+  if (KAMPF && !KAMPF.vorbei) return { kann: false, grund: "Erst Kampf beenden." };
+  if (!zone || !zone.wasser || !zone.wasser.angeln) return { kann: false, grund: "Kein Angelplatz." };
+  var hatAngel = Object.keys(zone.wasser.angeln).some(typ => {
+    var cfg = zone.wasser.angeln[typ];
+    var item = cfg.item || typ;
+    return STATE.items && STATE.items[item] > 0;
+  });
+  if (!hatAngel) return { kann: false, grund: "Keine Angel im Inventar." };
+  return { kann: true, grund: "" };
+}
+
+function aktualisiereAngelTabStatus() {
+  var btn = document.getElementById("tabAngeln");
+  if (!btn || !STATE) return;
+  var status = angelStatus();
+  btn.disabled = !status.kann;
+  btn.dataset.reason = status.grund || "";
+  btn.classList.toggle("tab-disabled", !status.kann);
+  btn.title = status.grund || "Angeln";
+}
+
+function rendereAngelTab() {
+  aktualisiereAngelTabStatus();
+  var container = document.getElementById("fishingContent"); if (!container || !STATE) return;
+  var zone = getZone(STATE.zone);
+  var status = angelStatus();
+  if (!zone || !zone.wasser || !zone.wasser.angeln) {
+    container.innerHTML = '<div class="fishing-panel fishing-disabled"><div class="fishing-title">Angeln</div><div class="fishing-note">Hier gibt es keinen Angelplatz.</div></div>';
+    return;
+  }
+
+  var typen = ["angel", "profiangel", "superangel"].filter(t => zone.wasser.angeln[t]);
+  if (!typen.includes(_angelAuswahl)) _angelAuswahl = typen[0] || "angel";
+  var cfgAktiv = zone.wasser.angeln[_angelAuswahl];
+  var besitztAktiv = cfgAktiv && STATE.items && STATE.items[cfgAktiv.item || _angelAuswahl] > 0;
+  var kannAuswerfen = status.kann && besitztAktiv && !_angelWurfLaeuft;
+  var namen = { angel: "Angel", profiangel: "Profiangel", superangel: "Superangel" };
+
+  var html = '<div class="fishing-panel' + (status.kann ? '' : ' fishing-disabled') + '">' +
+    '<div class="fishing-title">' + (zone.wasser.label || "Angelplatz") + '</div>' +
+    '<div class="fishing-zone">' + zone.name + '</div>' +
+    '<div class="fishing-rods">';
+
+  typen.forEach(typ => {
+    var cfg = zone.wasser.angeln[typ];
+    var item = cfg.item || typ;
+    var def = ITEM_DEFS[item] || {};
+    var besitzt = STATE.items && STATE.items[item] > 0;
+    html += '<button class="fishing-rod-btn' + (_angelAuswahl === typ ? ' selected' : '') + '" ' +
+      (besitzt && !_angelWurfLaeuft ? 'onclick="setzeAngelAuswahl(' + JSON.stringify(typ) + ')"' : 'disabled') + '>' +
+      '<span>' + (def.name || namen[typ] || typ) + '</span>' +
+      '<small>' + (besitzt ? ((cfg.begegnung || 100) + '% Bisschance') : 'Nicht im Inventar') + '</small>' +
+      '</button>';
+  });
+
+  html += '</div>' +
+    '<button class="fishing-cast-btn" ' + (kannAuswerfen ? 'onclick="wirfAngelAus()"' : 'disabled') + '>' +
+      (_angelWurfLaeuft ? 'Warten...' : 'Angel auswerfen') +
+    '</button>' +
+    (!status.kann ? '<div class="fishing-note">' + status.grund + '</div>' : '') +
+    '</div>';
+  container.innerHTML = html;
+}
+
+window.setzeAngelAuswahl = function(angelTyp) {
+  _angelAuswahl = angelTyp;
+  rendereAngelTab();
+};
+
+window.wirfAngelAus = function() {
+  starteAngeln(_angelAuswahl);
+};
+
+window.starteAngeln = function(angelTyp) {
+  var zone = getZone(STATE.zone);
+  var cfg = zone && zone.wasser && zone.wasser.angeln && zone.wasser.angeln[angelTyp];
+  if (!cfg) { zeigToast("Hier kannst du damit nicht angeln."); return; }
+  if (KAMPF && !KAMPF.vorbei) { zeigToast("Erst Kampf beenden."); return; }
+  var item = cfg.item || angelTyp;
+  if (!STATE.items || !(STATE.items[item] > 0)) {
+    var def = ITEM_DEFS[item] || {};
+    zeigToast("Du brauchst " + (def.name || item) + "!");
+    return;
+  }
+
+  clearInterval(STAGE_INTERVALL);
+  clearInterval(KAMPF_INTERVALL);
+  if (typeof setzeAngelSzene === "function") setzeAngelSzene(true);
+  _angelWurfLaeuft = true;
+  _wartetAufInput = true;
+  rendereAngelTab();
+  zeigToast("Du wirfst die Angel aus...", 1200);
+
+  setTimeout(function() {
+    if (Math.random() >= ((cfg.begegnung || 100) / 100)) {
+      zeigToast("Nichts hat angebissen.", 1800);
+      _angelWurfLaeuft = false;
+      _wartetAufInput = false;
+      if (zone.typ === "stadt" || zone.typ === "wachposten") stadtBetreten(zone);
+      else stufenLoopStarten();
+      rendereAngelTab();
+      return;
+    }
+
+    var wild = rollPkmnAusTabelle(cfg.pokemon);
+    if (!wild) {
+      zeigToast("Hier beisst gerade nichts an.", 1800);
+      _angelWurfLaeuft = false;
+      _wartetAufInput = false;
+      if (zone.typ === "stadt" || zone.typ === "wachposten") stadtBetreten(zone);
+      else stufenLoopStarten();
+      rendereAngelTab();
+      return;
+    }
+    _angelWurfLaeuft = false;
+    rendereAngelTab();
+    triggereWildKampf(wild, zone);
+  }, 900);
+};
 
 function rendereStadtHub(zone) {
   var container = document.getElementById("viewWorld"); if (!container || !zone) return;
@@ -242,8 +395,11 @@ window.kaufeItem = function(itemId, preis, btn) {
 // ══════════════════════════════════════════════════════════════
 function zeigGebaeude(gebaeude, zone) {
   var container = document.getElementById("viewWorld"); if (!container) return;
+  var backAction = (zone.typ === "stadt" || zone.typ === "wachposten")
+    ? `rendereStadtHub(getZone('${zone.id}'))`
+    : `rendereWeltTab()`;
   var html = `<div class="gebaeude-view">` +
-    `<div class="gebaeude-header"><button onclick="rendereStadtHub(getZone('${zone.id}'))">← Zurück</button><h3>${gebaeude.name||"?"}</h3></div>`;
+    `<div class="gebaeude-header"><button onclick="${backAction}">← Zurück</button><h3>${gebaeude.name||"?"}</h3></div>`;
 
   (gebaeude.features || []).forEach(feat => {
     var getan = flagGesetzt(feat.flagId);
@@ -265,7 +421,7 @@ function zeigGebaeude(gebaeude, zone) {
   container.innerHTML = html;
 
   window._claimFeat = function(gebId, featId, zoneId) {
-    var bld = BUILDINGS[gebId]; if (!bld) return;
+    var bld = BUILDINGS[gebId] ? { _id: gebId, ...BUILDINGS[gebId] } : null; if (!bld) return;
     var feat = (bld.features||[]).find(f => f.id === featId); if (!feat) return;
     if (flagGesetzt(feat.flagId)) return;
     if (feat.bedingung && !checkBedingung(feat.bedingung, STATE)) { zeigToast(feat.gesperrtText||"Gesperrt"); return; }
@@ -297,6 +453,14 @@ function zeigGebaeude(gebaeude, zone) {
     }
   };
 }
+
+window.zeigGebaeudeById = function(gebaeudeId, zoneId) {
+  var zone = getZone(zoneId);
+  var gebaeude = zone && zone._gebaeudeDaten
+    ? zone._gebaeudeDaten.find(b => b._id === gebaeudeId)
+    : null;
+  if (gebaeude && zone) zeigGebaeude(gebaeude, zone);
+};
 
 function zeigDialog(text, callback) {
   var overlay = document.createElement("div"); overlay.className = "dialog-overlay";
@@ -457,12 +621,15 @@ function rendereTascheScreen() {
       var def = ITEM_DEFS[id] || {}, anzahl = STATE.items[id] || 0;
       var row = document.createElement("div"); row.className = "bag-item";
       var istSpeziell = def.einmalig && anzahl > 0;
+      var schaltbar = istSpeziell && ["fahrrad_tempo","ep_teiler"].includes(def.effekt);
+      var aktiv = schaltbar && itemAktiv(id);
       row.innerHTML =
         `<div class="bag-icon-wrap"><img src="${ITEM_BASE}${id.replace(/_/g,'-')}.png" class="bag-item-sprite" onerror="this.style.display='none'"></div>` +
         `<div class="bag-info"><b>${def.name||id}</b>` + (def.beschr ? `<br><small>${def.beschr}</small>` : "") +
-          (istSpeziell && def.beschr ? `<br><small class="bag-aktiv">✅ Aktiv</small>` : "") +
+          (schaltbar ? `<br><small class="bag-aktiv">${aktiv ? "Aktiv" : "Inaktiv"}</small>` : "") +
         `</div>` +
-        (istSpeziell ? `<div class="bag-spezial-badge">Aktiv</div>` :
+        (schaltbar ? `<button onclick="toggleAktivesItem('${id}')">${aktiv ? "Deaktivieren" : "Aktivieren"}</button>` :
+          istSpeziell ? `<div class="bag-spezial-badge">Besitzt</div>` :
           `<span class="bag-anzahl">x${anzahl}</span>` +
           (["heilung","status","beleben"].includes(def.typ) ? `<button onclick="benutzeItem('${id}')">Nutzen</button>` : "")
         );
@@ -470,8 +637,22 @@ function rendereTascheScreen() {
     });
   });
 
-  if (!gefunden) container.innerHTML = `<p class="bag-leer">Tasche leer</p>`;
+if (!gefunden) container.innerHTML = `<p class="bag-leer">Tasche leer</p>`;
 }
+
+window.toggleAktivesItem = function(itemId) {
+  if (!STATE || !(STATE.items[itemId] > 0)) { zeigToast("Item nicht vorhanden!"); return; }
+  var def = ITEM_DEFS[itemId] || {};
+  if (!["fahrrad_tempo","ep_teiler"].includes(def.effekt)) {
+    zeigToast("Dieses Item kann nicht aktiviert werden.");
+    return;
+  }
+  var wirdAktiv = !itemAktiv(itemId);
+  setzeItemAktiv(itemId, wirdAktiv);
+  zeigToast((def.name || itemId) + (wirdAktiv ? " aktiviert!" : " deaktiviert!"));
+  rendereTascheScreen();
+  speichern();
+};
 
 window.benutzeItem = function(itemId) {
   if (!STATE || !(STATE.items[itemId]>0)) { zeigToast("Keine mehr!"); return; }

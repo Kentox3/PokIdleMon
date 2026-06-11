@@ -38,7 +38,27 @@ function getErlernteAttacken(dexId, level) {
   return unique.length ? unique : ["tackle"];
 }
 
-function xpFuerLevel(level) { return level * level * level; }
+function xpFuerLevel(level, expGruppe) {
+  var l = Math.max(1, Math.min(100, level));
+  switch (expGruppe || "medium_fast") {
+    case "fast":
+      return Math.floor(4 * l * l * l / 5);
+    case "medium_slow":
+      return Math.floor((6 * l * l * l / 5) - (15 * l * l) + (100 * l) - 140);
+    case "slow":
+      return Math.floor(5 * l * l * l / 4);
+    case "medium_fast":
+    default:
+      return l * l * l;
+  }
+}
+
+function xpBisNaechstesLevel(pkmnInst) {
+  var pd = getPkmn(pkmnInst.dexId);
+  var cur = xpFuerLevel(pkmnInst.level, pd && pd.expGruppe);
+  var next = xpFuerLevel(pkmnInst.level + 1, pd && pd.expGruppe);
+  return Math.max(1, next - cur);
+}
 
 function createPkmnInst(dexId, level) {
   var pd = getPkmn(dexId);
@@ -50,7 +70,7 @@ function createPkmnInst(dexId, level) {
   return {
     _iid:  "p" + (++_iidCtr) + "_" + Date.now(),
     dexId: dexId, nick: "", level: level, xp: 0,
-    xpBis: xpFuerLevel(level + 1),
+    xpBis: xpFuerLevel(level + 1, pd.expGruppe) - xpFuerLevel(level, pd.expGruppe),
     maxKP: maxKP, kp: maxKP,
     ang:   berechneStat(pd.ang,   level, ivs.ang,  evs.ang),
     vert:  berechneStat(pd.vert,  level, ivs.vert, evs.vert),
@@ -103,7 +123,7 @@ function vergebeXP(pkmnInst, xp, gegnerDexId) {
     pkmnInst.spAng = berechneStat(pd.spAng, pkmnInst.level, ivs.spez, evs.spez);
     pkmnInst.spVert= berechneStat(pd.spVert,pkmnInst.level, ivs.spez, evs.spez);
     pkmnInst.init  = berechneStat(pd.init,  pkmnInst.level, ivs.init, evs.init);
-    pkmnInst.xpBis = xpFuerLevel(pkmnInst.level + 1);
+    pkmnInst.xpBis = xpBisNaechstesLevel(pkmnInst);
 
     (pd.attacken || []).forEach(e => {
       if (e[0] === pkmnInst.level && MOVES[e[1]]) {
@@ -130,11 +150,9 @@ function vergebeXP(pkmnInst, xp, gegnerDexId) {
 }
 
 function berechneXPGewinn(eigeneLevel, gegnerLevel, basisXP, istTrainer) {
-  var basis = Math.floor((basisXP * gegnerLevel) / 7);
-  if (istTrainer) basis = Math.floor(basis * 1.5);
-  var diff = eigeneLevel - gegnerLevel;
-  if (diff > 5) basis = Math.floor(basis * Math.max(0.1, 1 - (diff - 5) * 0.1));
-  return Math.max(1, basis);
+  var trainerFaktor = istTrainer ? 1.5 : 1;
+  var xp = Math.floor((trainerFaktor * basisXP * gegnerLevel) / 7);
+  return Math.max(1, xp);
 }
 
 function versucheFangen(gegner, ballTyp) {
@@ -184,6 +202,13 @@ function zonenBesucht(id) { return !!(STATE && STATE.besucht && STATE.besucht[id
 function markiereBesucht(id) { if (STATE) { if (!STATE.besucht) STATE.besucht = {}; STATE.besucht[id] = true; } }
 function trainerBesiegt(zoneId, etappe) { return !!(STATE && STATE.besiegt && STATE.besiegt[zoneId + ":" + etappe]); }
 function markiereTrainerBesiegt(zoneId, etappe) { if (STATE) { if (!STATE.besiegt) STATE.besiegt = {}; STATE.besiegt[zoneId + ":" + etappe] = true; } }
+function itemAktiv(id) { return !!(STATE && STATE.aktiveItems && STATE.aktiveItems[id] && STATE.items && STATE.items[id] > 0); }
+function setzeItemAktiv(id, aktiv) {
+  if (!STATE) return;
+  if (!STATE.aktiveItems) STATE.aktiveItems = {};
+  if (aktiv && STATE.items && STATE.items[id] > 0) STATE.aktiveItems[id] = true;
+  else delete STATE.aktiveItems[id];
+}
 
 function neuesSpiel(uid, trainerName, starterDexId) {
   var starter = createPkmnInst(starterDexId, 5);
@@ -191,6 +216,7 @@ function neuesSpiel(uid, trainerName, starterDexId) {
     version: GAME_VERSION, uid: uid, name: trainerName, starter: starterDexId,
     party: [starter], box: [],
     items: { pokeball: 5, potion: 3 },
+    aktiveItems: {},
     geld: 1000, orden: 0, ordenIds: [],
     besucht: { alabastia: true }, besiegt: {}, flags: {},
     gesehen: {}, gefangen: {},
@@ -212,6 +238,7 @@ function ladeSpiel(uid, gespeichert) {
   STATE = gespeichert;
   STATE.uid = uid;
   if (!STATE.items)    STATE.items   = {};
+  if (!STATE.aktiveItems) STATE.aktiveItems = {};
   if (!STATE.besucht)  STATE.besucht = { alabastia: true };
   if (!STATE.besiegt)  STATE.besiegt = {};
   if (!STATE.flags)    STATE.flags   = {};
@@ -220,6 +247,9 @@ function ladeSpiel(uid, gespeichert) {
   if (!STATE.party)    STATE.party   = [];
   if (!STATE.box)      STATE.box     = [];
   if (!STATE.ordenIds) STATE.ordenIds = [];
+  Object.keys(STATE.aktiveItems).forEach(id => {
+    if (!STATE.items[id]) delete STATE.aktiveItems[id];
+  });
 
   if (!STATE.version || STATE.version < GAME_VERSION) {
     STATE.besucht = { alabastia: true };
@@ -234,6 +264,7 @@ function ladeSpiel(uid, gespeichert) {
     if (p && !p.ap)  p.ap  = initAP(p.attacken || []);
     if (p && !p.evs) p.evs = { kp:0, ang:0, vert:0, init:0, spez:0 };
     if (p && !p.ivs) p.ivs = genIVs();
+    if (p) p.xpBis = xpBisNaechstesLevel(p);
   });
 
   var weg = Math.min((Date.now() - (STATE.zuletzt || Date.now())) / 1000, 8 * 3600);

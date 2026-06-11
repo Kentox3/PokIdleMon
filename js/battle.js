@@ -246,6 +246,41 @@ function waehleKIAttacke(angreifer, verteidiger) {
 }
 
 // ── Kampfende prüfen ─────────────────────────────────────────
+function vergebeXPFuerBesiegtenGegner(spieler) {
+  var pd = getPkmn(KAMPF.gegner.dexId);
+  var bxp = pd ? pd.basisXP : 50;
+  var xp = berechneXPGewinn(spieler.level, KAMPF.gegner.level, bxp, KAMPF.istTrainer);
+  KAMPF.xpGewonnen += xp;
+  var xpMeldungen = [];
+  var aktiveXP = xp;
+
+  if (itemAktiv("ep_teiler") && STATE.party && STATE.party.length > 1) {
+    var empfaenger = STATE.party.filter(p => p && p.kp > 0 && p.level < 100);
+    if (empfaenger.length > 1) {
+      var kampfAnteil = Math.floor(xp / 2);
+      var teamPool = xp - kampfAnteil;
+      var teamAnteil = Math.floor(teamPool / empfaenger.length);
+      var rest = teamPool - (teamAnteil * empfaenger.length);
+
+      aktiveXP = kampfAnteil + teamAnteil + rest;
+      xpMeldungen.push("EP-Teiler verteilt " + teamPool + " EP im Team.");
+      xpMeldungen = xpMeldungen.concat(vergebeXP(spieler, aktiveXP, KAMPF.gegner.dexId));
+
+      empfaenger.forEach(p => {
+        if (p === spieler) return;
+        xpMeldungen = xpMeldungen.concat(vergebeXP(p, teamAnteil, KAMPF.gegner.dexId));
+      });
+    } else {
+      xpMeldungen = vergebeXP(spieler, xp, KAMPF.gegner.dexId);
+    }
+  } else {
+    xpMeldungen = vergebeXP(spieler, xp, KAMPF.gegner.dexId);
+  }
+
+  if (pd) { STATE.gesehen[KAMPF.gegner.dexId] = true; }
+  return { xp: aktiveXP, xpGesamt: xp, xpMeldungen: xpMeldungen };
+}
+
 function pruefeKampfende() {
   if (!KAMPF || KAMPF.vorbei) return null;
   var spieler = aktivePkmn();
@@ -258,24 +293,24 @@ function pruefeKampfende() {
 
   // Gegner besiegt
   if (KAMPF.gegner.kp <= 0) {
+    var xpErgebnis = vergebeXPFuerBesiegtenGegner(spieler);
+
     // Trainer: nächstes Pokémon?
     if (KAMPF.istTrainer) {
       KAMPF.trainerIndex++;
       var naechstes = KAMPF.trainerParty[KAMPF.trainerIndex];
       if (naechstes) {
         KAMPF.gegner = createPkmnInst(naechstes.id, naechstes.lv);
-        return { ergebnis: "naechstes", neuerGegner: KAMPF.gegner };
+        return {
+          ergebnis: "naechstes",
+          neuerGegner: KAMPF.gegner,
+          xp: xpErgebnis.xp,
+          xpMeldungen: xpErgebnis.xpMeldungen
+        };
       }
     }
-    // XP vergeben
-    var pd = getPkmn(KAMPF.gegner.dexId);
-    var bxp = pd ? pd.basisXP : 50;
-    var xp = berechneXPGewinn(spieler.level, KAMPF.gegner.level, bxp, KAMPF.istTrainer);
-    KAMPF.xpGewonnen += xp;
-    var xpMeldungen = vergebeXP(spieler, xp, KAMPF.gegner.dexId);
-    if (pd) { STATE.gesehen[KAMPF.gegner.dexId] = true; }
     KAMPF.vorbei = true;
-    return { ergebnis: "sieg", xp, xpMeldungen };
+    return { ergebnis: "sieg", xp: xpErgebnis.xp, xpMeldungen: xpErgebnis.xpMeldungen };
   }
   return null;
 }

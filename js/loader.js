@@ -98,9 +98,14 @@ function getEffektivitaet(angriffTyp, vertTypen) {
 // FIX: Kein doppelter Encounter-Check — app.js macht den Rate-Check bereits
 function rollWildPkmn(zone) {
   if (!zone.wildePkmn || zone.wildePkmn.length === 0) return null;
-  const total = zone.wildePkmn.reduce((s, e) => s + e.rate, 0);
+  return rollPkmnAusTabelle(zone.wildePkmn);
+}
+
+function rollPkmnAusTabelle(tabelle) {
+  if (!tabelle || tabelle.length === 0) return null;
+  const total = tabelle.reduce((s, e) => s + e.rate, 0);
   let roll = Math.random() * total;
-  for (const e of zone.wildePkmn) {
+  for (const e of tabelle) {
     roll -= e.rate;
     if (roll < 0) {
       const lv = e.lvMin + Math.floor(Math.random() * (e.lvMax - e.lvMin + 1));

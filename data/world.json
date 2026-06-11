@@ -13,7 +13,60 @@
         "richtung": "nord",
         "label": "Route 1 →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            },
+            {
+              "id": 72,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "route1",
@@ -116,7 +169,60 @@
         "richtung": "west",
         "label": "Route 22 →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            },
+            {
+              "id": 72,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "viridian_gym",
@@ -235,7 +341,60 @@
         "richtung": "nord",
         "label": "Weiter →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "wachposten_r22_r23",
@@ -312,7 +471,72 @@
         "richtung": "nord",
         "label": "Siegerstraße →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 80,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            },
+            {
+              "id": 99,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            },
+            {
+              "id": 117,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            },
+            {
+              "id": 119,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "victory_road",
@@ -775,14 +999,14 @@
       {
         "zoneId": "mt_moon",
         "richtung": "ost",
-        "label": "Rotes Gebirge →"
+        "label": "Mondberg →"
       }
     ]
   },
   {
     "id": "mt_moon",
     "typ": "dungeon",
-    "name": "Rotes Gebirge",
+    "name": "Mondberg",
     "etappen": 20,
     "begegnung": 85,
     "wildePkmn": [
@@ -946,7 +1170,7 @@
       {
         "zoneId": "mt_moon",
         "richtung": "west",
-        "label": "← Rotes Gebirge"
+        "label": "← Mondberg"
       },
       {
         "zoneId": "cerulean_city",
@@ -963,7 +1187,6 @@
       "pokecenter",
       "pokemart_2",
       "fahrrad_shop",
-      "bills_haus",
       "cerulean_gym_building"
     ],
     "verbindungen": [
@@ -973,18 +1196,18 @@
         "label": "← Route 4 / Mondberg"
       },
       {
-        "zoneId": "route5_6",
+        "zoneId": "route5",
         "richtung": "sued",
-        "label": "Route 5 Süd →",
+        "label": "Route 5 →",
         "bedingung": {
           "minBadges": 2
         },
         "gesperrtText": "Du brauchst den Kaskaden-Orden!"
       },
       {
-        "zoneId": "route24_25",
+        "zoneId": "route24",
         "richtung": "nord",
-        "label": "Nugget-Brücke →"
+        "label": "Route 24 / Nugget-Brücke →"
       },
       {
         "zoneId": "route9",
@@ -1004,7 +1227,66 @@
         },
         "gesperrtText": "Nur mit allen 8 Orden!"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 54,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 34
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "cerulean_gym",
@@ -1059,10 +1341,10 @@
     ]
   },
   {
-    "id": "route24_25",
+    "id": "route24",
     "typ": "route",
-    "name": "Nugget-Brücke",
-    "etappen": 12,
+    "name": "Route 24 - Nugget-Brücke",
+    "etappen": 8,
     "begegnung": 65,
     "wildePkmn": [
       {
@@ -1162,8 +1444,206 @@
         "zoneId": "cerulean_city",
         "richtung": "sued",
         "label": "← Azuria City"
+      },
+      {
+        "zoneId": "route25",
+        "richtung": "ost",
+        "label": "Route 25 / Bills Haus →"
       }
-    ]
+    ],
+    "autoNext": {
+      "cerulean_city": "route25",
+      "route25": "cerulean_city"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 54,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 34
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "route25",
+    "typ": "route",
+    "name": "Route 25",
+    "etappen": 8,
+    "begegnung": 65,
+    "wildePkmn": [
+      {
+        "id": 63,
+        "lvMin": 10,
+        "lvMax": 15,
+        "rate": 25
+      },
+      {
+        "id": 43,
+        "lvMin": 10,
+        "lvMax": 15,
+        "rate": 20
+      },
+      {
+        "id": 69,
+        "lvMin": 10,
+        "lvMax": 14,
+        "rate": 20
+      },
+      {
+        "id": 16,
+        "lvMin": 10,
+        "lvMax": 14,
+        "rate": 15
+      },
+      {
+        "id": 72,
+        "lvMin": 10,
+        "lvMax": 14,
+        "rate": 20
+      }
+    ],
+    "trainer": [
+      {
+        "etappe": 4,
+        "typ": "Wanderer",
+        "name": "Wanderer Norbert",
+        "team": [
+          {
+            "id": 74,
+            "lv": 15
+          },
+          {
+            "id": 66,
+            "lv": 15
+          }
+        ],
+        "belohnung": 600
+      }
+    ],
+    "waypoints": [],
+    "verbindungen": [
+      {
+        "zoneId": "route24",
+        "richtung": "west",
+        "label": "← Route 24 / Azuria"
+      }
+    ],
+    "gebaeude": [
+      "bills_haus"
+    ],
+    "autoNext": {
+      "route24": "route24"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 54,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 34
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "cerulean_cave",
@@ -1237,7 +1717,72 @@
         "richtung": "sued",
         "label": "← Azuria City"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 80,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            },
+            {
+              "id": 99,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            },
+            {
+              "id": 117,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            },
+            {
+              "id": 119,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "route9",
@@ -1339,7 +1884,60 @@
         "richtung": "sued",
         "label": "Felstunnel →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 61,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 50
+            },
+            {
+              "id": 79,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "rock_tunnel",
@@ -1421,10 +2019,10 @@
     ]
   },
   {
-    "id": "route5_6",
+    "id": "route5",
     "typ": "route",
-    "name": "Route 5-6",
-    "etappen": 15,
+    "name": "Route 5",
+    "etappen": 8,
     "begegnung": 70,
     "wildePkmn": [
       {
@@ -1468,7 +2066,93 @@
           }
         ],
         "belohnung": 600
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "cerulean_city",
+        "richtung": "nord",
+        "label": "← Azuria City"
       },
+      {
+        "zoneId": "underground_5_6",
+        "richtung": "sued",
+        "label": "Untergrundpfad →"
+      },
+      {
+        "zoneId": "saffron_city",
+        "richtung": "ost",
+        "label": "Saffronia City →",
+        "bedingung": {
+          "eventFlag": "rocket_hq_cleared"
+        },
+        "gesperrtText": "Die Wache lässt dich noch nicht nach Saffronia. Vertreibe Team Rocket in Prismania!"
+      }
+    ],
+    "autoNext": {
+      "cerulean_city": "underground_5_6",
+      "underground_5_6": "cerulean_city",
+      "saffron_city": "cerulean_city"
+    }
+  },
+  {
+    "id": "underground_5_6",
+    "typ": "dungeon",
+    "name": "Untergrundpfad Route 5-6",
+    "etappen": 6,
+    "begegnung": 0,
+    "wildePkmn": [],
+    "trainer": [],
+    "verbindungen": [
+      {
+        "zoneId": "route5",
+        "richtung": "nord",
+        "label": "← Route 5"
+      },
+      {
+        "zoneId": "route6",
+        "richtung": "sued",
+        "label": "Route 6 →"
+      }
+    ],
+    "autoNext": {
+      "route5": "route6",
+      "route6": "route5"
+    }
+  },
+  {
+    "id": "route6",
+    "typ": "route",
+    "name": "Route 6",
+    "etappen": 10,
+    "begegnung": 70,
+    "wildePkmn": [
+      {
+        "id": 43,
+        "lvMin": 13,
+        "lvMax": 17,
+        "rate": 30
+      },
+      {
+        "id": 52,
+        "lvMin": 13,
+        "lvMax": 17,
+        "rate": 25
+      },
+      {
+        "id": 35,
+        "lvMin": 14,
+        "lvMax": 17,
+        "rate": 25
+      },
+      {
+        "id": 37,
+        "lvMin": 15,
+        "lvMax": 17,
+        "rate": 20
+      }
+    ],
+    "trainer": [
       {
         "etappe": 10,
         "typ": "Jugendlicher",
@@ -1488,37 +2172,111 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "cerulean_city",
+        "zoneId": "underground_5_6",
         "richtung": "nord",
-        "label": "← Azuria City"
+        "label": "← Untergrundpfad"
       },
       {
         "zoneId": "vermilion_city",
         "richtung": "sued",
-        "label": "Zinnia City →"
+        "label": "Orania City →"
+      },
+      {
+        "zoneId": "saffron_city",
+        "richtung": "ost",
+        "label": "Saffronia City →",
+        "bedingung": {
+          "eventFlag": "rocket_hq_cleared"
+        },
+        "gesperrtText": "Die Wache lässt dich noch nicht nach Saffronia. Vertreibe Team Rocket in Prismania!"
       }
-    ]
+    ],
+    "autoNext": {
+      "underground_5_6": "vermilion_city",
+      "vermilion_city": "underground_5_6",
+      "saffron_city": "vermilion_city"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 34
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "vermilion_city",
     "typ": "stadt",
-    "name": "Zinnia City",
+    "name": "Orania City",
     "gebaeude": [
       "pokecenter",
       "pokemart_2",
       "fan_klub_zinnia",
-      "vermilion_gym_building"
+      "vermilion_gym_building",
+      "angelhaus_orania"
     ],
     "verbindungen": [
       {
-        "zoneId": "route5_6",
+        "zoneId": "route6",
         "richtung": "nord",
-        "label": "← Route 5-6 / Azuria"
+        "label": "← Route 6 / Azuria"
       },
       {
-        "zoneId": "route11_12",
+        "zoneId": "route11",
         "richtung": "ost",
-        "label": "Route 11-12 →",
+        "label": "Route 11 →",
         "bedingung": {
           "minBadges": 3
         },
@@ -1533,12 +2291,71 @@
         },
         "gesperrtText": "Du brauchst ein Bootsticket!"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 34
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "vermilion_gym",
     "typ": "gym",
-    "name": "Zinnia Arena",
+    "name": "Orania Arena",
     "parentZone": "vermilion_city",
     "returnTo": "vermilion_city",
     "etappen": 5,
@@ -1587,7 +2404,7 @@
       {
         "zoneId": "vermilion_city",
         "richtung": "sued",
-        "label": "← Zinnia City"
+        "label": "← Orania City"
       }
     ]
   },
@@ -1642,15 +2459,15 @@
       {
         "zoneId": "vermilion_city",
         "richtung": "nord",
-        "label": "← Zinnia City"
+        "label": "← Orania City"
       }
     ]
   },
   {
-    "id": "route11_12",
+    "id": "route11",
     "typ": "route",
-    "name": "Route 11-12",
-    "etappen": 15,
+    "name": "Route 11",
+    "etappen": 8,
     "begegnung": 70,
     "wildePkmn": [
       {
@@ -1694,7 +2511,118 @@
           }
         ],
         "belohnung": 760
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "vermilion_city",
+        "richtung": "west",
+        "label": "← Orania City"
       },
+      {
+        "zoneId": "route12",
+        "richtung": "ost",
+        "label": "Route 12 →"
+      }
+    ],
+    "waypoints": [],
+    "autoNext": {
+      "vermilion_city": "route12",
+      "route12": "vermilion_city"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 33
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 34
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "route12",
+    "typ": "route",
+    "name": "Route 12",
+    "etappen": 10,
+    "begegnung": 70,
+    "wildePkmn": [
+      {
+        "id": 21,
+        "lvMin": 17,
+        "lvMax": 22,
+        "rate": 30
+      },
+      {
+        "id": 23,
+        "lvMin": 17,
+        "lvMax": 22,
+        "rate": 25
+      },
+      {
+        "id": 60,
+        "lvMin": 17,
+        "lvMax": 22,
+        "rate": 25
+      },
+      {
+        "id": 98,
+        "lvMin": 19,
+        "lvMax": 22,
+        "rate": 20
+      }
+    ],
+    "trainer": [
       {
         "etappe": 10,
         "typ": "Jungtrainerin",
@@ -1712,6 +2640,23 @@
         "belohnung": 840
       }
     ],
+    "verbindungen": [
+      {
+        "zoneId": "route11",
+        "richtung": "west",
+        "label": "← Route 11"
+      },
+      {
+        "zoneId": "lavender_town",
+        "richtung": "nord",
+        "label": "Lavendeldorf →"
+      },
+      {
+        "zoneId": "route13",
+        "richtung": "sued",
+        "label": "Route 13 →"
+      }
+    ],
     "waypoints": [
       {
         "etappe": 8,
@@ -1721,18 +2666,79 @@
         "blockedMsg": "Relaxo schläft! Pokéflöte nötig."
       }
     ],
-    "verbindungen": [
-      {
-        "zoneId": "vermilion_city",
-        "richtung": "west",
-        "label": "← Zinnia City"
-      },
-      {
-        "zoneId": "lavender_town",
-        "richtung": "nord",
-        "label": "Lavendeldorf →"
+    "autoNext": {
+      "route11": "lavender_town",
+      "lavender_town": "route13",
+      "route13": "lavender_town"
+    },
+    "gebaeude": [
+      "angelhaus_route12"
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 72,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 129,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
       }
-    ]
+    }
   },
   {
     "id": "lavender_town",
@@ -1745,9 +2751,9 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "route11_12",
+        "zoneId": "route12",
         "richtung": "sued",
-        "label": "← Route 11-12 / Zinnia"
+        "label": "Route 12 →"
       },
       {
         "zoneId": "rock_tunnel",
@@ -1760,9 +2766,9 @@
         "label": "Pokémon-Turm →"
       },
       {
-        "zoneId": "route7_8",
+        "zoneId": "route8",
         "richtung": "west",
-        "label": "Route 7-8 →"
+        "label": "Route 8 →"
       }
     ]
   },
@@ -1839,10 +2845,10 @@
     ]
   },
   {
-    "id": "route7_8",
+    "id": "route8",
     "typ": "route",
-    "name": "Route 7-8",
-    "etappen": 15,
+    "name": "Route 8",
+    "etappen": 8,
     "begegnung": 70,
     "wildePkmn": [
       {
@@ -1886,7 +2892,94 @@
           }
         ],
         "belohnung": 960
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "lavender_town",
+        "richtung": "ost",
+        "label": "← Lavendeldorf"
       },
+      {
+        "zoneId": "underground_7_8",
+        "richtung": "west",
+        "label": "Untergrundpfad →"
+      },
+      {
+        "zoneId": "saffron_city",
+        "richtung": "west",
+        "label": "Saffronia City →",
+        "bedingung": {
+          "eventFlag": "rocket_hq_cleared"
+        },
+        "gesperrtText": "Die Wache lässt dich noch nicht nach Saffronia. Vertreibe Team Rocket in Prismania!"
+      }
+    ],
+    "waypoints": [],
+    "autoNext": {
+      "lavender_town": "underground_7_8",
+      "underground_7_8": "lavender_town",
+      "saffron_city": "lavender_town"
+    }
+  },
+  {
+    "id": "underground_7_8",
+    "typ": "dungeon",
+    "name": "Untergrundpfad Route 7-8",
+    "etappen": 6,
+    "begegnung": 0,
+    "wildePkmn": [],
+    "trainer": [],
+    "verbindungen": [
+      {
+        "zoneId": "route8",
+        "richtung": "ost",
+        "label": "← Route 8"
+      },
+      {
+        "zoneId": "route7",
+        "richtung": "west",
+        "label": "Route 7 →"
+      }
+    ],
+    "autoNext": {
+      "route8": "route7",
+      "route7": "route8"
+    }
+  },
+  {
+    "id": "route7",
+    "typ": "route",
+    "name": "Route 7",
+    "etappen": 10,
+    "begegnung": 70,
+    "wildePkmn": [
+      {
+        "id": 52,
+        "lvMin": 22,
+        "lvMax": 27,
+        "rate": 30
+      },
+      {
+        "id": 35,
+        "lvMin": 22,
+        "lvMax": 27,
+        "rate": 25
+      },
+      {
+        "id": 37,
+        "lvMin": 22,
+        "lvMax": 27,
+        "rate": 25
+      },
+      {
+        "id": 79,
+        "lvMin": 22,
+        "lvMax": 27,
+        "rate": 20
+      }
+    ],
+    "trainer": [
       {
         "etappe": 10,
         "typ": "Jugendlicher",
@@ -1904,27 +2997,33 @@
         "belohnung": 1000
       }
     ],
-    "waypoints": [
-      {
-        "etappe": 8,
-        "typ": "relaxo_block",
-        "flagId": "relaxo_r16",
-        "needsItem": "pokefloete",
-        "blockedMsg": "Relaxo blockiert die Route! Pokéflöte nötig."
-      }
-    ],
     "verbindungen": [
       {
-        "zoneId": "lavender_town",
+        "zoneId": "underground_7_8",
         "richtung": "ost",
-        "label": "← Lavendeldorf"
+        "label": "← Untergrundpfad"
       },
       {
         "zoneId": "celadon_city",
         "richtung": "west",
         "label": "Prismania City →"
+      },
+      {
+        "zoneId": "saffron_city",
+        "richtung": "ost",
+        "label": "Saffronia City →",
+        "bedingung": {
+          "eventFlag": "rocket_hq_cleared"
+        },
+        "gesperrtText": "Die Wache lässt dich noch nicht nach Saffronia. Vertreibe Team Rocket in Prismania!"
       }
-    ]
+    ],
+    "waypoints": [],
+    "autoNext": {
+      "underground_7_8": "celadon_city",
+      "celadon_city": "underground_7_8",
+      "saffron_city": "celadon_city"
+    }
   },
   {
     "id": "celadon_city",
@@ -1939,20 +3038,69 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "route7_8",
+        "zoneId": "route7",
         "richtung": "ost",
-        "label": "← Route 7-8 / Lavendeldorf"
+        "label": "Route 7 / Lavendeldorf →"
       },
       {
-        "zoneId": "route16_18",
+        "zoneId": "route16",
         "richtung": "west",
-        "label": "Fahrradroute →",
-        "bedingung": {
-          "minBadges": 4
-        },
-        "gesperrtText": "Du brauchst den Regenbogen-Orden!"
+        "label": "Route 16 →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 61,
+              "lvMin": 23,
+              "lvMax": 23,
+              "rate": 50
+            },
+            {
+              "id": 79,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 50
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "celadon_gym",
@@ -2015,101 +3163,107 @@
     ]
   },
   {
-    "id": "route16_18",
+    "id": "route16",
     "typ": "route",
-    "name": "Fahrradroute (Route 16-18)",
-    "etappen": 18,
-    "begegnung": 70,
+    "name": "Route 16",
+    "etappen": 8,
+    "begegnung": 60,
     "wildePkmn": [
       {
-        "id": 21,
-        "lvMin": 25,
-        "lvMax": 30,
+        "id": 19,
+        "lvMin": 18,
+        "lvMax": 24,
         "rate": 30
       },
       {
-        "id": 22,
-        "lvMin": 25,
-        "lvMax": 30,
-        "rate": 25
+        "id": 21,
+        "lvMin": 20,
+        "lvMax": 23,
+        "rate": 30
       },
       {
         "id": 84,
-        "lvMin": 26,
-        "lvMax": 30,
+        "lvMin": 18,
+        "lvMax": 26,
         "rate": 25
       },
       {
-        "id": 128,
-        "lvMin": 26,
-        "lvMax": 30,
-        "rate": 20
+        "id": 20,
+        "lvMin": 23,
+        "lvMax": 26,
+        "rate": 10
+      },
+      {
+        "id": 22,
+        "lvMin": 24,
+        "lvMax": 24,
+        "rate": 5
       }
     ],
     "trainer": [
       {
         "etappe": 5,
         "typ": "Biker",
-        "name": "Biker Dirk",
+        "name": "Biker",
         "team": [
           {
-            "id": 21,
-            "lv": 26
+            "id": 88,
+            "lv": 29
           },
           {
-            "id": 22,
-            "lv": 27
+            "id": 109,
+            "lv": 29
           }
         ],
-        "belohnung": 1040
+        "belohnung": 580
       },
       {
-        "etappe": 10,
+        "etappe": 6,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 66,
+            "lv": 28
+          },
+          {
+            "id": 56,
+            "lv": 28
+          },
+          {
+            "id": 66,
+            "lv": 28
+          }
+        ],
+        "belohnung": 700
+      },
+      {
+        "etappe": 7,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 56,
+            "lv": 29
+          },
+          {
+            "id": 66,
+            "lv": 29
+          }
+        ],
+        "belohnung": 725
+      },
+      {
+        "etappe": 8,
         "typ": "Biker",
-        "name": "Biker Stefan",
+        "name": "Biker",
         "team": [
           {
-            "id": 84,
-            "lv": 28
-          },
-          {
-            "id": 84,
-            "lv": 28
+            "id": 110,
+            "lv": 33
           }
         ],
-        "belohnung": 1120
-      },
-      {
-        "etappe": 14,
-        "typ": "Jungtrainer",
-        "name": "Trainer Marc",
-        "team": [
-          {
-            "id": 128,
-            "lv": 30
-          },
-          {
-            "id": 128,
-            "lv": 30
-          }
-        ],
-        "belohnung": 1200
-      }
-    ],
-    "feldItems": [
-      {
-        "flagId": "r16_hm_fly",
-        "item": "hm_fly",
-        "etappe": 6
-      }
-    ],
-    "waypoints": [
-      {
-        "etappe": 10,
-        "typ": "relaxo_block",
-        "flagId": "relaxo_r16b",
-        "needsItem": "pokefloete",
-        "blockedMsg": "Relaxo blockiert die Fahrradstraße!"
+        "belohnung": 660
       }
     ],
     "verbindungen": [
@@ -2119,27 +3273,511 @@
         "label": "← Prismania City"
       },
       {
-        "zoneId": "fuchsia_city",
+        "zoneId": "route17",
         "richtung": "sued",
-        "label": "Pokérosia City →"
+        "label": "Route 17 - Fahrradstraße →",
+        "bedingung": {
+          "hasItem": "fahrrad"
+        },
+        "gesperrtText": "Der Wärter lässt dich ohne Fahrrad nicht auf die Fahrradstraße."
       }
+    ],
+    "waypoints": [
+      {
+        "etappe": 4,
+        "typ": "relaxo_block",
+        "flagId": "relaxo_r16",
+        "needsItem": "pokefloete",
+        "relaxoDexId": 143,
+        "relaxoLevel": 30,
+        "blockedMsg": "Relaxo blockiert den Weg zur Fahrradstraße! Spiele die Pokéflöte."
+      }
+    ],
+    "autoNext": {
+      "celadon_city": "route17",
+      "route17": "celadon_city"
+    },
+    "gebaeude": [
+      "route16_fly_house"
     ]
+  },
+  {
+    "id": "route17",
+    "typ": "route",
+    "name": "Route 17 - Fahrradstraße",
+    "etappen": 18,
+    "begegnung": 0,
+    "wildePkmn": [],
+    "trainer": [
+      {
+        "etappe": 2,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 66,
+            "lv": 29
+          },
+          {
+            "id": 67,
+            "lv": 29
+          }
+        ],
+        "belohnung": 725
+      },
+      {
+        "etappe": 4,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 56,
+            "lv": 29
+          },
+          {
+            "id": 57,
+            "lv": 29
+          }
+        ],
+        "belohnung": 725
+      },
+      {
+        "etappe": 5,
+        "typ": "Biker",
+        "name": "Biker",
+        "team": [
+          {
+            "id": 110,
+            "lv": 28
+          },
+          {
+            "id": 109,
+            "lv": 28
+          },
+          {
+            "id": 110,
+            "lv": 28
+          }
+        ],
+        "belohnung": 560
+      },
+      {
+        "etappe": 7,
+        "typ": "Biker",
+        "name": "Biker",
+        "team": [
+          {
+            "id": 89,
+            "lv": 33
+          }
+        ],
+        "belohnung": 660
+      },
+      {
+        "etappe": 9,
+        "typ": "Biker",
+        "name": "Biker",
+        "team": [
+          {
+            "id": 100,
+            "lv": 29
+          },
+          {
+            "id": 100,
+            "lv": 29
+          }
+        ],
+        "belohnung": 580
+      },
+      {
+        "etappe": 11,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 67,
+            "lv": 33
+          }
+        ],
+        "belohnung": 825
+      },
+      {
+        "etappe": 12,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 57,
+            "lv": 29
+          },
+          {
+            "id": 67,
+            "lv": 29
+          }
+        ],
+        "belohnung": 725
+      },
+      {
+        "etappe": 14,
+        "typ": "Cue Ball",
+        "name": "Cue Ball",
+        "team": [
+          {
+            "id": 56,
+            "lv": 26
+          },
+          {
+            "id": 56,
+            "lv": 26
+          },
+          {
+            "id": 67,
+            "lv": 26
+          },
+          {
+            "id": 66,
+            "lv": 26
+          }
+        ],
+        "belohnung": 650
+      },
+      {
+        "etappe": 16,
+        "typ": "Biker",
+        "name": "Biker",
+        "team": [
+          {
+            "id": 110,
+            "lv": 29
+          },
+          {
+            "id": 89,
+            "lv": 29
+          }
+        ],
+        "belohnung": 580
+      },
+      {
+        "etappe": 17,
+        "typ": "Biker",
+        "name": "Biker",
+        "team": [
+          {
+            "id": 109,
+            "lv": 25
+          },
+          {
+            "id": 110,
+            "lv": 25
+          },
+          {
+            "id": 109,
+            "lv": 25
+          },
+          {
+            "id": 109,
+            "lv": 25
+          },
+          {
+            "id": 110,
+            "lv": 25
+          }
+        ],
+        "belohnung": 500
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "route16",
+        "richtung": "nord",
+        "label": "← Route 16",
+        "bedingung": {
+          "hasItem": "fahrrad"
+        },
+        "gesperrtText": "Die Fahrradstraße darfst du nur mit Fahrrad benutzen."
+      },
+      {
+        "zoneId": "route18",
+        "richtung": "sued",
+        "label": "Route 18 →",
+        "bedingung": {
+          "hasItem": "fahrrad"
+        },
+        "gesperrtText": "Die Fahrradstraße darfst du nur mit Fahrrad benutzen."
+      }
+    ],
+    "autoNext": {
+      "route16": "route18",
+      "route18": "route16"
+    },
+    "bedingung": {
+      "hasItem": "fahrrad"
+    },
+    "routeRules": {
+      "requiresBike": true,
+      "downhill": true,
+      "note": "In Rot/Blau rollt man auf der Fahrradstraße automatisch bergab."
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 72,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 129,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "route18",
+    "typ": "route",
+    "name": "Route 18",
+    "etappen": 10,
+    "begegnung": 65,
+    "wildePkmn": [
+      {
+        "id": 21,
+        "lvMin": 20,
+        "lvMax": 23,
+        "rate": 35
+      },
+      {
+        "id": 84,
+        "lvMin": 22,
+        "lvMax": 28,
+        "rate": 30
+      },
+      {
+        "id": 19,
+        "lvMin": 23,
+        "lvMax": 24,
+        "rate": 15
+      },
+      {
+        "id": 22,
+        "lvMin": 25,
+        "lvMax": 29,
+        "rate": 15
+      },
+      {
+        "id": 20,
+        "lvMin": 25,
+        "lvMax": 26,
+        "rate": 5
+      }
+    ],
+    "trainer": [
+      {
+        "etappe": 3,
+        "typ": "Vogelfänger",
+        "name": "Vogelfänger",
+        "team": [
+          {
+            "id": 21,
+            "lv": 29
+          },
+          {
+            "id": 22,
+            "lv": 29
+          }
+        ],
+        "belohnung": 725
+      },
+      {
+        "etappe": 6,
+        "typ": "Vogelfänger",
+        "name": "Vogelfänger",
+        "team": [
+          {
+            "id": 21,
+            "lv": 26
+          },
+          {
+            "id": 21,
+            "lv": 26
+          },
+          {
+            "id": 22,
+            "lv": 26
+          },
+          {
+            "id": 21,
+            "lv": 26
+          }
+        ],
+        "belohnung": 650
+      },
+      {
+        "etappe": 8,
+        "typ": "Vogelfänger",
+        "name": "Vogelfänger",
+        "team": [
+          {
+            "id": 85,
+            "lv": 34
+          }
+        ],
+        "belohnung": 850
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "route17",
+        "richtung": "nord",
+        "label": "← Route 17 - Fahrradstraße",
+        "bedingung": {
+          "hasItem": "fahrrad"
+        },
+        "gesperrtText": "Der Wärter lässt dich ohne Fahrrad nicht auf die Fahrradstraße."
+      },
+      {
+        "zoneId": "fuchsia_city",
+        "richtung": "ost",
+        "label": "Fuchsania City →"
+      }
+    ],
+    "autoNext": {
+      "route17": "fuchsia_city",
+      "fuchsia_city": "route17"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 72,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 129,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "fuchsia_city",
     "typ": "stadt",
-    "name": "Pokérosia City",
+    "name": "Fuchsania City",
     "gebaeude": [
       "pokecenter",
       "pokemart_3",
       "safari_zone",
-      "fuchsia_gym_building"
+      "fuchsia_gym_building",
+      "angelhaus_fuchsania"
     ],
     "verbindungen": [
       {
-        "zoneId": "route16_18",
+        "zoneId": "route18",
         "richtung": "nord",
-        "label": "← Fahrradroute / Prismania"
+        "label": "Route 18 / Fahrradstraße →"
       },
       {
         "zoneId": "route15",
@@ -2151,20 +3789,85 @@
         "gesperrtText": "Du brauchst den Seelen-Orden!"
       },
       {
-        "zoneId": "route19_20",
+        "zoneId": "route19",
         "richtung": "sued",
-        "label": "Route 19-20 →",
+        "label": "Route 19 →",
         "bedingung": {
           "hasItem": "hm_surf"
         },
         "gesperrtText": "Du brauchst VM03 Surfer!"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 119,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 129,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "fuchsia_gym",
     "typ": "gym",
-    "name": "Pokérosia Arena",
+    "name": "Fuchsania Arena",
     "parentZone": "fuchsia_city",
     "returnTo": "fuchsia_city",
     "etappen": 5,
@@ -2221,15 +3924,15 @@
       {
         "zoneId": "fuchsia_city",
         "richtung": "sued",
-        "label": "← Pokérosia City"
+        "label": "← Fuchsania City"
       }
     ]
   },
   {
-    "id": "route15",
+    "id": "route13",
     "typ": "route",
-    "name": "Route 15",
-    "etappen": 12,
+    "name": "Route 13",
+    "etappen": 8,
     "begegnung": 65,
     "wildePkmn": [
       {
@@ -2259,16 +3962,186 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "fuchsia_city",
-        "richtung": "west",
-        "label": "← Pokérosia City"
+        "zoneId": "route12",
+        "richtung": "nord",
+        "label": "← Route 12"
       },
       {
-        "zoneId": "saffron_city",
-        "richtung": "ost",
-        "label": "Saffronia City →"
+        "zoneId": "route14",
+        "richtung": "west",
+        "label": "Route 14 →"
       }
-    ]
+    ],
+    "trainer": [],
+    "autoNext": {
+      "route12": "route14",
+      "route14": "route12"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 72,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 98,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 129,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "route14",
+    "typ": "route",
+    "name": "Route 14",
+    "etappen": 8,
+    "begegnung": 65,
+    "wildePkmn": [
+      {
+        "id": 83,
+        "lvMin": 26,
+        "lvMax": 32,
+        "rate": 30
+      },
+      {
+        "id": 114,
+        "lvMin": 26,
+        "lvMax": 32,
+        "rate": 25
+      },
+      {
+        "id": 102,
+        "lvMin": 26,
+        "lvMax": 32,
+        "rate": 25
+      },
+      {
+        "id": 115,
+        "lvMin": 28,
+        "lvMax": 32,
+        "rate": 20
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "route13",
+        "richtung": "ost",
+        "label": "← Route 13"
+      },
+      {
+        "zoneId": "route15",
+        "richtung": "west",
+        "label": "Route 15 →"
+      }
+    ],
+    "trainer": [],
+    "autoNext": {
+      "route13": "route15",
+      "route15": "route13"
+    }
+  },
+  {
+    "id": "route15",
+    "typ": "route",
+    "name": "Route 15",
+    "etappen": 8,
+    "begegnung": 65,
+    "wildePkmn": [
+      {
+        "id": 83,
+        "lvMin": 26,
+        "lvMax": 32,
+        "rate": 30
+      },
+      {
+        "id": 114,
+        "lvMin": 26,
+        "lvMax": 32,
+        "rate": 25
+      },
+      {
+        "id": 102,
+        "lvMin": 26,
+        "lvMax": 32,
+        "rate": 25
+      },
+      {
+        "id": 115,
+        "lvMin": 28,
+        "lvMax": 32,
+        "rate": 20
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "route14",
+        "richtung": "ost",
+        "label": "← Route 14"
+      },
+      {
+        "zoneId": "fuchsia_city",
+        "richtung": "west",
+        "label": "Fuchsania City →"
+      }
+    ],
+    "trainer": [],
+    "autoNext": {
+      "route14": "fuchsia_city",
+      "fuchsia_city": "route14"
+    }
   },
   {
     "id": "saffron_city",
@@ -2283,9 +4156,24 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "route15",
+        "zoneId": "route5",
+        "richtung": "nord",
+        "label": "Route 5 / Azuria →"
+      },
+      {
+        "zoneId": "route6",
+        "richtung": "sued",
+        "label": "Route 6 / Orania →"
+      },
+      {
+        "zoneId": "route7",
         "richtung": "west",
-        "label": "← Route 15 / Pokérosia"
+        "label": "Route 7 / Prismania →"
+      },
+      {
+        "zoneId": "route8",
+        "richtung": "ost",
+        "label": "Route 8 / Lavendeldorf →"
       }
     ]
   },
@@ -2354,10 +4242,10 @@
     ]
   },
   {
-    "id": "route19_20",
+    "id": "route19",
     "typ": "see",
-    "name": "Route 19-20 (Meer)",
-    "etappen": 18,
+    "name": "Route 19",
+    "etappen": 8,
     "begegnung": 80,
     "wildePkmn": [
       {
@@ -2401,7 +4289,238 @@
           }
         ],
         "belohnung": 1200
+      }
+    ],
+    "verbindungen": [
+      {
+        "zoneId": "fuchsia_city",
+        "richtung": "nord",
+        "label": "← Fuchsania City"
       },
+      {
+        "zoneId": "seafoam_islands",
+        "richtung": "sued",
+        "label": "Seeschauminseln →"
+      }
+    ],
+    "autoNext": {
+      "fuchsia_city": "seafoam_islands",
+      "seafoam_islands": "fuchsia_city"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 116,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 120,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "seafoam_islands",
+    "typ": "dungeon",
+    "name": "Seeschauminseln",
+    "etappen": 10,
+    "begegnung": 80,
+    "wildePkmn": [
+      {
+        "id": 72,
+        "lvMin": 25,
+        "lvMax": 30,
+        "rate": 35
+      },
+      {
+        "id": 120,
+        "lvMin": 25,
+        "lvMax": 30,
+        "rate": 30
+      },
+      {
+        "id": 98,
+        "lvMin": 22,
+        "lvMax": 28,
+        "rate": 20
+      },
+      {
+        "id": 54,
+        "lvMin": 22,
+        "lvMax": 28,
+        "rate": 15
+      }
+    ],
+    "trainer": [],
+    "verbindungen": [
+      {
+        "zoneId": "route19",
+        "richtung": "nord",
+        "label": "← Route 19"
+      },
+      {
+        "zoneId": "route20",
+        "richtung": "west",
+        "label": "Route 20 →"
+      }
+    ],
+    "autoNext": {
+      "route19": "route20",
+      "route20": "route19"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 116,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 120,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "route20",
+    "typ": "see",
+    "name": "Route 20",
+    "etappen": 12,
+    "begegnung": 80,
+    "wildePkmn": [
+      {
+        "id": 72,
+        "lvMin": 25,
+        "lvMax": 30,
+        "rate": 35
+      },
+      {
+        "id": 120,
+        "lvMin": 25,
+        "lvMax": 30,
+        "rate": 30
+      },
+      {
+        "id": 98,
+        "lvMin": 22,
+        "lvMax": 28,
+        "rate": 20
+      },
+      {
+        "id": 54,
+        "lvMin": 22,
+        "lvMax": 28,
+        "rate": 15
+      }
+    ],
+    "trainer": [
       {
         "etappe": 12,
         "typ": "Schwimmerin",
@@ -2421,16 +4540,85 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "fuchsia_city",
-        "richtung": "nord",
-        "label": "← Pokérosia City"
+        "zoneId": "seafoam_islands",
+        "richtung": "ost",
+        "label": "← Seeschauminseln"
       },
       {
         "zoneId": "cinnabar_island",
-        "richtung": "sued",
+        "richtung": "west",
         "label": "Zinnoberinsel →"
       }
-    ]
+    ],
+    "autoNext": {
+      "seafoam_islands": "cinnabar_island",
+      "cinnabar_island": "seafoam_islands"
+    },
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 116,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 120,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "cinnabar_island",
@@ -2444,20 +4632,85 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "route19_20",
-        "richtung": "nord",
-        "label": "← Meer / Pokérosia"
+        "zoneId": "route20",
+        "richtung": "ost",
+        "label": "← Route 20 / Seeschauminseln"
       },
       {
         "zoneId": "route21",
-        "richtung": "ost",
+        "richtung": "nord",
         "label": "Route 21 →",
         "bedingung": {
           "minBadges": 7
         },
         "gesperrtText": "Du brauchst den Hitze-Orden!"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 116,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 120,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "cinnabar_gym",
@@ -2578,7 +4831,72 @@
         "richtung": "nord",
         "label": "Vertania City →"
       }
-    ]
+    ],
+    "wasser": {
+      "label": "Wasserstelle",
+      "angeln": {
+        "angel": {
+          "item": "angel",
+          "begegnung": 100,
+          "pokemon": [
+            {
+              "id": 129,
+              "lvMin": 5,
+              "lvMax": 5,
+              "rate": 100
+            }
+          ]
+        },
+        "profiangel": {
+          "item": "profiangel",
+          "begegnung": 33,
+          "pokemon": [
+            {
+              "id": 60,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            },
+            {
+              "id": 118,
+              "lvMin": 10,
+              "lvMax": 10,
+              "rate": 50
+            }
+          ]
+        },
+        "superangel": {
+          "item": "superangel",
+          "begegnung": 50,
+          "pokemon": [
+            {
+              "id": 90,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 116,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 118,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            },
+            {
+              "id": 120,
+              "lvMin": 15,
+              "lvMax": 15,
+              "rate": 25
+            }
+          ]
+        }
+      }
+    }
   },
   {
     "id": "indigo",
