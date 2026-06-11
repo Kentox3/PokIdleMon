@@ -36,10 +36,8 @@ var BG_MAP = {
   "route3_east":      "Route3.png",
   "route4":           "Route4.png",
   "viridian_forest":  "VertaniaWald.png",
-  // Alle anderen Zonen → Canvas-Fallback
 };
 
-// BG-Image-Cache: zone.id → HTMLImageElement (oder null wenn nicht vorhanden)
 var _bgCache = {};
 
 function _ladeBgBild(zoneId, callback) {
@@ -54,13 +52,12 @@ function _ladeBgBild(zoneId, callback) {
 
 // ── Canvas-Szene ──────────────────────────────────────────────
 var _sceneCanvas = null, _sceneCtx = null, _sceneAnimId = null, _sceneT = 0;
-var _bgImg = null; // aktuell geladenes BG-Bild
+var _bgImg = null;
 
 function rendereZoneBg(zone) {
   if (!zone) return;
   if (_sceneAnimId) cancelAnimationFrame(_sceneAnimId);
   var view = document.getElementById("sceneView"); if (!view) return;
-
   if (!_sceneCanvas) {
     _sceneCanvas = document.createElement("canvas");
     _sceneCanvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;z-index:1";
@@ -71,9 +68,8 @@ function rendereZoneBg(zone) {
   _sceneCanvas.height = view.clientHeight || 220;
   _sceneT = 0;
   _bgImg = null;
-
   _ladeBgBild(zone.id, function(img) {
-    _bgImg = img; // null = kein Bild → Canvas-Fallback
+    _bgImg = img;
     _startCanvasLoop(zone);
   });
 }
@@ -82,8 +78,6 @@ function _startCanvasLoop(zone) {
   if (_sceneAnimId) cancelAnimationFrame(_sceneAnimId);
   var W = _sceneCanvas.width, H = _sceneCanvas.height;
   var c = _sceneCtx;
-
-  // Welche Canvas-Fallback-Funktion?
   var fallbackFn;
   if      (zone.typ === "see")     fallbackFn = () => zeichneMeer(c, W, H, _sceneT);
   else if (zone.typ === "dungeon") fallbackFn = () => zeichneHoehle(c, W, H, _sceneT);
@@ -91,15 +85,10 @@ function _startCanvasLoop(zone) {
   else if (zone.typ === "stadt" || zone.typ === "wachposten")
                                    fallbackFn = () => zeichneStadt(c, W, H, _sceneT);
   else                             fallbackFn = () => zeichneRoute(c, W, H, _sceneT, zone);
-
   function loop() {
     if (_bgImg) {
-      // BG-Bild: einmal zeichnen, dann Overlay-Effekte drüber
       c.drawImage(_bgImg, 0, 0, W, H);
-      // Leichtes Zeit-Overlay (Tageszeit-Schimmer) — optional
-      // c.fillStyle = "rgba(0,0,0,0)"; c.fillRect(0,0,W,H);
     } else {
-      // Canvas-Fallback
       try { fallbackFn(); } catch(e) {}
     }
     _sceneT++;
@@ -110,73 +99,12 @@ function _startCanvasLoop(zone) {
 
 // ── Canvas-Fallback-Zeichner ──────────────────────────────────
 function px(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(x,y,w,h);}
-
-function zeichneRoute(c,W,H,t){
-  var g=c.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,"#87ceeb");g.addColorStop(0.6,"#87ceeb");g.addColorStop(1,"#5aaa2a");
-  c.fillStyle=g;c.fillRect(0,0,W,H);
-  px(c,0,H*0.58,W,H*0.42,"#5aaa2a");
-  px(c,0,H*0.7,W,H*0.3,"#3a7a12");
-  px(c,W*0.38,H*0.58,W*0.14,H*0.42,"#c8a878");
-  [[0.04,0.22],[0.72,0.22],[0.88,0.24]].forEach(([x,y])=>zeichneBaum(c,x*W,y*H,1.1));
-  [[0.06,0.10],[0.72,0.12]].forEach(([x,y])=>{
-    var wx=x*W+Math.sin(t*0.005)*8;
-    c.fillStyle="rgba(255,255,255,.8)";c.fillRect(wx,y*H,30,12);c.fillRect(wx+5,y*H-7,20,10);
-  });
-}
-
-function zeichneHoehle(c,W,H,t){
-  px(c,0,0,W,H,"#0a0810");px(c,0,H*0.75,W,H*0.25,"#1a1020");
-  for(var i=0;i<12;i++){
-    c.fillStyle="#1a1520";c.beginPath();
-    c.moveTo(i*42,0);c.lineTo(i*42+10,0);c.lineTo(i*42+5,15+Math.sin(i*1.7)*10);
-    c.closePath();c.fill();
-  }
-  [W*.12,W*.38,W*.62,W*.88].forEach(tx=>{
-    px(c,tx,H*.5,5,26,"#5a3a18");
-    c.fillStyle="#ff8800";
-    c.fillRect(tx-3+Math.sin(t*.15+tx)*2,H*.5-14,12,16);
-  });
-}
-
-function zeichneMeer(c,W,H,t){
-  var g=c.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,"#1a5fa0");g.addColorStop(1,"#3a9de0");
-  c.fillStyle=g;c.fillRect(0,0,W,H);
-  px(c,0,H*.4,W,H*.6,"#1a5090");
-  for(var i=0;i<5;i++){
-    c.fillStyle=`rgba(${30+i*15},${100+i*20},${180+i*10},.5)`;
-    var wy=H*.42+i*H*.11;
-    c.beginPath();c.moveTo(0,wy);
-    for(var x=0;x<=W;x+=4) c.lineTo(x,wy+Math.sin(x/80+t*(5-i)*.06)*(7-i));
-    c.lineTo(W,H);c.lineTo(0,H);c.closePath();c.fill();
-  }
-}
-
-function zeichneStadt(c,W,H,t){
-  var g=c.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,"#7aadca");g.addColorStop(1,"#c0d8e0");
-  c.fillStyle=g;c.fillRect(0,0,W,H);
-  px(c,0,H*.73,W,H*.27,"#9a8878");
-  [[0,50,68,90,"#8899aa"],[68,35,78,110,"#99aacc"],[204,25,88,115,"#aabbcc"],[360,40,58,105,"#8899bb"]]
-    .forEach(b=>px(c,b[0],b[1],b[2],b[3],b[4]));
-}
-
-function zeichneArena(c,W,H,t){
-  var g=c.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,"#2a1040");g.addColorStop(1,"#4a2060");
-  c.fillStyle=g;c.fillRect(0,0,W,H);
-  px(c,0,H*.75,W,H*.25,"#2a1535");
-}
-
-function zeichneBaum(c,x,y,s){
-  s=s||1;var tw=20*s,th=42*s;
-  px(c,x+tw*.3,y+th*.67,tw*.4,th*.33,"#6b3a1f");
-  c.fillStyle="#2d5a1b";
-  c.fillRect(x,y+th*.4,tw,th*.35);
-  c.fillRect(x+tw*.1,y+th*.2,tw*.8,th*.28);
-  c.fillRect(x+tw*.25,y,tw*.5,th*.25);
-}
+function zeichneRoute(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#87ceeb");g.addColorStop(0.6,"#87ceeb");g.addColorStop(1,"#5aaa2a");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*0.58,W,H*0.42,"#5aaa2a");px(c,0,H*0.7,W,H*0.3,"#3a7a12");px(c,W*0.38,H*0.58,W*0.14,H*0.42,"#c8a878");[[0.04,0.22],[0.72,0.22],[0.88,0.24]].forEach(([x,y])=>zeichneBaum(c,x*W,y*H,1.1));[[0.06,0.10],[0.72,0.12]].forEach(([x,y])=>{var wx=x*W+Math.sin(t*0.005)*8;c.fillStyle="rgba(255,255,255,.8)";c.fillRect(wx,y*H,30,12);c.fillRect(wx+5,y*H-7,20,10);});}
+function zeichneHoehle(c,W,H,t){px(c,0,0,W,H,"#0a0810");px(c,0,H*0.75,W,H*0.25,"#1a1020");for(var i=0;i<12;i++){c.fillStyle="#1a1520";c.beginPath();c.moveTo(i*42,0);c.lineTo(i*42+10,0);c.lineTo(i*42+5,15+Math.sin(i*1.7)*10);c.closePath();c.fill();}[W*.12,W*.38,W*.62,W*.88].forEach(tx=>{px(c,tx,H*.5,5,26,"#5a3a18");c.fillStyle="#ff8800";c.fillRect(tx-3+Math.sin(t*.15+tx)*2,H*.5-14,12,16);});}
+function zeichneMeer(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1a5fa0");g.addColorStop(1,"#3a9de0");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*.4,W,H*.6,"#1a5090");for(var i=0;i<5;i++){c.fillStyle=`rgba(${30+i*15},${100+i*20},${180+i*10},.5)`;var wy=H*.42+i*H*.11;c.beginPath();c.moveTo(0,wy);for(var x=0;x<=W;x+=4)c.lineTo(x,wy+Math.sin(x/80+t*(5-i)*.06)*(7-i));c.lineTo(W,H);c.lineTo(0,H);c.closePath();c.fill();}}
+function zeichneStadt(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#7aadca");g.addColorStop(1,"#c0d8e0");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*.73,W,H*.27,"#9a8878");[[0,50,68,90,"#8899aa"],[68,35,78,110,"#99aacc"],[204,25,88,115,"#aabbcc"],[360,40,58,105,"#8899bb"]].forEach(b=>px(c,b[0],b[1],b[2],b[3],b[4]));}
+function zeichneArena(c,W,H,t){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#2a1040");g.addColorStop(1,"#4a2060");c.fillStyle=g;c.fillRect(0,0,W,H);px(c,0,H*.75,W,H*.25,"#2a1535");}
+function zeichneBaum(c,x,y,s){s=s||1;var tw=20*s,th=42*s;px(c,x+tw*.3,y+th*.67,tw*.4,th*.33,"#6b3a1f");c.fillStyle="#2d5a1b";c.fillRect(x,y+th*.4,tw,th*.35);c.fillRect(x+tw*.1,y+th*.2,tw*.8,th*.28);c.fillRect(x+tw*.25,y,tw*.5,th*.25);}
 
 // ── Angelszene ────────────────────────────────────────────────
 function setzeAngelSzene(aktiv) {
@@ -197,28 +125,22 @@ function setzeAngelSzene(aktiv) {
   _sceneCanvas.width  = view.clientWidth  || 480;
   _sceneCanvas.height = view.clientHeight || 220;
   _sceneT = 0;
-
-  // Angelszene: BG-Bild wenn vorhanden + Angelruten-Overlay
   var zoneId = STATE && STATE.zone;
   _ladeBgBild(zoneId, function(img) {
     var c = _sceneCtx, W = _sceneCanvas.width, H = _sceneCanvas.height;
     function loop() {
       if (img) {
         c.drawImage(img, 0, 0, W, H);
-        // Halbtransparentes Wasser-Overlay
         c.fillStyle = "rgba(26,80,144,.35)";
         c.fillRect(0, H * .58, W, H * .42);
       } else {
         zeichneMeer(c, W, H, _sceneT);
       }
-      // Angelrute
       c.strokeStyle="#d7c08a"; c.lineWidth=4;
       c.beginPath(); c.moveTo(W*.18,H*.72); c.lineTo(W*.34,H*.34); c.stroke();
-      // Schnur
       c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=1;
       c.beginPath(); c.moveTo(W*.34,H*.34);
       c.lineTo(W*.58, H*.56 + Math.sin(_sceneT*.12)*4); c.stroke();
-      // Schwimmer
       c.fillStyle="#f04f4f";
       c.beginPath(); c.arc(W*.58, H*.56 + Math.sin(_sceneT*.12)*4, 5, 0, Math.PI*2); c.fill();
       _sceneT++;
@@ -514,4 +436,5 @@ function wechsleTab(name) {
   if (name==="Team")     rendereTeamScreen();
   if (name==="Tasche")   rendereTascheScreen();
   if (name==="Welt" && !_inStadt) rendereWeltTab();
+  if (name==="Dex" && typeof renderPokedexScreen === "function") renderPokedexScreen();
 }
