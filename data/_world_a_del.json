@@ -1,0 +1,229 @@
+[
+  {
+    "id":"alabastia", "typ":"stadt", "name":"Alabastia",
+    "gebaeude":["labor_alabastia","pokemart_1"],
+    "verbindungen":[
+      { "zoneId":"route1", "richtung":"nord", "label":"Route 1 →" }
+    ]
+  },
+  {
+    "id":"route1", "typ":"route", "name":"Route 1",
+    "etappen":10, "begegnung":70,
+    "wildePkmn":[
+      {"id":16,"lvMin":2,"lvMax":5,"rate":35},
+      {"id":19,"lvMin":2,"lvMax":4,"rate":35},
+      {"id":1, "lvMin":1,"lvMax":5,"rate":30}
+    ],
+    "trainer":[
+      {"etappe":4,"typ":"Jungtrainer",  "name":"Trainer Frank",  "team":[{"id":19,"lv":4},{"id":16,"lv":4}],"belohnung":160},
+      {"etappe":8,"typ":"Jungtrainerin","name":"Trainerin Sarah","team":[{"id":1,"lv":5}],"belohnung":200}
+    ],
+    "feldItems":[{"flagId":"r1_potion","item":"potion","etappe":6}],
+    "verbindungen":[
+      {"zoneId":"alabastia",    "richtung":"sued","label":"← Alabastia"},
+      {"zoneId":"viridian_city","richtung":"nord","label":"Vertania City →"}
+    ]
+  },
+  {
+    "id":"viridian_city", "typ":"stadt", "name":"Vertania City",
+    "gebaeude":["pokecenter","pokemart_1"],
+    "verbindungen":[
+      {"zoneId":"route1",      "richtung":"sued", "label":"← Route 1 / Alabastia"},
+      {"zoneId":"route2",      "richtung":"nord", "label":"Route 2 →"},
+      {"zoneId":"route22",     "richtung":"west", "label":"Route 22 →"},
+      {"zoneId":"viridian_gym","richtung":"mitte","label":"Vertania Arena",
+       "bedingung":{"minBadges":8},"gesperrtText":"Die Arena ist geschlossen!"}
+    ]
+  },
+  {
+    "id":"viridian_gym", "typ":"arena", "name":"Vertania Arena",
+    "arenaleiter":"Giovanni","ordenId":"earth","orden":"Erd-Orden",
+    "team":[{"id":111,"lv":50},{"id":31,"lv":53},{"id":34,"lv":55}],"belohnung":5500,
+    "verbindungen":[{"zoneId":"viridian_city","richtung":"sued","label":"← Vertania City"}]
+  },
+  {
+    "id":"route22", "typ":"route", "name":"Route 22",
+    "etappen":6,"begegnung":65,
+    "wildePkmn":[
+      {"id":29,"lvMin":2,"lvMax":5,"rate":45},
+      {"id":32,"lvMin":2,"lvMax":5,"rate":45},
+      {"id":56,"lvMin":3,"lvMax":5,"rate":10}
+    ],
+    "waypoints":[
+      {"etappe":4,"typ":"rival_fight","flagId":"rival_route22",
+       "text":"Gary: Du wirst mir niemals das Wasser reichen können!"}
+    ],
+    "verbindungen":[
+      {"zoneId":"viridian_city",     "richtung":"ost", "label":"← Vertania City"},
+      {"zoneId":"wachposten_r22_r23","richtung":"nord","label":"Weiter →"}
+    ]
+  },
+  {
+    "id":"wachposten_r22_r23","typ":"wachposten","name":"Wachposten Route 22/23",
+    "npc":{"name":"Wachmann","text":"Stopp! Zeig mir alle 8 Orden!"},
+    "gebaeude":[],
+    "verbindungen":[
+      {"zoneId":"route22","richtung":"sued","label":"← Route 22"},
+      {"zoneId":"route23","richtung":"nord","label":"Route 23 →",
+       "bedingung":{"minBadges":8},"gesperrtText":"Du hast erst {badges}/8 Orden!"}
+    ]
+  },
+  {
+    "id":"route23","typ":"route","name":"Route 23 — Siegerstraße",
+    "etappen":12,"begegnung":75,
+    "wildePkmn":[
+      {"id":23, "lvMin":41,"lvMax":47,"rate":25},
+      {"id":27, "lvMin":41,"lvMax":47,"rate":25},
+      {"id":111,"lvMin":44,"lvMax":47,"rate":20},
+      {"id":95, "lvMin":41,"lvMax":47,"rate":15},
+      {"id":74, "lvMin":41,"lvMax":47,"rate":15}
+    ],
+    "verbindungen":[
+      {"zoneId":"wachposten_r22_r23","richtung":"sued","label":"← Wachposten"},
+      {"zoneId":"victory_road","richtung":"nord","label":"Siegerstraße →"}
+    ]
+  },
+  {
+    "id":"victory_road","typ":"dungeon","name":"Siegerstraße",
+    "etappen":20,"begegnung":80,
+    "wildePkmn":[
+      {"id":56, "lvMin":42,"lvMax":46,"rate":25},
+      {"id":66, "lvMin":42,"lvMax":46,"rate":25},
+      {"id":95, "lvMin":41,"lvMax":46,"rate":20},
+      {"id":74, "lvMin":41,"lvMax":46,"rate":15},
+      {"id":105,"lvMin":41,"lvMax":46,"rate":15}
+    ],
+    "verbindungen":[
+      {"zoneId":"route23","richtung":"sued","label":"← Route 23"},
+      {"zoneId":"indigo", "richtung":"nord","label":"Top 4 →"}
+    ]
+  },
+  {
+    "id":"route2","typ":"route","name":"Route 2",
+    "etappen":8,"begegnung":65,
+    "wildePkmn":[
+      {"id":16,"lvMin":3,"lvMax":7,"rate":40},
+      {"id":19,"lvMin":4,"lvMax":7,"rate":35},
+      {"id":21,"lvMin":4,"lvMax":7,"rate":25}
+    ],
+    "trainer":[
+      {"etappe":3,"typ":"Wanderer",   "name":"Wanderer Klaus","team":[{"id":74,"lv":8}],"belohnung":350},
+      {"etappe":6,"typ":"Jungtrainer","name":"Trainer Ben","team":[{"id":19,"lv":7},{"id":19,"lv":7}],"belohnung":280}
+    ],
+    "verbindungen":[
+      {"zoneId":"viridian_city",  "richtung":"sued","label":"← Vertania City"},
+      {"zoneId":"viridian_forest","richtung":"nord","label":"Vertania-Wald →"}
+    ]
+  },
+  {
+    "id":"viridian_forest","typ":"dungeon","name":"Vertania-Wald",
+    "etappen":15,"begegnung":80,
+    "wildePkmn":[
+      {"id":10,"lvMin":3,"lvMax":7,"rate":35},
+      {"id":13,"lvMin":3,"lvMax":7,"rate":35},
+      {"id":25,"lvMin":3,"lvMax":6,"rate":15},
+      {"id":11,"lvMin":4,"lvMax":7,"rate":10},
+      {"id":14,"lvMin":4,"lvMax":7,"rate":5}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Bugcatcher","name":"Käfersammler Willy","team":[{"id":10,"lv":6},{"id":10,"lv":6}],"belohnung":240},
+      {"etappe":10,"typ":"Bugcatcher","name":"Käfersammler Sammy","team":[{"id":13,"lv":8},{"id":10,"lv":7},{"id":13,"lv":8}],"belohnung":360}
+    ],
+    "verbindungen":[
+      {"zoneId":"route2",     "richtung":"sued","label":"← Route 2"},
+      {"zoneId":"route3_west","richtung":"nord","label":"Route 3 →"}
+    ]
+  },
+  {
+    "id":"route3_west","typ":"route","name":"Route 3 West",
+    "etappen":12,"begegnung":75,
+    "wildePkmn":[
+      {"id":16,"lvMin":6, "lvMax":10,"rate":30},
+      {"id":39,"lvMin":7, "lvMax":10,"rate":25},
+      {"id":20,"lvMin":8, "lvMax":11,"rate":20},
+      {"id":41,"lvMin":6, "lvMax":10,"rate":15},
+      {"id":35,"lvMin":7, "lvMax":11,"rate":10}
+    ],
+    "trainer":[
+      {"etappe":3,"typ":"Jungtrainer",  "name":"Trainer Max", "team":[{"id":16,"lv":8},{"id":41,"lv":9}], "belohnung":360},
+      {"etappe":6,"typ":"Jungtrainerin","name":"Trainerin Anna","team":[{"id":39,"lv":9},{"id":35,"lv":10}],"belohnung":400},
+      {"etappe":9,"typ":"Wanderer",     "name":"Wanderer Joe", "team":[{"id":74,"lv":10},{"id":66,"lv":10}],"belohnung":500}
+    ],
+    "verbindungen":[
+      {"zoneId":"viridian_forest","richtung":"sued","label":"← Vertania-Wald"},
+      {"zoneId":"pewter_city",    "richtung":"nord","label":"Marmoria City →"}
+    ]
+  },
+  {
+    "id":"pewter_city","typ":"stadt","name":"Marmoria City",
+    "gebaeude":["pokecenter","pokemart_2","trainer_schule","museum_marmoria"],
+    "arena":{"arenaleiter":"Rocco","ordenId":"stone","orden":"Stein-Orden",
+      "team":[{"id":74,"lv":12},{"id":75,"lv":14}],"belohnung":1400},
+    "verbindungen":[
+      {"zoneId":"route3_west","richtung":"sued","label":"← Route 3 West / Wald"},
+      {"zoneId":"route3_east","richtung":"ost", "label":"Route 3 Ost →",
+       "bedingung":{"minBadges":1},"gesperrtText":"Du brauchst den Stein-Orden!"}
+    ]
+  },
+  {
+    "id":"route3_east","typ":"route","name":"Route 3 Ost",
+    "etappen":10,"begegnung":70,
+    "wildePkmn":[
+      {"id":21,"lvMin":8, "lvMax":12,"rate":30},
+      {"id":39,"lvMin":9, "lvMax":12,"rate":25},
+      {"id":35,"lvMin":9, "lvMax":12,"rate":25},
+      {"id":23,"lvMin":9, "lvMax":12,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":3,"typ":"Jungtrainer","name":"Trainer Klaus","team":[{"id":21,"lv":10},{"id":16,"lv":11}],"belohnung":440},
+      {"etappe":7,"typ":"Wanderer",   "name":"Wanderer Ralf", "team":[{"id":74,"lv":12}],"belohnung":600}
+    ],
+    "verbindungen":[
+      {"zoneId":"pewter_city","richtung":"west","label":"← Marmoria City"},
+      {"zoneId":"mt_moon",    "richtung":"ost", "label":"Rotes Gebirge →"}
+    ]
+  },
+  {
+    "id":"mt_moon","typ":"dungeon","name":"Rotes Gebirge",
+    "etappen":20,"begegnung":85,
+    "wildePkmn":[
+      {"id":41,"lvMin":8, "lvMax":12,"rate":35},
+      {"id":35,"lvMin":8, "lvMax":12,"rate":25},
+      {"id":39,"lvMin":10,"lvMax":15,"rate":20},
+      {"id":74,"lvMin":10,"lvMax":15,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Supernerd","name":"Supernerd Markus","team":[{"id":74,"lv":11},{"id":74,"lv":11},{"id":74,"lv":11}],"belohnung":550},
+      {"etappe":12,"typ":"Rocket",  "name":"Rocket Grunt",    "team":[{"id":23,"lv":12},{"id":88,"lv":12}],"belohnung":480},
+      {"etappe":17,"typ":"Rocket",  "name":"Rocket Grunt",    "team":[{"id":41,"lv":13},{"id":42,"lv":15}],"belohnung":600}
+    ],
+    "waypoints":[
+      {"etappe":19,"typ":"fossil_choice","flagId":"mt_moon_fossil",
+       "text":"Team Rocket flieht und lässt zwei Fossilien zurück! Wähle eines:",
+       "wahl":[
+         {"item":"dome_fossil", "itemName":"Kuppelfossil",   "dexId":140},
+         {"item":"helix_fossil","itemName":"Spiralenfossil","dexId":138}
+       ]}
+    ],
+    "verbindungen":[
+      {"zoneId":"route3_east","richtung":"west","label":"← Route 3 Ost"},
+      {"zoneId":"route4",     "richtung":"ost", "label":"Route 4 →"}
+    ]
+  },
+  {
+    "id":"route4","typ":"route","name":"Route 4",
+    "etappen":8,"begegnung":70,
+    "wildePkmn":[
+      {"id":21,"lvMin":12,"lvMax":15,"rate":35},
+      {"id":27,"lvMin":12,"lvMax":15,"rate":35},
+      {"id":54,"lvMin":12,"lvMax":15,"rate":30}
+    ],
+    "trainer":[
+      {"etappe":4,"typ":"Jugendlicher","name":"Jugendlicher Tim","team":[{"id":27,"lv":13},{"id":21,"lv":13}],"belohnung":520}
+    ],
+    "verbindungen":[
+      {"zoneId":"mt_moon",      "richtung":"west","label":"← Rotes Gebirge"},
+      {"zoneId":"cerulean_city","richtung":"ost", "label":"Azuria City →"}
+    ]
+  }
+]

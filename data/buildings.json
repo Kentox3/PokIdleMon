@@ -1,0 +1,859 @@
+{
+  "pokecenter": {
+    "name": "Pokémon Center",
+    "typ": "heilen"
+  },
+  "pokemart_1": {
+    "name": "Supermarkt",
+    "typ": "shop",
+    "stock": [
+      {
+        "id": "pokeball",
+        "preis": 200
+      },
+      {
+        "id": "potion",
+        "preis": 300
+      },
+      {
+        "id": "antidote",
+        "preis": 100
+      }
+    ]
+  },
+  "pokemart_2": {
+    "name": "Supermarkt",
+    "typ": "shop",
+    "stock": [
+      {
+        "id": "pokeball",
+        "preis": 200
+      },
+      {
+        "id": "superball",
+        "preis": 600
+      },
+      {
+        "id": "potion",
+        "preis": 300
+      },
+      {
+        "id": "superpotion",
+        "preis": 700
+      },
+      {
+        "id": "antidote",
+        "preis": 100
+      },
+      {
+        "id": "awakening",
+        "preis": 250
+      },
+      {
+        "id": "paralysheal",
+        "preis": 200
+      }
+    ]
+  },
+  "pokemart_3": {
+    "name": "Supermarkt",
+    "typ": "shop",
+    "stock": [
+      {
+        "id": "superball",
+        "preis": 600
+      },
+      {
+        "id": "hyperball",
+        "preis": 1200
+      },
+      {
+        "id": "superpotion",
+        "preis": 700
+      },
+      {
+        "id": "hyperpotion",
+        "preis": 1500
+      },
+      {
+        "id": "fullheal",
+        "preis": 600
+      },
+      {
+        "id": "revive",
+        "preis": 1500
+      }
+    ]
+  },
+  "pokemart_4": {
+    "name": "Supermarkt",
+    "typ": "shop",
+    "stock": [
+      {
+        "id": "hyperball",
+        "preis": 1200
+      },
+      {
+        "id": "hyperpotion",
+        "preis": 1500
+      },
+      {
+        "id": "maxpotion",
+        "preis": 2500
+      },
+      {
+        "id": "fullrestore",
+        "preis": 3000
+      },
+      {
+        "id": "revive",
+        "preis": 1500
+      },
+      {
+        "id": "fullheal",
+        "preis": 600
+      }
+    ]
+  },
+  "labor_alabastia": {
+    "name": "Prof. Eichs Labor",
+    "typ": "lore",
+    "features": [
+      {
+        "id": "intro",
+        "typ": "lore",
+        "label": "Prof. Eich ansprechen",
+        "text": "Willkommen in der Welt der Pokémon! Ich bin Prof. Eich. Hier ist dein Starter!"
+      },
+      {
+        "id": "rival_oak_lab",
+        "typ": "rival_fight",
+        "label": "Gary herausfordern",
+        "flagId": "rival_oak_lab",
+        "rivalProfile": "oak_lab",
+        "text": "Gary: Warte! Lass uns unsere Pok?mon testen!"
+      }
+    ]
+  },
+  "trainer_schule": {
+    "name": "Trainer-Schule",
+    "typ": "lore",
+    "features": [
+      {
+        "id": "typen",
+        "typ": "lore",
+        "label": "Typ-Stärken lesen",
+        "text": "Feuer > Pflanze > Wasser > Feuer. Elektro > Wasser. Boden > Elektro."
+      },
+      {
+        "id": "status",
+        "typ": "lore",
+        "label": "Status-Effekte lesen",
+        "text": "Verbrennung schadet. Schlaf verhindert Angriffe. Lähmung: 25% blockiert."
+      },
+      {
+        "id": "items",
+        "typ": "lore",
+        "label": "Items & EP",
+        "text": "Mit EP-Teiler erhält das ganze Team EP! Fahrrad verdoppelt Etappentempo."
+      }
+    ]
+  },
+  "museum_marmoria": {
+    "name": "Marmoria Museum",
+    "typ": "lore",
+    "features": [
+      {
+        "id": "fossil_info",
+        "typ": "lore",
+        "label": "Fossilien betrachten",
+        "text": "Diese Fossilien stammen aus dem Mondberg. Ein Labor auf der Zinnoberinsel kann sie zum Leben erwecken."
+      }
+    ]
+  },
+  "fan_klub_zinnia": {
+    "name": "Pokémon Fan-Klub",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "fan_lore",
+        "typ": "lore",
+        "label": "Mit Fans sprechen",
+        "text": "Fan: 'Ich LIEBE Rapidash!'"
+      },
+      {
+        "id": "rad_coupon_gift",
+        "typ": "item_geschenk",
+        "label": "Rad-Coupon erhalten",
+        "beschr": "Der Präsident erzählt dir von seinem Flegmon und schenkt dir als Dankeschön etwas.",
+        "item": "rad_coupon",
+        "itemName": "Rad-Coupon",
+        "flagId": "got_rad_coupon",
+        "text": "Präsident: '...und so hat mein Flegmon gewonnen! Als Dank — hier ist ein Rad-Coupon! Im Fahrradladen in Azuria tauschst du ihn gegen ein Fahrrad!'"
+      }
+    ]
+  },
+  "fahrrad_shop": {
+    "name": "Fahrrad-Shop",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "bike_info",
+        "typ": "lore",
+        "label": "Händler ansprechen",
+        "text": "Händler: 'Hast du einen Rad-Coupon? Den tausche ich gegen ein Fahrrad — kostenlos! Sonst kostet es 10.000₽.'"
+      },
+      {
+        "id": "fahrrad_coupon",
+        "typ": "item_geschenk",
+        "label": "Rad-Coupon einlösen (Gratis!)",
+        "beschr": "Tausche deinen Rad-Coupon gegen ein Fahrrad.",
+        "item": "fahrrad",
+        "itemName": "Fahrrad",
+        "flagId": "got_fahrrad",
+        "bedingung": {
+          "hasItem": "rad_coupon"
+        },
+        "gesperrtText": "Du brauchst einen Rad-Coupon! Hol ihn im Pokémon Fan-Klub in Orania City.",
+        "text": "Händler: 'Ein Rad-Coupon! Hier ist dein nagelneues Fahrrad — kostenlos!'"
+      }
+    ],
+    "stock": [
+      {
+        "id": "fahrrad",
+        "preis": 10000
+      }
+    ]
+  },
+  "bills_haus": {
+    "name": "Bills Küstenhaus",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "bill_intro",
+        "typ": "lore",
+        "label": "Das sprechende Pokémon ansprechen",
+        "flagId": "bill_seen_transformed",
+        "text": "Das Pokémon spricht: 'Hey! Ich bin kein Pokémon. Ich bin Bill! Bei einem Experiment mit meinem Teleporter ist etwas schiefgelaufen.'"
+      },
+      {
+        "id": "bill_rescue",
+        "typ": "item_geschenk",
+        "label": "Teleporter bedienen",
+        "beschr": "Aktiviere Bills Zellentrenner am PC.",
+        "item": "bootsticket",
+        "itemName": "Bootsticket",
+        "flagId": "bill_rescued",
+        "bedingung": {
+          "eventFlag": "bill_seen_transformed"
+        },
+        "gesperrtText": "Sprich zuerst mit Bill.",
+        "text": "Bill: 'Danke! Jetzt bin ich wieder ich selbst. Als Dank bekommst du ein Ticket fuer die S.S. Anne!'"
+      }
+    ]
+  },
+  "spielhalle_prismania": {
+    "name": "Spielhalle",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "muenzen_kaufen",
+        "typ": "muenzen_kauf",
+        "label": "Spielmünzen kaufen",
+        "pakete": [
+          {
+            "muenzen": 50,
+            "preis": 500
+          },
+          {
+            "muenzen": 200,
+            "preis": 1500
+          },
+          {
+            "muenzen": 500,
+            "preis": 3000
+          }
+        ]
+      },
+      {
+        "id": "muenzshop",
+        "typ": "muenz_shop",
+        "label": "Münzshop",
+        "items": [
+          {
+            "id": "pkmn_scyther",
+            "name": "Scyther",
+            "kosten": 5500,
+            "dexId": 123
+          },
+          {
+            "id": "pkmn_dratini",
+            "name": "Dratini",
+            "kosten": 4600,
+            "dexId": 147
+          },
+          {
+            "id": "pkmn_porygon",
+            "name": "Porygon",
+            "kosten": 9999,
+            "dexId": 137
+          }
+        ]
+      },
+      {
+        "id": "rocket_schalter",
+        "typ": "schalter",
+        "label": "Seltsames Poster...",
+        "beschr": "Hinter einem Poster verbirgt sich ein Schalter.",
+        "flagId": "rocket_switch_found",
+        "freigeschaltetText": "KLICK! Eine Geheimtreppe öffnet sich!"
+      }
+    ]
+  },
+  "rocket_hq": {
+    "name": "Rocket-Versteck",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "rocket_hideout_enter",
+        "typ": "zone_reise",
+        "label": "Geheimtreppe hinabsteigen",
+        "targetZone": "rocket_hideout",
+        "bedingung": {
+          "eventFlag": "rocket_switch_found"
+        },
+        "gesperrtText": "Erst den Schalter hinter dem Poster in der Spielhalle dr?cken!",
+        "text": "Du steigst in Team Rockets Versteck hinab."
+      }
+    ]
+  },
+  "kampfdojo": {
+    "name": "Kampfdojo",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "dojo_intro",
+        "typ": "lore",
+        "label": "Dojo-Meister ansprechen",
+        "text": "Dojo-Meister: 'Wer alle meine Schüler und mich besiegt, erhält ein Kampf-Pokémon!'"
+      },
+      {
+        "id": "dojo_schueler",
+        "typ": "kampf_sequenz",
+        "label": "Schüler herausfordern",
+        "flagId": "dojo_schueler_cleared",
+        "trainer": [
+          {
+            "name": "Karateka Ken",
+            "team": [
+              {
+                "id": 56,
+                "lv": 35
+              },
+              {
+                "id": 56,
+                "lv": 35
+              }
+            ],
+            "belohnung": 1400
+          },
+          {
+            "name": "Karateka Ryo",
+            "team": [
+              {
+                "id": 66,
+                "lv": 36
+              },
+              {
+                "id": 67,
+                "lv": 36
+              }
+            ],
+            "belohnung": 1440
+          }
+        ]
+      },
+      {
+        "id": "dojo_meister",
+        "typ": "kampf_sequenz",
+        "label": "Dojo-Meister herausfordern",
+        "flagId": "dojo_cleared",
+        "bedingung": {
+          "eventFlag": "dojo_schueler_cleared"
+        },
+        "gesperrtText": "Erst alle Schüler besiegen!",
+        "trainer": [
+          {
+            "name": "Dojo-Meister Kyo",
+            "team": [
+              {
+                "id": 106,
+                "lv": 40
+              },
+              {
+                "id": 107,
+                "lv": 40
+              },
+              {
+                "id": 68,
+                "lv": 43
+              }
+            ],
+            "belohnung": 4300,
+            "isBoss": true
+          }
+        ]
+      },
+      {
+        "id": "dojo_wahl",
+        "typ": "dojo_wahl",
+        "label": "Kampf-Pokémon wählen",
+        "flagId": "dojo_reward_taken",
+        "bedingung": {
+          "eventFlag": "dojo_cleared"
+        },
+        "gesperrtText": "Erst den Dojo-Meister besiegen!",
+        "wahl": [
+          {
+            "dexId": 106,
+            "name": "Kicklee",
+            "level": 25,
+            "beschr": "Hoher Angriff!"
+          },
+          {
+            "dexId": 107,
+            "name": "Nockchan",
+            "level": 25,
+            "beschr": "Hohe Abwehr!"
+          }
+        ]
+      }
+    ]
+  },
+  "pokemon_herrenhaus": {
+    "name": "Pok?mon Herrenhaus",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "mansion_enter",
+        "typ": "zone_reise",
+        "label": "Herrenhaus betreten",
+        "targetZone": "pokemon_mansion",
+        "text": "Du betrittst das verlassene Pok?mon-Herrenhaus."
+      }
+    ]
+  },
+  "mr_fuji_haus": {
+    "name": "Haus von Mr. Fuji",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "fuji_intro",
+        "typ": "lore",
+        "label": "Oma Küchlein sprechen",
+        "text": "Oma Küchlein: 'Mr. Fuji ist im Pokémon-Turm gefangen! Rette ihn!'"
+      },
+      {
+        "id": "pokefloete_gift",
+        "typ": "item_geschenk",
+        "label": "Pokéflöte erhalten",
+        "item": "pokefloete",
+        "itemName": "Pokéflöte",
+        "flagId": "got_pokefloete",
+        "bedingung": {
+          "eventFlag": "fuji_gerettet"
+        },
+        "gesperrtText": "Rette erst Mr. Fuji an der Spitze des Pok?mon-Turms!",
+        "text": "Mr. Fuji: 'Danke, dass du mich gerettet hast. Nimm diese Pok?fl?te.'"
+      }
+    ]
+  },
+  "safari_zone": {
+    "name": "Safari Zone Eingang",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "safari_enter",
+        "typ": "zone_reise",
+        "label": "Safari-Zone betreten",
+        "targetZone": "safari_zone_area",
+        "text": "Du betrittst die Safari-Zone."
+      }
+    ]
+  },
+  "silph_ag": {
+    "name": "Silph AG",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "silph_info",
+        "typ": "lore",
+        "label": "Empfang",
+        "text": "'Die Silph AG wurde von Team Rocket übernommen! Hilf uns!'"
+      },
+      {
+        "id": "silph_enter",
+        "typ": "zone_reise",
+        "label": "Silph AG betreten",
+        "targetZone": "silph_ag_zone",
+        "text": "Du betrittst die von Team Rocket besetzte Silph AG."
+      },
+      {
+        "id": "meisterball_gift",
+        "typ": "item_geschenk",
+        "label": "Meisterball erhalten",
+        "item": "masterball",
+        "itemName": "Meisterball",
+        "flagId": "got_masterball",
+        "bedingung": {
+          "eventFlag": "silph_cleared"
+        },
+        "gesperrtText": "Erst Silph AG befreien!",
+        "text": "Silph-Präsident: 'Als Dank für deine Hilfe — unser neuester Prototyp: der Meisterball!'"
+      }
+    ]
+  },
+  "pewter_gym_building": {
+    "name": "Marmoria Arena",
+    "typ": "gym",
+    "targetZone": "pewter_gym",
+    "completedFlag": "gym_stone_cleared",
+    "completedText": "Marmoria Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "cerulean_gym_building": {
+    "name": "Azuria Arena",
+    "typ": "gym",
+    "targetZone": "cerulean_gym",
+    "completedFlag": "gym_cascade_cleared",
+    "completedText": "Azuria Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "vermilion_gym_building": {
+    "name": "Orania Arena",
+    "typ": "gym",
+    "targetZone": "vermilion_gym",
+    "bedingung": {
+      "hasItem": "hm01",
+      "hasPokemonMove": "zerschneider",
+      "hasBadge": "cascade"
+    },
+    "gesperrtText": "VM01 Zerschneider nötig!",
+    "completedFlag": "gym_thunder_cleared",
+    "completedText": "Orania Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "celadon_gym_building": {
+    "name": "Prismania Arena",
+    "typ": "gym",
+    "targetZone": "celadon_gym",
+    "completedFlag": "gym_rainbow_cleared",
+    "completedText": "Prismania Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "fuchsia_gym_building": {
+    "name": "Fuchsania Arena",
+    "typ": "gym",
+    "targetZone": "fuchsia_gym",
+    "completedFlag": "gym_soul_cleared",
+    "completedText": "Fuchsania Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "saffron_gym_building": {
+    "name": "Saffronia Arena",
+    "typ": "gym",
+    "targetZone": "saffron_gym",
+    "completedFlag": "gym_marsh_cleared",
+    "completedText": "Saffronia Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "cinnabar_gym_building": {
+    "name": "Zinnoberinsel Arena",
+    "typ": "gym",
+    "targetZone": "cinnabar_gym",
+    "bedingung": {
+      "hasItem": "secret_key"
+    },
+    "gesperrtText": "Geheimschlüssel nötig!",
+    "completedFlag": "gym_volcano_cleared",
+    "completedText": "Zinnoberinsel Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "viridian_gym_building": {
+    "name": "Vertania Arena",
+    "typ": "gym",
+    "targetZone": "viridian_gym",
+    "bedingung": {
+      "minBadges": 7
+    },
+    "gesperrtText": "Die Arena ist verschlossen. Komm wieder, wenn du 7 Orden besitzt.",
+    "completedFlag": "gym_earth_cleared",
+    "completedText": "Vertania Arena ist abgeschlossen.",
+    "rechallenge": false
+  },
+  "route16_fly_house": {
+    "name": "Verstecktes Haus",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "fly_house_lore",
+        "typ": "lore",
+        "label": "Bewohnerin ansprechen",
+        "flagId": "fly_house_seen",
+        "bedingung": {
+          "hasItem": "hm01",
+          "hasPokemonMove": "zerschneider",
+          "hasBadge": "cascade"
+        },
+        "gesperrtText": "Der Weg zum Haus ist von einem Busch versperrt. Du brauchst VM01 Zerschneider.",
+        "text": "Bewohnerin: 'Bitte verrate niemandem, dass ich hier wohne.'"
+      },
+      {
+        "id": "hm02_gift",
+        "typ": "item_geschenk",
+        "label": "VM02 Fliegen erhalten",
+        "item": "hm02",
+        "itemName": "VM02 Fliegen",
+        "flagId": "r16_hm02",
+        "bedingung": {
+          "eventFlag": "fly_house_seen",
+          "hasItem": "hm01",
+          "hasPokemonMove": "zerschneider",
+          "hasBadge": "cascade"
+        },
+        "gesperrtText": "Sprich zuerst mit der Bewohnerin. Du brauchst außerdem VM01 Zerschneider.",
+        "text": "Bewohnerin: 'Hier, nimm VM02 Fliegen. Aber sag niemandem, dass du sie von mir hast!'"
+      }
+    ]
+  },
+  "angelhaus_orania": {
+    "name": "Haus des Anglers",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "old_rod_gift",
+        "typ": "item_geschenk",
+        "label": "Angler ansprechen",
+        "beschr": "Der Angler gibt dir die einfache Angel.",
+        "item": "angel",
+        "itemName": "Angel",
+        "flagId": "got_old_rod",
+        "text": "Angler: 'Ich liebe Angeln! Hier, nimm diese Angel und probier es am Wasser.'"
+      }
+    ]
+  },
+  "angelhaus_fuchsania": {
+    "name": "Haus des Angelprofis",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "good_rod_gift",
+        "typ": "item_geschenk",
+        "label": "Angelprofi ansprechen",
+        "beschr": "Der Angelprofi gibt dir die bessere Angel.",
+        "item": "profiangel",
+        "itemName": "Profiangel",
+        "flagId": "got_good_rod",
+        "text": "Angelprofi: 'Du siehst aus, als w?rdest du gern angeln. Nimm diese Profiangel!'"
+      }
+    ]
+  },
+  "angelhaus_route12": {
+    "name": "Anglerh?tte",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "super_rod_gift",
+        "typ": "item_geschenk",
+        "label": "Angelguru ansprechen",
+        "beschr": "Der Angelguru gibt dir die beste Angel.",
+        "item": "superangel",
+        "itemName": "Superangel",
+        "flagId": "got_super_rod",
+        "text": "Angelguru: 'Ich bin der Angelguru! Mit dieser Superangel holst du die st?rksten Wasser-Pok?mon an Land.'"
+      }
+    ]
+  },
+  "celadon_department_store": {
+    "name": "Prismania Kaufhaus",
+    "typ": "shop",
+    "stock": [
+      {
+        "id": "pokeball",
+        "preis": 200
+      },
+      {
+        "id": "superball",
+        "preis": 600
+      },
+      {
+        "id": "potion",
+        "preis": 300
+      },
+      {
+        "id": "superpotion",
+        "preis": 700
+      },
+      {
+        "id": "revive",
+        "preis": 1500
+      },
+      {
+        "id": "antidote",
+        "preis": 100
+      },
+      {
+        "id": "paralysheal",
+        "preis": 200
+      },
+      {
+        "id": "awakening",
+        "preis": 250
+      },
+      {
+        "id": "fullheal",
+        "preis": 600
+      },
+      {
+        "id": "tm01",
+        "preis": 3000
+      },
+      {
+        "id": "tm02",
+        "preis": 2000
+      },
+      {
+        "id": "tm05",
+        "preis": 3000
+      },
+      {
+        "id": "tm07",
+        "preis": 2000
+      },
+      {
+        "id": "tm09",
+        "preis": 3000
+      },
+      {
+        "id": "tm17",
+        "preis": 3000
+      },
+      {
+        "id": "tm32",
+        "preis": 1000
+      },
+      {
+        "id": "tm33",
+        "preis": 1000
+      },
+      {
+        "id": "tm37",
+        "preis": 2000
+      },
+      {
+        "id": "pokepuppe",
+        "preis": 1000
+      },
+      {
+        "id": "feuerstein",
+        "preis": 2100
+      },
+      {
+        "id": "donnerstein",
+        "preis": 2100
+      },
+      {
+        "id": "wasserstein",
+        "preis": 2100
+      },
+      {
+        "id": "blattstein",
+        "preis": 2100
+      },
+      {
+        "id": "x_accuracy",
+        "preis": 950
+      },
+      {
+        "id": "guard_spec",
+        "preis": 700
+      },
+      {
+        "id": "dire_hit",
+        "preis": 650
+      },
+      {
+        "id": "x_attack",
+        "preis": 500
+      },
+      {
+        "id": "x_defend",
+        "preis": 550
+      },
+      {
+        "id": "x_speed",
+        "preis": 350
+      },
+      {
+        "id": "x_special",
+        "preis": 350
+      },
+      {
+        "id": "hp_up",
+        "preis": 9800
+      },
+      {
+        "id": "protein",
+        "preis": 9800
+      },
+      {
+        "id": "iron",
+        "preis": 9800
+      },
+      {
+        "id": "carbos",
+        "preis": 9800
+      },
+      {
+        "id": "calcium",
+        "preis": 9800
+      },
+      {
+        "id": "fresh_water",
+        "preis": 200
+      },
+      {
+        "id": "soda_pop",
+        "preis": 300
+      },
+      {
+        "id": "lemonade",
+        "preis": 350
+      }
+    ]
+  },
+  "azuria_robbed_house": {
+    "name": "Verw?stetes Haus",
+    "typ": "komplex",
+    "features": [
+      {
+        "id": "robbed_house_lore",
+        "typ": "lore",
+        "label": "Spuren ansehen",
+        "flagId": "azuria_robbed_house_seen",
+        "text": "Hier wurde eingebrochen. Ein Rocket-R?pel ist durch die R?ckwand geflohen."
+      },
+      {
+        "id": "cerulean_rocket_exit",
+        "typ": "zone_reise",
+        "label": "Durch den Hinterausgang gehen",
+        "targetZone": "cerulean_rocket_yard",
+        "bedingung": {
+          "eventFlag": "bill_rescued"
+        },
+        "gesperrtText": "Hilf erst Bill auf Route 25. Danach kannst du den Rocket hinter dem Haus stellen.",
+        "text": "Du folgst den Spuren hinter das Haus."
+      }
+    ]
+  }
+}

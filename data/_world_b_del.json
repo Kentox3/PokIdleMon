@@ -1,0 +1,374 @@
+[
+  {
+    "id":"cerulean_city","typ":"stadt","name":"Azuria City",
+    "gebaeude":["pokecenter","pokemart_2","fahrrad_shop","bills_haus"],
+    "arena":{"arenaleiter":"Misty","ordenId":"cascade","orden":"Kaskaden-Orden",
+      "team":[{"id":86,"lv":18},{"id":54,"lv":21}],"belohnung":2100},
+    "verbindungen":[
+      {"zoneId":"route4",       "richtung":"west",    "label":"← Route 4 / Mondberg"},
+      {"zoneId":"route5_6",     "richtung":"sued",    "label":"Route 5 Süd →",
+       "bedingung":{"minBadges":2},"gesperrtText":"Du brauchst den Kaskaden-Orden!"},
+      {"zoneId":"route24_25",   "richtung":"nord",    "label":"Nugget-Brücke →"},
+      {"zoneId":"route9",       "richtung":"ost",     "label":"Route 9 →",
+       "bedingung":{"minBadges":2},"gesperrtText":"Du brauchst den Kaskaden-Orden!"},
+      {"zoneId":"cerulean_cave","richtung":"nordwest","label":"Unbekannte Höhle",
+       "bedingung":{"minBadges":8},"gesperrtText":"Nur mit allen 8 Orden!"}
+    ]
+  },
+  {
+    "id":"route24_25","typ":"route","name":"Nugget-Brücke (Route 24-25)",
+    "etappen":12,"begegnung":65,
+    "wildePkmn":[
+      {"id":63,"lvMin":10,"lvMax":15,"rate":25},
+      {"id":43,"lvMin":10,"lvMax":15,"rate":20},
+      {"id":69,"lvMin":10,"lvMax":14,"rate":20},
+      {"id":16,"lvMin":10,"lvMax":14,"rate":15},
+      {"id":72,"lvMin":10,"lvMax":14,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":2,"typ":"Jungtrainer",  "name":"Trainer Stefan", "team":[{"id":16,"lv":11},{"id":19,"lv":11}],"belohnung":440},
+      {"etappe":4,"typ":"Jungtrainerin","name":"Trainerin Lisa",  "team":[{"id":43,"lv":12}],"belohnung":480},
+      {"etappe":6,"typ":"Rocket",       "name":"Rocket Gruntz",   "team":[{"id":23,"lv":14},{"id":69,"lv":14}],"belohnung":560}
+    ],
+    "waypoints":[
+      {"etappe":7,"typ":"event","flagId":"nugget_erhalten","geld":5000,
+       "text":"Team Rocket: 'Du beweist deinen Wert!' Du besiegst ihn — er drückt dir ein goldenes Nugget (5000₽) in die Hand!"},
+      {"etappe":10,"typ":"rival_fight","flagId":"rival_nugget",
+       "text":"Gary: 'Wow, du schaffst es sogar über die Brücke!'"}
+    ],
+    "verbindungen":[
+      {"zoneId":"cerulean_city","richtung":"sued","label":"← Azuria City"}
+    ]
+  },
+  {
+    "id":"cerulean_cave","typ":"dungeon","name":"Unbekannte Höhle",
+    "etappen":15,"begegnung":80,
+    "wildePkmn":[
+      {"id":63, "lvMin":46,"lvMax":55,"rate":25},
+      {"id":79, "lvMin":46,"lvMax":55,"rate":20},
+      {"id":74, "lvMin":46,"lvMax":55,"rate":15},
+      {"id":41, "lvMin":46,"lvMax":55,"rate":15},
+      {"id":66, "lvMin":46,"lvMax":55,"rate":10},
+      {"id":112,"lvMin":50,"lvMax":60,"rate":8},
+      {"id":31, "lvMin":50,"lvMax":58,"rate":4},
+      {"id":34, "lvMin":50,"lvMax":58,"rate":3}
+    ],
+    "waypoints":[
+      {"etappe":15,"typ":"mewtu_encounter","flagId":"mewtu_fought",
+       "dexId":150,"level":70,"text":"Die Höhle endet an einem großen Wasser... MEWTU taucht auf!"}
+    ],
+    "verbindungen":[
+      {"zoneId":"cerulean_city","richtung":"sued","label":"← Azuria City"}
+    ]
+  },
+  {
+    "id":"route9","typ":"route","name":"Route 9",
+    "etappen":10,"begegnung":65,
+    "wildePkmn":[
+      {"id":22,"lvMin":19,"lvMax":25,"rate":35},
+      {"id":81,"lvMin":19,"lvMax":25,"rate":35},
+      {"id":23,"lvMin":19,"lvMax":25,"rate":30}
+    ],
+    "verbindungen":[
+      {"zoneId":"cerulean_city","richtung":"west","label":"← Azuria City"},
+      {"zoneId":"wachposten_r9","richtung":"sued","label":"Wachposten →"}
+    ]
+  },
+  {
+    "id":"wachposten_r9","typ":"wachposten","name":"Wachposten Route 9/10",
+    "npc":{"name":"Wachfrau","text":"Hier beginnt Route 10 Süd. Gut vorbereiten für den Felstunnel!"},
+    "gebaeude":["pokemart_2"],
+    "verbindungen":[
+      {"zoneId":"route9",       "richtung":"nord","label":"← Route 9"},
+      {"zoneId":"route10_sued", "richtung":"sued","label":"Route 10 Süd →"}
+    ]
+  },
+  {
+    "id":"route10_sued","typ":"route","name":"Route 10 Süd",
+    "etappen":8,"begegnung":70,
+    "wildePkmn":[
+      {"id":81,"lvMin":19,"lvMax":25,"rate":35},
+      {"id":22,"lvMin":19,"lvMax":25,"rate":35},
+      {"id":100,"lvMin":20,"lvMax":24,"rate":30}
+    ],
+    "verbindungen":[
+      {"zoneId":"wachposten_r9","richtung":"nord","label":"← Wachposten"},
+      {"zoneId":"rock_tunnel",  "richtung":"sued","label":"Felstunnel →"}
+    ]
+  },
+  {
+    "id":"rock_tunnel","typ":"dungeon","name":"Felstunnel",
+    "etappen":15,"begegnung":85,
+    "wildePkmn":[
+      {"id":41,"lvMin":17,"lvMax":22,"rate":35},
+      {"id":42,"lvMin":20,"lvMax":24,"rate":25},
+      {"id":74,"lvMin":18,"lvMax":22,"rate":25},
+      {"id":95,"lvMin":18,"lvMax":22,"rate":15}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Wanderer",    "name":"Wanderer Rolf","team":[{"id":74,"lv":20},{"id":95,"lv":20}],"belohnung":900},
+      {"etappe":10,"typ":"Jungtrainerin","name":"Trainerin Sina","team":[{"id":41,"lv":21},{"id":41,"lv":21}],"belohnung":840}
+    ],
+    "verbindungen":[
+      {"zoneId":"route10_sued","richtung":"nord","label":"← Route 10 Süd"},
+      {"zoneId":"lavender_town","richtung":"sued","label":"Lavendeldorf →"}
+    ]
+  },
+  {
+    "id":"route5_6","typ":"route","name":"Route 5-6 (Untergrundtunnel)",
+    "etappen":15,"begegnung":70,
+    "wildePkmn":[
+      {"id":43,"lvMin":13,"lvMax":17,"rate":30},
+      {"id":52,"lvMin":13,"lvMax":17,"rate":25},
+      {"id":35,"lvMin":14,"lvMax":17,"rate":25},
+      {"id":37,"lvMin":15,"lvMax":17,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Jungtrainerin","name":"Trainerin Anne","team":[{"id":43,"lv":15},{"id":35,"lv":15}],"belohnung":600},
+      {"etappe":10,"typ":"Jugendlicher", "name":"Jugendlicher Dirk","team":[{"id":52,"lv":16},{"id":37,"lv":16}],"belohnung":640}
+    ],
+    "verbindungen":[
+      {"zoneId":"cerulean_city", "richtung":"nord","label":"← Azuria City"},
+      {"zoneId":"vermilion_city","richtung":"sued","label":"Zinnia City →"}
+    ]
+  },
+  {
+    "id":"vermilion_city","typ":"stadt","name":"Zinnia City",
+    "gebaeude":["pokecenter","pokemart_2","fan_klub_zinnia"],
+    "arena":{"arenaleiter":"Mysto","ordenId":"thunder","orden":"Donner-Orden",
+      "team":[{"id":100,"lv":21},{"id":100,"lv":21},{"id":125,"lv":24}],"belohnung":2400,
+      "bedingung":{"hasItem":"hm_cut"},"gesperrtText":"Der Eingang ist von Büschen blockiert — VM01 Zerschneider nötig!"},
+    "verbindungen":[
+      {"zoneId":"route5_6",   "richtung":"nord","label":"← Route 5-6 / Azuria"},
+      {"zoneId":"route11_12", "richtung":"ost", "label":"Route 11-12 →",
+       "bedingung":{"minBadges":3},"gesperrtText":"Du brauchst den Donner-Orden!"},
+      {"zoneId":"ss_anne",    "richtung":"sued","label":"S.S. Anne",
+       "bedingung":{"hasItem":"bootsticket"},"gesperrtText":"Du brauchst ein Bootsticket!"}
+    ]
+  },
+  {
+    "id":"ss_anne","typ":"dungeon","name":"S.S. Anne",
+    "etappen":10,"begegnung":0,"wildePkmn":[],
+    "trainer":[
+      {"etappe":3,"typ":"Gentleman",  "name":"Gentleman Arthur","team":[{"id":116,"lv":17}],"belohnung":850},
+      {"etappe":7,"typ":"Jugendliche","name":"Jugendliche Kim",  "team":[{"id":72,"lv":18},{"id":41,"lv":17}],"belohnung":680}
+    ],
+    "waypoints":[
+      {"etappe":8,"typ":"hm_geschenk","flagId":"hm_cut_erhalten","item":"hm_cut","itemName":"VM01 Zerschneider",
+       "text":"Der Kapitän ist seekrank. Als Dank für deine Hilfe bekommst du VM01 Zerschneider!"}
+    ],
+    "verbindungen":[
+      {"zoneId":"vermilion_city","richtung":"nord","label":"← Zinnia City"}
+    ]
+  },
+  {
+    "id":"route11_12","typ":"route","name":"Route 11-12",
+    "etappen":15,"begegnung":70,
+    "wildePkmn":[
+      {"id":21,"lvMin":17,"lvMax":22,"rate":30},
+      {"id":23,"lvMin":17,"lvMax":22,"rate":25},
+      {"id":60,"lvMin":17,"lvMax":22,"rate":25},
+      {"id":98,"lvMin":19,"lvMax":22,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Jugendlicher", "name":"Jugendlicher Lars","team":[{"id":21,"lv":18},{"id":23,"lv":19}],"belohnung":760},
+      {"etappe":10,"typ":"Jungtrainerin","name":"Trainerin Petra", "team":[{"id":60,"lv":20},{"id":72,"lv":21}],"belohnung":840}
+    ],
+    "waypoints":[
+      {"etappe":8,"typ":"relaxo_block","flagId":"relaxo_route12","needsItem":"pokefloete",
+       "blockedMsg":"Ein riesiges Relaxo schläft auf dem Weg! Pokéflöte von Mr. Fuji nötig."}
+    ],
+    "verbindungen":[
+      {"zoneId":"vermilion_city","richtung":"west","label":"← Zinnia City"},
+      {"zoneId":"lavender_town", "richtung":"nord","label":"Lavendeldorf →"}
+    ]
+  },
+  {
+    "id":"lavender_town","typ":"stadt","name":"Lavendeldorf",
+    "gebaeude":["pokecenter","pokemart_2","mr_fuji_haus"],
+    "verbindungen":[
+      {"zoneId":"route11_12",  "richtung":"sued","label":"← Route 11-12 / Zinnia"},
+      {"zoneId":"rock_tunnel", "richtung":"nord","label":"← Felstunnel / Azuria"},
+      {"zoneId":"pokemon_turm","richtung":"mitte","label":"Pokémon-Turm →"},
+      {"zoneId":"route7_8",   "richtung":"west","label":"Route 7-8 →"}
+    ]
+  },
+  {
+    "id":"pokemon_turm","typ":"dungeon","name":"Pokémon-Turm",
+    "etappen":15,"begegnung":75,
+    "wildePkmn":[
+      {"id":92,"lvMin":20,"lvMax":28,"rate":40},
+      {"id":93,"lvMin":25,"lvMax":30,"rate":30},
+      {"id":41,"lvMin":20,"lvMax":25,"rate":30}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Channelerin","name":"Channelerin Maria","team":[{"id":92,"lv":22}],"belohnung":880},
+      {"etappe":10,"typ":"Rocket",     "name":"Rocket Grunt",     "team":[{"id":88,"lv":23},{"id":23,"lv":23}],"belohnung":920}
+    ],
+    "waypoints":[
+      {"etappe":13,"typ":"rival_fight","flagId":"rival_tower_beaten",
+       "text":"Gary: 'Dein Pokémon ist dein Freund? Wie rührend!' — Du besiegst ihn!"}
+    ],
+    "verbindungen":[
+      {"zoneId":"lavender_town","richtung":"sued","label":"← Lavendeldorf"}
+    ]
+  },
+  {
+    "id":"route7_8","typ":"route","name":"Route 7-8",
+    "etappen":15,"begegnung":70,
+    "wildePkmn":[
+      {"id":52,"lvMin":22,"lvMax":27,"rate":30},
+      {"id":35,"lvMin":22,"lvMax":27,"rate":25},
+      {"id":37,"lvMin":22,"lvMax":27,"rate":25},
+      {"id":79,"lvMin":22,"lvMax":27,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Jugendliche", "name":"Jugendliche Nina","team":[{"id":52,"lv":23},{"id":35,"lv":24}],"belohnung":960},
+      {"etappe":10,"typ":"Jugendlicher","name":"Jugendlicher Nico","team":[{"id":37,"lv":24},{"id":37,"lv":25}],"belohnung":1000}
+    ],
+    "waypoints":[
+      {"etappe":8,"typ":"relaxo_block","flagId":"relaxo_route16","needsItem":"pokefloete",
+       "blockedMsg":"Ein Relaxo blockiert die Fahrradstraße! Pokéflöte nötig."}
+    ],
+    "verbindungen":[
+      {"zoneId":"lavender_town","richtung":"ost", "label":"← Lavendeldorf"},
+      {"zoneId":"celadon_city", "richtung":"west","label":"Prismania City →"}
+    ]
+  },
+  {
+    "id":"celadon_city","typ":"stadt","name":"Prismania City",
+    "gebaeude":["pokecenter","pokemart_3","spielhalle_prismania","rocket_hq"],
+    "arena":{"arenaleiter":"Erika","ordenId":"rainbow","orden":"Regenbogen-Orden",
+      "team":[{"id":71,"lv":29},{"id":114,"lv":24},{"id":45,"lv":29}],"belohnung":2900},
+    "verbindungen":[
+      {"zoneId":"route7_8",  "richtung":"ost", "label":"← Route 7-8 / Lavendeldorf"},
+      {"zoneId":"route16_18","richtung":"west","label":"Fahrradroute →",
+       "bedingung":{"minBadges":4},"gesperrtText":"Du brauchst den Regenbogen-Orden!"}
+    ]
+  },
+  {
+    "id":"route16_18","typ":"route","name":"Fahrradroute (Route 16-18)",
+    "etappen":18,"begegnung":70,
+    "wildePkmn":[
+      {"id":21, "lvMin":25,"lvMax":30,"rate":30},
+      {"id":22, "lvMin":25,"lvMax":30,"rate":25},
+      {"id":84, "lvMin":26,"lvMax":30,"rate":25},
+      {"id":128,"lvMin":26,"lvMax":30,"rate":20}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Biker","name":"Biker Dirk",  "team":[{"id":21,"lv":26},{"id":22,"lv":27}],"belohnung":1040},
+      {"etappe":10,"typ":"Biker","name":"Biker Stefan","team":[{"id":84,"lv":28},{"id":84,"lv":28}],"belohnung":1120},
+      {"etappe":14,"typ":"Jungtrainer","name":"Trainer Marc","team":[{"id":128,"lv":30},{"id":128,"lv":30}],"belohnung":1200}
+    ],
+    "feldItems":[{"flagId":"r16_hm_fly","item":"hm_fly","etappe":6}],
+    "waypoints":[
+      {"etappe":10,"typ":"relaxo_block","flagId":"relaxo_route16b","needsItem":"pokefloete",
+       "blockedMsg":"Relaxo schläft auf der Route! Pokéflöte nötig."}
+    ],
+    "verbindungen":[
+      {"zoneId":"celadon_city","richtung":"ost", "label":"← Prismania City"},
+      {"zoneId":"fuchsia_city","richtung":"sued","label":"Pokérosia City →"}
+    ]
+  },
+  {
+    "id":"fuchsia_city","typ":"stadt","name":"Pokérosia City",
+    "gebaeude":["pokecenter","pokemart_3","safari_zone"],
+    "arena":{"arenaleiter":"Koga","ordenId":"soul","orden":"Seelen-Orden",
+      "team":[{"id":109,"lv":37},{"id":89,"lv":39},{"id":110,"lv":37},{"id":89,"lv":43}],"belohnung":4300},
+    "verbindungen":[
+      {"zoneId":"route16_18","richtung":"nord","label":"← Fahrradroute / Prismania"},
+      {"zoneId":"route15",   "richtung":"ost", "label":"Route 15 →",
+       "bedingung":{"minBadges":5},"gesperrtText":"Du brauchst den Seelen-Orden!"},
+      {"zoneId":"route19_20","richtung":"sued","label":"Route 19-20 (Meer) →",
+       "bedingung":{"hasItem":"hm_surf"},"gesperrtText":"Du brauchst VM03 Surfer!"}
+    ]
+  },
+  {
+    "id":"route15","typ":"route","name":"Route 15",
+    "etappen":12,"begegnung":65,
+    "wildePkmn":[
+      {"id":83, "lvMin":26,"lvMax":32,"rate":30},
+      {"id":114,"lvMin":26,"lvMax":32,"rate":25},
+      {"id":102,"lvMin":26,"lvMax":32,"rate":25},
+      {"id":115,"lvMin":28,"lvMax":32,"rate":20}
+    ],
+    "verbindungen":[
+      {"zoneId":"fuchsia_city","richtung":"west","label":"← Pokérosia City"},
+      {"zoneId":"saffron_city","richtung":"ost", "label":"Saffronia City →"}
+    ]
+  },
+  {
+    "id":"saffron_city","typ":"stadt","name":"Saffronia City",
+    "gebaeude":["pokecenter","pokemart_3","kampfdojo","silph_ag"],
+    "arena":{"arenaleiter":"Sabrina","ordenId":"marsh","orden":"Sumpf-Orden",
+      "team":[{"id":64,"lv":38},{"id":122,"lv":37},{"id":49,"lv":38},{"id":65,"lv":43}],"belohnung":4300},
+    "verbindungen":[
+      {"zoneId":"route15","richtung":"west","label":"← Route 15 / Pokérosia"}
+    ]
+  },
+  {
+    "id":"route19_20","typ":"see","name":"Route 19-20 (Meer)",
+    "etappen":18,"begegnung":80,
+    "wildePkmn":[
+      {"id":72, "lvMin":25,"lvMax":30,"rate":35},
+      {"id":120,"lvMin":25,"lvMax":30,"rate":30},
+      {"id":98, "lvMin":22,"lvMax":28,"rate":20},
+      {"id":54, "lvMin":22,"lvMax":28,"rate":15}
+    ],
+    "trainer":[
+      {"etappe":5, "typ":"Schwimmer",  "name":"Schwimmer Tim", "team":[{"id":72,"lv":28},{"id":60,"lv":30}],"belohnung":1200},
+      {"etappe":12,"typ":"Schwimmerin","name":"Schwimmerin Lisa","team":[{"id":120,"lv":30},{"id":120,"lv":30}],"belohnung":1200}
+    ],
+    "verbindungen":[
+      {"zoneId":"fuchsia_city",   "richtung":"nord","label":"← Pokérosia City"},
+      {"zoneId":"cinnabar_island","richtung":"sued","label":"Zinnoberinsel →"}
+    ]
+  },
+  {
+    "id":"cinnabar_island","typ":"stadt","name":"Zinnoberinsel",
+    "gebaeude":["pokecenter","pokemart_4","pokemon_herrenhaus"],
+    "arena":{"arenaleiter":"Brand","ordenId":"volcano","orden":"Hitze-Orden",
+      "team":[{"id":58,"lv":42},{"id":77,"lv":40},{"id":126,"lv":42},{"id":59,"lv":47}],"belohnung":4700,
+      "bedingung":{"hasItem":"secret_key"},"gesperrtText":"Die Arena ist verschlossen — Geheimschlüssel aus dem Herrenhaus nötig!"},
+    "verbindungen":[
+      {"zoneId":"route19_20","richtung":"nord","label":"← Meer / Pokérosia"},
+      {"zoneId":"route21",   "richtung":"ost", "label":"Route 21 →",
+       "bedingung":{"minBadges":7},"gesperrtText":"Du brauchst den Hitze-Orden!"}
+    ]
+  },
+  {
+    "id":"route21","typ":"see","name":"Route 21",
+    "etappen":12,"begegnung":75,
+    "wildePkmn":[
+      {"id":129,"lvMin":20,"lvMax":35,"rate":50},
+      {"id":72, "lvMin":30,"lvMax":35,"rate":25},
+      {"id":120,"lvMin":28,"lvMax":35,"rate":25}
+    ],
+    "trainer":[
+      {"etappe":6,"typ":"Schwimmer","name":"Schwimmer Mike","team":[{"id":72,"lv":33},{"id":72,"lv":33}],"belohnung":1320}
+    ],
+    "verbindungen":[
+      {"zoneId":"cinnabar_island","richtung":"west","label":"← Zinnoberinsel"},
+      {"zoneId":"viridian_city",  "richtung":"nord","label":"Vertania City →"}
+    ]
+  },
+  {
+    "id":"indigo","typ":"dungeon","name":"Top 4 — Indigo Plateau",
+    "etappen":5,"begegnung":0,"wildePkmn":[],
+    "trainer":[
+      {"etappe":1,"typ":"Elite","name":"Elite Agathe",
+       "team":[{"id":51,"lv":51},{"id":90,"lv":51},{"id":55,"lv":54},{"id":94,"lv":58}],"belohnung":5800,"isBoss":true},
+      {"etappe":2,"typ":"Elite","name":"Elite Bruno",
+       "team":[{"id":95,"lv":53},{"id":107,"lv":55},{"id":95,"lv":53},{"id":106,"lv":55},{"id":68,"lv":58}],"belohnung":5800,"isBoss":true},
+      {"etappe":3,"typ":"Elite","name":"Elite Agathe",
+       "team":[{"id":94,"lv":54},{"id":92,"lv":54},{"id":93,"lv":58},{"id":94,"lv":58}],"belohnung":5800,"isBoss":true},
+      {"etappe":4,"typ":"Elite","name":"Elite Siegfried",
+       "team":[{"id":148,"lv":56},{"id":123,"lv":58},{"id":65,"lv":58},{"id":112,"lv":58},{"id":149,"lv":62}],"belohnung":6200,"isBoss":true},
+      {"etappe":5,"typ":"Champion","name":"Champion Gary",
+       "team":[{"id":18,"lv":59},{"id":65,"lv":59},{"id":112,"lv":61},{"id":130,"lv":61},{"id":149,"lv":65}],"belohnung":7500,"isBoss":true}
+    ],
+    "verbindungen":[
+      {"zoneId":"victory_road","richtung":"sued","label":"← Siegerstraße"}
+    ]
+  }
+]

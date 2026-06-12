@@ -1,0 +1,1406 @@
+{
+  "tackle": {
+    "name": "Tackle",
+    "typ": "Normal",
+    "staerke": 35,
+    "genau": 95,
+    "ap": 35,
+    "effekt": null
+  },
+  "kratzer": {
+    "name": "Kratzer",
+    "typ": "Normal",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 35,
+    "effekt": null
+  },
+  "pfund": {
+    "name": "Pfund",
+    "typ": "Normal",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 35,
+    "effekt": null
+  },
+  "piks": {
+    "name": "Schnabel",
+    "typ": "Flug",
+    "staerke": 35,
+    "genau": 100,
+    "ap": 35,
+    "effekt": null
+  },
+  "ruckzuckhieb": {
+    "name": "Ruckzuckhieb",
+    "typ": "Normal",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 30,
+    "effekt": null,
+    "prioritaet": 1
+  },
+  "schnellangriff": {
+    "name": "Ruckzuckhieb",
+    "typ": "Normal",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 30,
+    "effekt": null,
+    "prioritaet": 1
+  },
+  "koerperrammler": {
+    "name": "Bodyslam",
+    "typ": "Normal",
+    "staerke": 85,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "laehme",
+      "ziel": "gegner",
+      "chance": 0.3
+    }
+  },
+  "megahieb": {
+    "name": "Megahieb",
+    "typ": "Normal",
+    "staerke": 80,
+    "genau": 85,
+    "ap": 20,
+    "effekt": null
+  },
+  "hyperstrahl": {
+    "name": "Hyperstrahl",
+    "typ": "Normal",
+    "staerke": 150,
+    "genau": 90,
+    "ap": 5,
+    "effekt": null
+  },
+  "schlitzer": {
+    "name": "Schlitzer",
+    "typ": "Normal",
+    "staerke": 70,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null,
+    "hoheKrit": true
+  },
+  "biss": {
+    "name": "Biss",
+    "typ": "Normal",
+    "staerke": 60,
+    "genau": 100,
+    "ap": 25,
+    "effekt": {
+      "typ": "erschrecken",
+      "chance": 0.3
+    }
+  },
+  "stampfer": {
+    "name": "Stampfer",
+    "typ": "Normal",
+    "staerke": 65,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "erschrecken",
+      "chance": 0.3
+    }
+  },
+  "einwickler": {
+    "name": "Wickel",
+    "typ": "Normal",
+    "staerke": 15,
+    "genau": 85,
+    "ap": 20,
+    "effekt": null
+  },
+  "platscher": {
+    "name": "Platscher",
+    "typ": "Wasser",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 40,
+    "effekt": null
+  },
+  "dauerklaps": {
+    "name": "Duplexhieb",
+    "typ": "Normal",
+    "staerke": 15,
+    "genau": 85,
+    "ap": 10,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      5
+    ]
+  },
+  "raserei": {
+    "name": "Raserei",
+    "typ": "Normal",
+    "staerke": 20,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "schaedelhieb": {
+    "name": "Schaedelwumme",
+    "typ": "Normal",
+    "staerke": 100,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "knochen": {
+    "name": "Knochenkeule",
+    "typ": "Boden",
+    "staerke": 50,
+    "genau": 85,
+    "ap": 20,
+    "effekt": {
+      "typ": "erschrecken",
+      "chance": 0.1
+    }
+  },
+  "klauen": {
+    "name": "Kratzfurie",
+    "typ": "Normal",
+    "staerke": 18,
+    "genau": 80,
+    "ap": 15,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      5
+    ]
+  },
+  "hornattacke": {
+    "name": "Hornattacke",
+    "typ": "Normal",
+    "staerke": 65,
+    "genau": 100,
+    "ap": 25,
+    "effekt": null
+  },
+  "beissattacke": {
+    "name": "Blutsauger",
+    "typ": "Käfer",
+    "staerke": 20,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "sog"
+    }
+  },
+  "blutsauger": {
+    "name": "Blutsauger",
+    "typ": "Käfer",
+    "staerke": 20,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "sog"
+    }
+  },
+  "klinge": {
+    "name": "Kometenhieb",
+    "typ": "Normal",
+    "staerke": 18,
+    "genau": 85,
+    "ap": 15,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      5
+    ]
+  },
+  "egg_bomb": {
+    "name": "Eierbombe",
+    "typ": "Normal",
+    "staerke": 100,
+    "genau": 75,
+    "ap": 10,
+    "effekt": null
+  },
+  "wutangriff": {
+    "name": "Furienschlag",
+    "typ": "Normal",
+    "staerke": 15,
+    "genau": 85,
+    "ap": 20,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      5
+    ]
+  },
+  "knochenboomerang": {
+    "name": "Knochmerang",
+    "typ": "Boden",
+    "staerke": 50,
+    "genau": 90,
+    "ap": 10,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      2
+    ]
+  },
+  "zahltag": {
+    "name": "Zahltag",
+    "typ": "Normal",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "megakick": {
+    "name": "Megakick",
+    "typ": "Normal",
+    "staerke": 120,
+    "genau": 75,
+    "ap": 5,
+    "effekt": null
+  },
+  "irrschlag": {
+    "name": "Irrschlag",
+    "typ": "Normal",
+    "staerke": 70,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "kopfnuss": {
+    "name": "Kopfnuß",
+    "typ": "Normal",
+    "staerke": 70,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "erschrecken",
+      "chance": 0.3
+    }
+  },
+  "hyperzahn": {
+    "name": "Hyperzahn",
+    "typ": "Normal",
+    "staerke": 80,
+    "genau": 90,
+    "ap": 15,
+    "effekt": {
+      "typ": "erschrecken",
+      "chance": 0.1
+    }
+  },
+  "risikotackle": {
+    "name": "Risikotackle",
+    "typ": "Normal",
+    "staerke": 100,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "bodycheck": {
+    "name": "Bodycheck",
+    "typ": "Normal",
+    "staerke": 90,
+    "genau": 85,
+    "ap": 20,
+    "effekt": null
+  },
+  "slam": {
+    "name": "Slam",
+    "typ": "Normal",
+    "staerke": 80,
+    "genau": 75,
+    "ap": 20,
+    "effekt": null
+  },
+  "guillotine": {
+    "name": "Guillotine",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 30,
+    "ap": 5,
+    "effekt": {
+      "typ": "sofort_ks"
+    }
+  },
+  "hornbohrer": {
+    "name": "Hornbohrer",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 30,
+    "ap": 5,
+    "effekt": {
+      "typ": "sofort_ks"
+    }
+  },
+  "sternschauer": {
+    "name": "Sternschauer",
+    "typ": "Normal",
+    "staerke": 60,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "drachenwut": {
+    "name": "Drachenwut",
+    "typ": "Drachen",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "kamikazeangriff": {
+    "name": "Risikotackle",
+    "typ": "Normal",
+    "staerke": 120,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "knurrer": {
+    "name": "Knurrer",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 40,
+    "effekt": {
+      "typ": "ang_minus",
+      "ziel": "gegner"
+    }
+  },
+  "schwanzwedler": {
+    "name": "Rutenschlag",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "vert_minus",
+      "ziel": "gegner"
+    }
+  },
+  "starren": {
+    "name": "Silberblick",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "vert_minus",
+      "ziel": "gegner"
+    }
+  },
+  "sandwirbel": {
+    "name": "Sandwirbel",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "genau_minus",
+      "ziel": "gegner"
+    }
+  },
+  "haertner": {
+    "name": "Härtner",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "vert_plus",
+      "ziel": "selbst"
+    }
+  },
+  "wachstum": {
+    "name": "Wachstum",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 40,
+    "effekt": {
+      "typ": "spang_plus",
+      "ziel": "selbst"
+    }
+  },
+  "minimieren": {
+    "name": "Komprimator",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "ausw_plus",
+      "ziel": "selbst"
+    }
+  },
+  "singen": {
+    "name": "Gesang",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 55,
+    "ap": 15,
+    "effekt": {
+      "typ": "schlaf",
+      "ziel": "gegner"
+    }
+  },
+  "regeneration": {
+    "name": "Regeneration",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "heile_50",
+      "ziel": "selbst"
+    }
+  },
+  "teleport": {
+    "name": "Teleport",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "verwandlung": {
+    "name": "Wandler",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "metronom": {
+    "name": "Metronom",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "schwert": {
+    "name": "Schwerttanz",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "ang_plus2",
+      "ziel": "selbst"
+    }
+  },
+  "swordsdance": {
+    "name": "Schwerttanz",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "ang_plus2",
+      "ziel": "selbst"
+    }
+  },
+  "selbstzerstoerer": {
+    "name": "Finale",
+    "typ": "Normal",
+    "staerke": 130,
+    "genau": 100,
+    "ap": 5,
+    "effekt": {
+      "typ": "selbstzerstoerung",
+      "ziel": "selbst"
+    }
+  },
+  "explosion": {
+    "name": "Explosion",
+    "typ": "Normal",
+    "staerke": 170,
+    "genau": 100,
+    "ap": 5,
+    "effekt": {
+      "typ": "selbstzerstoerung",
+      "ziel": "selbst"
+    }
+  },
+  "rauchwolke": {
+    "name": "Rauchwolke",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "genau_minus",
+      "ziel": "gegner"
+    }
+  },
+  "doppelteam": {
+    "name": "Doppelteam",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "superschall": {
+    "name": "Superschall",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 55,
+    "ap": 20,
+    "effekt": {
+      "typ": "verwirre",
+      "ziel": "gegner"
+    }
+  },
+  "sonicwelle": {
+    "name": "Ultraschall",
+    "typ": "Normal",
+    "staerke": 20,
+    "genau": 90,
+    "ap": 20,
+    "effekt": null
+  },
+  "reflektor": {
+    "name": "Reflektor",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "vert_plus2",
+      "ziel": "selbst"
+    }
+  },
+  "mist": {
+    "name": "Weißnebel",
+    "typ": "Eis",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": null
+  },
+  "glut": {
+    "name": "Glut",
+    "typ": "Feuer",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 25,
+    "effekt": {
+      "typ": "verbrennung",
+      "chance": 0.1
+    }
+  },
+  "flammenwurf": {
+    "name": "Flammenwurf",
+    "typ": "Feuer",
+    "staerke": 95,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "verbrennung",
+      "chance": 0.1
+    }
+  },
+  "feuerblitz": {
+    "name": "Feuersturm",
+    "typ": "Feuer",
+    "staerke": 120,
+    "genau": 85,
+    "ap": 5,
+    "effekt": {
+      "typ": "verbrennung",
+      "chance": 0.3
+    }
+  },
+  "feuerring": {
+    "name": "Feuerwirbel",
+    "typ": "Feuer",
+    "staerke": 15,
+    "genau": 70,
+    "ap": 15,
+    "effekt": null
+  },
+  "feuerschlag": {
+    "name": "Feuerschlag",
+    "typ": "Feuer",
+    "staerke": 75,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "verbrennung",
+      "chance": 0.1
+    }
+  },
+  "blubber": {
+    "name": "Blubber",
+    "typ": "Wasser",
+    "staerke": 20,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "init_minus",
+      "chance": 0.1
+    }
+  },
+  "aquaknarre": {
+    "name": "Aquaknarre",
+    "typ": "Wasser",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 25,
+    "effekt": null
+  },
+  "blubberstrahl": {
+    "name": "Blubberstrahl",
+    "typ": "Wasser",
+    "staerke": 65,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "init_minus",
+      "ziel": "gegner",
+      "chance": 0.1
+    }
+  },
+  "surfer": {
+    "name": "Surfer",
+    "typ": "Wasser",
+    "staerke": 95,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "hydrokanone": {
+    "name": "Hydropumpe",
+    "typ": "Wasser",
+    "staerke": 120,
+    "genau": 80,
+    "ap": 5,
+    "effekt": null
+  },
+  "krabbhammer": {
+    "name": "Krabbhammer",
+    "typ": "Wasser",
+    "staerke": 90,
+    "genau": 85,
+    "ap": 10,
+    "effekt": null,
+    "hoheKrit": true
+  },
+  "kaskade": {
+    "name": "Kaskade",
+    "typ": "Wasser",
+    "staerke": 80,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "erschrecken",
+      "chance": 0.2
+    }
+  },
+  "ausharren": {
+    "name": "Geduld",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "klammern": {
+    "name": "Klammer",
+    "typ": "Wasser",
+    "staerke": 35,
+    "genau": 75,
+    "ap": 10,
+    "effekt": null
+  },
+  "rankenhieb": {
+    "name": "Rankenhieb",
+    "typ": "Pflanze",
+    "staerke": 35,
+    "genau": 100,
+    "ap": 25,
+    "effekt": null
+  },
+  "rasierblatt": {
+    "name": "Rasierblatt",
+    "typ": "Pflanze",
+    "staerke": 55,
+    "genau": 95,
+    "ap": 25,
+    "effekt": null,
+    "hoheKrit": true
+  },
+  "razorblatt": {
+    "name": "Rasierblatt",
+    "typ": "Pflanze",
+    "staerke": 55,
+    "genau": 95,
+    "ap": 25,
+    "effekt": null,
+    "hoheKrit": true
+  },
+  "solarstrahl": {
+    "name": "Solarstrahl",
+    "typ": "Pflanze",
+    "staerke": 120,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "megasauger": {
+    "name": "Megasauger",
+    "typ": "Pflanze",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 10,
+    "effekt": {
+      "typ": "sog",
+      "ziel": "gegner"
+    }
+  },
+  "absorber": {
+    "name": "Absorber",
+    "typ": "Pflanze",
+    "staerke": 20,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "sog"
+    }
+  },
+  "engelsamen": {
+    "name": "Engelsamen",
+    "typ": "Pflanze",
+    "staerke": 0,
+    "genau": 90,
+    "ap": 10,
+    "effekt": {
+      "typ": "sog"
+    }
+  },
+  "schlafpulver": {
+    "name": "Schlafpuder",
+    "typ": "Pflanze",
+    "staerke": 0,
+    "genau": 75,
+    "ap": 15,
+    "effekt": {
+      "typ": "schlaf",
+      "ziel": "gegner"
+    }
+  },
+  "paralysipora": {
+    "name": "Stachelspore",
+    "typ": "Pflanze",
+    "staerke": 0,
+    "genau": 75,
+    "ap": 30,
+    "effekt": {
+      "typ": "laehme",
+      "ziel": "gegner"
+    }
+  },
+  "giftpuder": {
+    "name": "Giftpuder",
+    "typ": "Gift",
+    "staerke": 0,
+    "genau": 75,
+    "ap": 35,
+    "effekt": {
+      "typ": "vergiftung",
+      "ziel": "gegner"
+    }
+  },
+  "donnerschock": {
+    "name": "Donnerschock",
+    "typ": "Elektro",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "laehme",
+      "chance": 0.1
+    }
+  },
+  "donnerblitz": {
+    "name": "Donnerblitz",
+    "typ": "Elektro",
+    "staerke": 95,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "laehme",
+      "ziel": "gegner",
+      "chance": 0.1
+    }
+  },
+  "donner": {
+    "name": "Donner",
+    "typ": "Elektro",
+    "staerke": 120,
+    "genau": 70,
+    "ap": 10,
+    "effekt": {
+      "typ": "laehme",
+      "ziel": "gegner",
+      "chance": 0.1
+    }
+  },
+  "donnerwelle": {
+    "name": "Donnerwelle",
+    "typ": "Elektro",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "laehme",
+      "ziel": "gegner"
+    }
+  },
+  "donnerschlag": {
+    "name": "Donnerschlag",
+    "typ": "Elektro",
+    "staerke": 75,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "laehme",
+      "chance": 0.1
+    }
+  },
+  "agilitaet": {
+    "name": "Agilität",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "init_plus2",
+      "ziel": "selbst"
+    }
+  },
+  "eisstrahl": {
+    "name": "Eisstrahl",
+    "typ": "Eis",
+    "staerke": 95,
+    "genau": 100,
+    "ap": 10,
+    "effekt": {
+      "typ": "einfriere",
+      "ziel": "gegner",
+      "chance": 0.1
+    }
+  },
+  "blizzard": {
+    "name": "Blizzard",
+    "typ": "Eis",
+    "staerke": 120,
+    "genau": 90,
+    "ap": 5,
+    "effekt": {
+      "typ": "einfriere",
+      "ziel": "gegner",
+      "chance": 0.1
+    }
+  },
+  "aurorastrahl": {
+    "name": "Aurorastrahl",
+    "typ": "Eis",
+    "staerke": 65,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "ang_minus",
+      "chance": 0.1
+    }
+  },
+  "eisschlag": {
+    "name": "Eishieb",
+    "typ": "Eis",
+    "staerke": 75,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "einfriere",
+      "chance": 0.1
+    }
+  },
+  "konfusion": {
+    "name": "Konfusion",
+    "typ": "Psycho",
+    "staerke": 50,
+    "genau": 100,
+    "ap": 25,
+    "effekt": {
+      "typ": "verwirre",
+      "chance": 0.1
+    }
+  },
+  "psych": {
+    "name": "Psychokinese",
+    "typ": "Psycho",
+    "staerke": 90,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "psystrahl": {
+    "name": "Psystrahl",
+    "typ": "Psycho",
+    "staerke": 65,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "verwirre",
+      "chance": 0.1
+    }
+  },
+  "psywelle": {
+    "name": "Psywelle",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 80,
+    "ap": 15,
+    "effekt": null
+  },
+  "hypnose": {
+    "name": "Hypnose",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 60,
+    "ap": 20,
+    "effekt": {
+      "typ": "schlaf",
+      "ziel": "gegner"
+    }
+  },
+  "traumfresser": {
+    "name": "Traumfresser",
+    "typ": "Psycho",
+    "staerke": 100,
+    "genau": 100,
+    "ap": 15,
+    "effekt": {
+      "typ": "sog",
+      "ziel": "gegner"
+    }
+  },
+  "konfustrahl": {
+    "name": "Konfustrahl",
+    "typ": "Geist",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": {
+      "typ": "verwirre",
+      "ziel": "gegner"
+    }
+  },
+  "amnesie": {
+    "name": "Amnesie",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "spang_plus2",
+      "ziel": "selbst"
+    }
+  },
+  "barriere": {
+    "name": "Barriere",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "vert_plus2",
+      "ziel": "selbst"
+    }
+  },
+  "erholung": {
+    "name": "Erholung",
+    "typ": "Psycho",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": {
+      "typ": "heile_voll",
+      "ziel": "selbst"
+    }
+  },
+  "giftstachel": {
+    "name": "Giftstachel",
+    "typ": "Gift",
+    "staerke": 15,
+    "genau": 100,
+    "ap": 35,
+    "effekt": {
+      "typ": "vergiftung",
+      "chance": 0.3
+    }
+  },
+  "saeureschwall": {
+    "name": "Säure",
+    "typ": "Gift",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "spvert_minus",
+      "chance": 0.1
+    }
+  },
+  "giftgas": {
+    "name": "Giftwolke",
+    "typ": "Gift",
+    "staerke": 0,
+    "genau": 85,
+    "ap": 40,
+    "effekt": {
+      "typ": "vergiftung",
+      "ziel": "gegner"
+    }
+  },
+  "toxin": {
+    "name": "Toxin",
+    "typ": "Gift",
+    "staerke": 0,
+    "genau": 90,
+    "ap": 10,
+    "effekt": {
+      "typ": "vergiftung",
+      "ziel": "gegner"
+    }
+  },
+  "smog": {
+    "name": "Smog",
+    "typ": "Gift",
+    "staerke": 20,
+    "genau": 70,
+    "ap": 20,
+    "effekt": {
+      "typ": "vergiftung",
+      "chance": 0.4
+    }
+  },
+  "doppelnadler": {
+    "name": "Duonadel",
+    "typ": "Käfer",
+    "staerke": 25,
+    "genau": 100,
+    "ap": 20,
+    "effekt": {
+      "typ": "vergiftung",
+      "chance": 0.2
+    },
+    "mehrfach": [
+      2,
+      2
+    ]
+  },
+  "nadelrakete": {
+    "name": "Nadelrakete",
+    "typ": "Käfer",
+    "staerke": 14,
+    "genau": 85,
+    "ap": 20,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      5
+    ]
+  },
+  "fadenschuss": {
+    "name": "Fadenschuß",
+    "typ": "Käfer",
+    "staerke": 0,
+    "genau": 95,
+    "ap": 40,
+    "effekt": {
+      "typ": "init_minus",
+      "ziel": "gegner"
+    }
+  },
+  "faedenschuss": {
+    "name": "Fadenschuß",
+    "typ": "Käfer",
+    "staerke": 0,
+    "genau": 95,
+    "ap": 40,
+    "effekt": {
+      "typ": "init_minus",
+      "ziel": "gegner"
+    }
+  },
+  "erdbeben": {
+    "name": "Erdbeben",
+    "typ": "Boden",
+    "staerke": 100,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "erdwurf": {
+    "name": "Geowurf",
+    "typ": "Kampf",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "felswurf": {
+    "name": "Steinwurf",
+    "typ": "Gestein",
+    "staerke": 50,
+    "genau": 65,
+    "ap": 15,
+    "effekt": null
+  },
+  "steinschlag": {
+    "name": "Steinhagel",
+    "typ": "Gestein",
+    "staerke": 75,
+    "genau": 90,
+    "ap": 10,
+    "effekt": null
+  },
+  "geofissur": {
+    "name": "Geofissur",
+    "typ": "Boden",
+    "staerke": 0,
+    "genau": 30,
+    "ap": 5,
+    "effekt": {
+      "typ": "sofort_ks"
+    }
+  },
+  "karateschlag": {
+    "name": "Karateschlag",
+    "typ": "Normal",
+    "staerke": 50,
+    "genau": 100,
+    "ap": 25,
+    "effekt": null,
+    "hoheKrit": true
+  },
+  "doppelkick": {
+    "name": "Doppelkick",
+    "typ": "Kampf",
+    "staerke": 30,
+    "genau": 100,
+    "ap": 30,
+    "effekt": null,
+    "mehrfach": [
+      2,
+      2
+    ]
+  },
+  "fokustreffer": {
+    "name": "Energiefokus",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "krit_plus",
+      "ziel": "selbst"
+    }
+  },
+  "konter": {
+    "name": "Konter",
+    "typ": "Kampf",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "sprungkick": {
+    "name": "Sprungkick",
+    "typ": "Kampf",
+    "staerke": 70,
+    "genau": 95,
+    "ap": 25,
+    "effekt": null
+  },
+  "windstoss": {
+    "name": "Windstoß",
+    "typ": "Normal",
+    "staerke": 40,
+    "genau": 100,
+    "ap": 35,
+    "effekt": null
+  },
+  "fluegelschlag": {
+    "name": "Flügelschlag",
+    "typ": "Flug",
+    "staerke": 35,
+    "genau": 100,
+    "ap": 35,
+    "effekt": null
+  },
+  "bohrschnabel": {
+    "name": "Bohrschnabel",
+    "typ": "Flug",
+    "staerke": 80,
+    "genau": 100,
+    "ap": 20,
+    "effekt": null
+  },
+  "fluegel": {
+    "name": "Fliegen",
+    "typ": "Flug",
+    "staerke": 70,
+    "genau": 95,
+    "ap": 15,
+    "effekt": null
+  },
+  "zungenangriff": {
+    "name": "Schlecker",
+    "typ": "Geist",
+    "staerke": 20,
+    "genau": 100,
+    "ap": 30,
+    "effekt": {
+      "typ": "laehme",
+      "chance": 0.3
+    }
+  },
+  "nachtschatten": {
+    "name": "Nachtnebel",
+    "typ": "Geist",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "struggle": {
+    "name": "Kräftemessen",
+    "typ": "Normal",
+    "staerke": 50,
+    "genau": 100,
+    "ap": 999,
+    "effekt": null
+  },
+  "staerke": {
+    "name": "Staerke",
+    "typ": "Normal",
+    "staerke": 80,
+    "genau": 100,
+    "ap": 15,
+    "effekt": null
+  },
+  "klingensturm": {
+    "name": "Klingensturm",
+    "typ": "Normal",
+    "staerke": 80,
+    "genau": 75,
+    "ap": 10,
+    "effekt": null
+  },
+  "wirbelwind": {
+    "name": "Wirbelwind",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 85,
+    "ap": 20,
+    "effekt": null
+  },
+  "ueberroller": {
+    "name": "Ueberroller",
+    "typ": "Kampf",
+    "staerke": 80,
+    "genau": 80,
+    "ap": 25,
+    "effekt": null
+  },
+  "schaufler": {
+    "name": "Schaufler",
+    "typ": "Boden",
+    "staerke": 100,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "mimikry": {
+    "name": "Mimikry",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "feuersturm": {
+    "name": "Feuersturm",
+    "typ": "Feuer",
+    "staerke": 120,
+    "genau": 85,
+    "ap": 5,
+    "effekt": {
+      "typ": "verbrennung",
+      "ziel": "gegner",
+      "chance": 0.3
+    }
+  },
+  "weichei": {
+    "name": "Weichei",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": {
+      "typ": "heile_50",
+      "ziel": "selbst"
+    }
+  },
+  "himmelsfeger": {
+    "name": "Himmelsfeger",
+    "typ": "Flug",
+    "staerke": 140,
+    "genau": 90,
+    "ap": 5,
+    "effekt": null
+  },
+  "triplette": {
+    "name": "Triplette",
+    "typ": "Normal",
+    "staerke": 80,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "delegator": {
+    "name": "Delegator",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 100,
+    "ap": 10,
+    "effekt": null
+  },
+  "zerschneider": {
+    "name": "Zerschneider",
+    "typ": "Normal",
+    "staerke": 50,
+    "genau": 95,
+    "ap": 30,
+    "effekt": null
+  },
+  "blitz": {
+    "name": "Blitz",
+    "typ": "Normal",
+    "staerke": 0,
+    "genau": 70,
+    "ap": 20,
+    "effekt": {
+      "typ": "genau_minus",
+      "ziel": "gegner"
+    }
+  }
+}
