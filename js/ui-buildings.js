@@ -7,7 +7,7 @@ function zeigGebaeude(gebaeude, zone) {
     `<div class="gebaeude-header"><button onclick="${backAction}">← Zurück</button><h3>${gebaeude.name||"?"}</h3></div>`;
 
   (gebaeude.features || []).forEach(feat => {
-    var getan = flagGesetzt(feat.flagId);
+    var getan = !!feat.flagId && flagGesetzt(feat.flagId);
     var gesperrt = feat.bedingung && !checkBedingung(feat.bedingung, STATE);
     html += `<div class="feat-section">`;
     html += `<div class="feat-titel">${feat.label}</div>`;
@@ -28,7 +28,7 @@ function zeigGebaeude(gebaeude, zone) {
   window._claimFeat = function(gebId, featId, zoneId) {
     var bld = BUILDINGS[gebId] ? { _id: gebId, ...BUILDINGS[gebId] } : null; if (!bld) return;
     var feat = (bld.features||[]).find(f => f.id === featId); if (!feat) return;
-    if (flagGesetzt(feat.flagId)) return;
+    if (feat.flagId && flagGesetzt(feat.flagId)) return;
     if (feat.bedingung && !checkBedingung(feat.bedingung, STATE)) { zeigToast(feat.gesperrtText||"Gesperrt"); return; }
 
     switch (feat.typ) {
@@ -45,7 +45,10 @@ function zeigGebaeude(gebaeude, zone) {
         triggereRivalKampf(getZone(zoneId), feat);
         break;
       case "lore":
-        zeigDialog(feat.text||"...", () => { setzeFlag(feat.flagId); speichern(); zeigGebaeude(bld, getZone(zoneId)); });
+        zeigDialog(feat.text||"...", () => {
+          if (feat.flagId) { setzeFlag(feat.flagId); speichern(); }
+          zeigGebaeude(bld, getZone(zoneId));
+        });
         break;
       case "item_geschenk":
         STATE.items[feat.item] = (STATE.items[feat.item]||0)+1;

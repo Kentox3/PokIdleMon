@@ -6,6 +6,17 @@ function rendereWeltTab() {
   var icon = {route:"🌿",dungeon:"🕳️",see:"🌊",gym:"⚔️"}[zone.typ] || "📍";
   var html = '<div class="zone-info-panel"><div class="zone-info-header">' + icon + ' <b>' + zone.name + '</b></div>';
 
+  if (typeof istLineareReiseZone === "function" && istLineareReiseZone(zone)) {
+    var links = zone.verbindungen[0], rechts = zone.verbindungen[1];
+    var zielId = STATE.routeZiel || (STATE.richtung === "rueckwaerts" ? links.zoneId : rechts.zoneId);
+    var linksAktiv = zielId === links.zoneId;
+    var rechtsAktiv = zielId === rechts.zoneId;
+    html += '<div class="route-dir-bar">' +
+      '<button type="button" class="route-dir-btn ' + (linksAktiv ? "active" : "") + '" data-route-target="' + links.zoneId + '" title="Richtung wechseln">← <span>' + (links.label || links.zoneId) + '</span></button>' +
+      '<button type="button" class="route-dir-btn ' + (rechtsAktiv ? "active" : "") + '" data-route-target="' + rechts.zoneId + '" title="Richtung wechseln"><span>' + (rechts.label || rechts.zoneId) + '</span> →</button>' +
+      '</div>';
+  }
+
   if (zone.wildePkmn && zone.wildePkmn.length > 0) {
     var total = zone.wildePkmn.reduce((s,e) => s + e.rate, 0);
     html += '<div class="encounter-section"><div class="encounter-title">🎲 Wilde Pokémon (' + zone.begegnung + '% Chance)</div>';
@@ -71,6 +82,13 @@ function rendereWeltTab() {
 
   html += '</div>';
   container.innerHTML = html;
+  container.querySelectorAll(".route-dir-btn[data-route-target]").forEach(function(btn) {
+    btn.addEventListener("click", function(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      routeRichtungWaehlen(btn.dataset.routeTarget);
+    });
+  });
 }
 
 function rendereStadtHub(zone) {
@@ -160,9 +178,11 @@ function rendereStadtHub(zone) {
 }
 
 function heilenUndRendere(zone) {
+  if (STATE && zone && zone.id) STATE.respawnZone = zone.id;
   vollHeilen();
   rendereSpielerSprites();
   aktualisiereHUD();
+  speichern();
   zeigToast("💚 Team vollständig geheilt!");
   rendereStadtHub(zone);
 }

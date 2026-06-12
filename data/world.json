@@ -78,7 +78,7 @@
     "id": "route1",
     "typ": "route",
     "name": "Route 1",
-    "etappen": 10,
+    "etappen": 5,
     "begegnung": 70,
     "wildePkmn": [
       {
@@ -542,7 +542,7 @@
     "id": "route23",
     "typ": "route",
     "name": "Route 23 — Siegerstraße",
-    "etappen": 12,
+    "etappen": 5,
     "begegnung": 75,
     "wildePkmn": [
       {
@@ -798,7 +798,7 @@
     ],
     "trainer": [
       {
-        "etappe": 2,
+        "etappe": 1,
         "typ": "K?fersammler",
         "name": "K?fersammler",
         "team": [
@@ -814,7 +814,7 @@
         "belohnung": 60
       },
       {
-        "etappe": 3,
+        "etappe": 2,
         "typ": "K?fersammler",
         "name": "K?fersammler",
         "team": [
@@ -834,7 +834,7 @@
         "belohnung": 70
       },
       {
-        "etappe": 4,
+        "etappe": 3,
         "typ": "K?fersammler",
         "name": "K?fersammler",
         "team": [
@@ -853,158 +853,53 @@
         "label": "← Route 2"
       },
       {
-        "zoneId": "route3_west",
+        "zoneId": "route2_north",
         "richtung": "nord",
-        "label": "Route 3 →"
+        "label": "Route 2 Nord ?"
       }
     ],
     "background": "VertaniaWald.png"
   },
   {
-    "id": "route3_west",
+    "id": "route2_north",
     "typ": "route",
-    "name": "Route 3 West",
-    "etappen": 12,
-    "begegnung": 75,
+    "name": "Route 2 Nord",
+    "etappen": 5,
+    "begegnung": 65,
     "wildePkmn": [
       {
         "id": 16,
-        "lvMin": 6,
-        "lvMax": 10,
-        "rate": 30
+        "lvMin": 3,
+        "lvMax": 7,
+        "rate": 40
       },
       {
-        "id": 39,
-        "lvMin": 7,
-        "lvMax": 10,
+        "id": 19,
+        "lvMin": 4,
+        "lvMax": 7,
+        "rate": 35
+      },
+      {
+        "id": 21,
+        "lvMin": 4,
+        "lvMax": 7,
         "rate": 25
-      },
-      {
-        "id": 20,
-        "lvMin": 8,
-        "lvMax": 11,
-        "rate": 20
-      },
-      {
-        "id": 41,
-        "lvMin": 6,
-        "lvMax": 10,
-        "rate": 15
-      },
-      {
-        "id": 35,
-        "lvMin": 7,
-        "lvMax": 11,
-        "rate": 10
       }
     ],
-    "trainer": [
-      {
-        "etappe": 2,
-        "typ": "G?re",
-        "name": "G?re",
-        "team": [
-          {
-            "id": 16,
-            "lv": 9
-          },
-          {
-            "id": 16,
-            "lv": 9
-          }
-        ],
-        "belohnung": 135
-      },
-      {
-        "etappe": 3,
-        "typ": "K?fersammler",
-        "name": "K?fersammler",
-        "team": [
-          {
-            "id": 10,
-            "lv": 10
-          },
-          {
-            "id": 13,
-            "lv": 10
-          },
-          {
-            "id": 10,
-            "lv": 10
-          }
-        ],
-        "belohnung": 100
-      },
-      {
-        "etappe": 4,
-        "typ": "Teenager",
-        "name": "Teenager",
-        "team": [
-          {
-            "id": 19,
-            "lv": 11
-          },
-          {
-            "id": 23,
-            "lv": 11
-          }
-        ],
-        "belohnung": 165
-      },
-      {
-        "etappe": 5,
-        "typ": "K?fersammler",
-        "name": "K?fersammler",
-        "team": [
-          {
-            "id": 13,
-            "lv": 9
-          },
-          {
-            "id": 14,
-            "lv": 9
-          },
-          {
-            "id": 10,
-            "lv": 9
-          },
-          {
-            "id": 11,
-            "lv": 9
-          }
-        ],
-        "belohnung": 90
-      },
-      {
-        "etappe": 6,
-        "typ": "G?re",
-        "name": "G?re",
-        "team": [
-          {
-            "id": 19,
-            "lv": 10
-          },
-          {
-            "id": 32,
-            "lv": 10
-          }
-        ],
-        "belohnung": 150
-      }
-    ],
+    "trainer": [],
     "verbindungen": [
       {
         "zoneId": "viridian_forest",
         "richtung": "sued",
-        "label": "← Vertania-Wald"
+        "label": "? Vertania-Wald"
       },
       {
         "zoneId": "pewter_city",
         "richtung": "nord",
-        "label": "Marmoria City →"
+        "label": "Marmoria City ?"
       }
     ],
-    "background": "Route3.png"
+    "background": "Route2.png"
   },
   {
     "id": "pewter_city",
@@ -1019,14 +914,14 @@
     ],
     "verbindungen": [
       {
-        "zoneId": "route3_west",
+        "zoneId": "route2_north",
         "richtung": "sued",
-        "label": "← Route 3 West / Wald"
+        "label": "? Route 2 / Wald"
       },
       {
         "zoneId": "route3_east",
         "richtung": "ost",
-        "label": "Route 3 Ost →",
+        "label": "Route 3 →",
         "bedingung": {
           "minBadges": 1
         },
@@ -1038,8 +933,8 @@
   {
     "id": "route3_east",
     "typ": "route",
-    "name": "Route 3 Ost",
-    "etappen": 10,
+    "name": "Route 3",
+    "etappen": 8,
     "begegnung": 70,
     "wildePkmn": [
       {
@@ -1069,7 +964,99 @@
     ],
     "trainer": [
       {
+        "etappe": 1,
+        "typ": "G?re",
+        "name": "G?re",
+        "team": [
+          {
+            "id": 16,
+            "lv": 9
+          },
+          {
+            "id": 16,
+            "lv": 9
+          }
+        ],
+        "belohnung": 135
+      },
+      {
         "etappe": 2,
+        "typ": "K?fersammler",
+        "name": "K?fersammler",
+        "team": [
+          {
+            "id": 10,
+            "lv": 10
+          },
+          {
+            "id": 13,
+            "lv": 10
+          },
+          {
+            "id": 10,
+            "lv": 10
+          }
+        ],
+        "belohnung": 100
+      },
+      {
+        "etappe": 3,
+        "typ": "Teenager",
+        "name": "Teenager",
+        "team": [
+          {
+            "id": 19,
+            "lv": 11
+          },
+          {
+            "id": 23,
+            "lv": 11
+          }
+        ],
+        "belohnung": 165
+      },
+      {
+        "etappe": 4,
+        "typ": "K?fersammler",
+        "name": "K?fersammler",
+        "team": [
+          {
+            "id": 13,
+            "lv": 9
+          },
+          {
+            "id": 14,
+            "lv": 9
+          },
+          {
+            "id": 10,
+            "lv": 9
+          },
+          {
+            "id": 11,
+            "lv": 9
+          }
+        ],
+        "belohnung": 90
+      },
+      {
+        "etappe": 5,
+        "typ": "G?re",
+        "name": "G?re",
+        "team": [
+          {
+            "id": 19,
+            "lv": 10
+          },
+          {
+            "id": 32,
+            "lv": 10
+          }
+        ],
+        "belohnung": 150
+      },
+      {
+        "etappe": 6,
         "typ": "Teenager",
         "name": "Teenager",
         "team": [
@@ -1081,7 +1068,7 @@
         "belohnung": 210
       },
       {
-        "etappe": 3,
+        "etappe": 7,
         "typ": "K?fersammler",
         "name": "K?fersammler",
         "team": [
@@ -1097,7 +1084,7 @@
         "belohnung": 110
       },
       {
-        "etappe": 4,
+        "etappe": 8,
         "typ": "G?re",
         "name": "G?re",
         "team": [
@@ -1113,12 +1100,12 @@
       {
         "zoneId": "pewter_city",
         "richtung": "west",
-        "label": "← Marmoria City"
+        "label": "? Marmoria City"
       },
       {
         "zoneId": "mt_moon",
         "richtung": "ost",
-        "label": "Rotes Gebirge →"
+        "label": "Mondberg ?"
       }
     ],
     "background": "Route3.png"
@@ -1385,7 +1372,7 @@
       {
         "zoneId": "route3_east",
         "richtung": "west",
-        "label": "← Route 3 Ost"
+        "label": "← Route 3"
       },
       {
         "zoneId": "route4",
@@ -4357,7 +4344,7 @@
         "name": "Jungtrainer",
         "team": [
           {
-            "id": 74,
+            "id": 50,
             "lv": 11
           },
           {

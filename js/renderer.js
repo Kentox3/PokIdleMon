@@ -379,7 +379,8 @@ function rendereStufenInfo() {
   if (zEl) zEl.textContent = zone.name;
   if (sEl && zone.etappen) {
     var icon = {route:"🌿",dungeon:"🕳️",see:"🌊",wachposten:"🚧",stadt:"🏙️",gym:"⚔️"}[zone.typ] || "📍";
-    sEl.textContent = icon + " Etappe " + STATE.etappe + " / " + zone.etappen;
+    var richtung = STATE.richtung === "rueckwaerts" ? " ←" : STATE.richtung === "vorwaerts" ? " →" : "";
+    sEl.textContent = icon + richtung + " Etappe " + STATE.etappe + " / " + zone.etappen;
   } else if (sEl) {
     sEl.textContent = "";
   }

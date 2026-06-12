@@ -160,5 +160,3 @@ function rollPkmnAusTabelle(tabelle) {
   }
   return null;
 }
-
-loadAllData();

@@ -10,6 +10,7 @@ var _wartetAufInput = false;
 var _inStadt        = false;
 var _animLaeuft     = false;
 var _autoKampf      = true;
+var _offlineModalCallback = null;
 
 // ── Spiel starten ─────────────────────────────────────────────
 document.addEventListener("dataReady", function() { auth_init(); });
@@ -26,6 +27,57 @@ document.addEventListener("gameReady", function(e) {
   }).catch(function() { zeigStarterWahl(); });
 });
 
+if (typeof loadAllData === "function") loadAllData();
+
+function istLineareReiseZone(zone) {
+  return !!(zone && zone.etappen && ["route", "dungeon", "see"].includes(zone.typ) && (zone.verbindungen || []).length === 2);
+}
+
+function routenZielVerbindung(zone) {
+  if (!istLineareReiseZone(zone)) return null;
+  return (zone.verbindungen || [])[STATE.richtung === "rueckwaerts" ? 0 : 1] || null;
+}
+
+function bereiteLineareRouteVor(zone, vonZoneId) {
+  if (!istLineareReiseZone(zone)) {
+    STATE.richtung = null;
+    STATE.routeZiel = null;
+    STATE.etappe = 1;
+    return;
+  }
+  var verbindungen = zone.verbindungen || [];
+  if (vonZoneId === verbindungen[1].zoneId) {
+    STATE.richtung = "rueckwaerts";
+    STATE.routeZiel = verbindungen[0].zoneId;
+    STATE.etappe = zone.etappen;
+  } else {
+    STATE.richtung = "vorwaerts";
+    STATE.routeZiel = verbindungen[1].zoneId;
+    STATE.etappe = 1;
+  }
+}
+
+window.routeRichtungWaehlen = function(zielZoneId) {
+  if (!STATE) return;
+  var zone = getZone(STATE.zone);
+  if (!istLineareReiseZone(zone)) return;
+  var verbindungen = zone.verbindungen || [];
+  if (zielZoneId === verbindungen[0].zoneId) {
+    if (STATE.etappe <= 1) { navigiereZu(verbindungen[0].zoneId); return; }
+    STATE.richtung = "rueckwaerts";
+    STATE.routeZiel = verbindungen[0].zoneId;
+  } else if (zielZoneId === verbindungen[1].zoneId) {
+    if (STATE.etappe >= zone.etappen) { navigiereZu(verbindungen[1].zoneId); return; }
+    STATE.richtung = "vorwaerts";
+    STATE.routeZiel = verbindungen[1].zoneId;
+  } else {
+    return;
+  }
+  rendereStufenInfo();
+  if (typeof rendereWeltTab === "function") rendereWeltTab();
+  speichern();
+};
+
 function onStarterGewaehlt(trainerName, starterDexId) {
   var uid = localStorage.getItem("pokidlemon_uid") || ("u" + Date.now());
   neuesSpiel(uid, trainerName, starterDexId);
@@ -37,16 +89,28 @@ function onStarterGewaehlt(trainerName, starterDexId) {
 function spielStarten(wegSekunden) {
   zeigScreen("gameScreen");
   aktualisiereHUD();
+  if (STATE.zone === "route3_west") STATE.zone = "route2_north";
+  if (STATE.prevZone === "route3_west") STATE.prevZone = "route2_north";
   markiereBesucht(STATE.zone);
   var zone = getZone(STATE.zone);
   if (!zone) { STATE.zone = "alabastia"; STATE.etappe = 1; zone = getZone("alabastia"); }
   if (!zone) { console.error("[app] Alabastia nicht in WORLD – world.json geladen?"); return; }
+  if (istLineareReiseZone(zone) && !STATE.richtung) bereiteLineareRouteVor(zone, STATE.prevZone);
   rendereZoneBg(zone);
   rendereSpielerSprites();
   rendereStufenInfo();
-  if (wegSekunden > 60) zeigOfflineBonus(wegSekunden);
-  if (zone.typ === "stadt" || zone.typ === "wachposten") stadtBetreten(zone);
-  else stufenLoopStarten();
+  var starteAktuelleZone = function() {
+    if (zone.typ === "stadt" || zone.typ === "wachposten") stadtBetreten(zone);
+    else stufenLoopStarten();
+  };
+  if (wegSekunden > 60) {
+    clearInterval(STAGE_INTERVALL);
+    clearInterval(KAMPF_INTERVALL);
+    _wartetAufInput = true;
+    zeigOfflineBonus(wegSekunden, starteAktuelleZone);
+  } else {
+    starteAktuelleZone();
+  }
   _updateAutoKampfBtn();
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
 }
@@ -65,6 +129,7 @@ function navigiereZu(zoneId) {
   STATE.prevZone = vorigeZone;
   markiereBesucht(zoneId);
   var zone = getZone(zoneId);
+  if (zone) bereiteLineareRouteVor(zone, vorigeZone);
   if (zone && zone.manualBattle) { _autoKampf = false; _updateAutoKampfBtn(); }
   if (zone) rendereZoneBg(zone);
   rendereSpielerSprites();
@@ -85,6 +150,7 @@ function stadtBetreten(zone) {
   clearInterval(KAMPF_INTERVALL);
   if (typeof setzeAngelSzene === "function") setzeAngelSzene(false);
   _wartetAufInput = true; _inStadt = true; _animLaeuft = false;
+  if (zone && zone.typ === "stadt") STATE.respawnZone = zone.id;
   STATE.gebaeude = null;
   versteckeKampfUI();
   rendereGegnerSprite(null, false);
@@ -97,6 +163,7 @@ function stadtBetreten(zone) {
   wechsleTab("Welt");
   rendereStadtHub(zone);
   if (typeof aktualisiereAngelTabStatus === "function") aktualisiereAngelTabStatus();
+  speichern();
   STAGE_INTERVALL = setInterval(verarbeiteEtappe, STAGE_TICK_MS);
 }
 
@@ -227,11 +294,21 @@ function clearLegendaryRespawn(flagId) {
 }
 
 function naechsteEtappe(zone) {
-  STATE.etappe++;
+  var rueckwaerts = istLineareReiseZone(zone) && STATE.richtung === "rueckwaerts";
+  STATE.etappe += rueckwaerts ? -1 : 1;
   rendereStufenInfo();
-  if (STATE.etappe > zone.etappen) {
-    STATE.etappe = 1;
+  if (rueckwaerts ? STATE.etappe < 1 : STATE.etappe > zone.etappen) {
     if (zone.typ === "gym" && zone.returnTo) { navigiereZu(zone.returnTo); return; }
+    if (istLineareReiseZone(zone)) {
+      var zielLinear = routenZielVerbindung(zone);
+      if (zielLinear && zielLinear.bedingung && !checkBedingung(zielLinear.bedingung, STATE)) {
+        STATE.etappe = rueckwaerts ? 1 : zone.etappen;
+        zeigToast((zielLinear.gesperrtText || "Gesperrt!").replace("{badges}", STATE.orden || 0), 4000);
+        return;
+      }
+      if (zielLinear) { navigiereZu(zielLinear.zoneId); return; }
+    }
+    STATE.etappe = 1;
     var verbindungen = zone.verbindungen || [];
     var autoNextId   = zone.autoNext && zone.autoNext[STATE.prevZone || ""];
     var ziel = autoNextId ? verbindungen.find(v => v.zoneId === autoNextId) : null;
@@ -489,22 +566,32 @@ window.onAttackeKlick = function(moveId) {
 };
 
 window.onBallKlick = function(ballTyp) {
-  if (!KAMPF || KAMPF.vorbei || _animLaeuft || !KAMPF.kannFangen) return;
+  if (!KAMPF || KAMPF.vorbei || KAMPF.fangLaeuft || _animLaeuft || !KAMPF.kannFangen) return;
   if (!(STATE.items[ballTyp] > 0)) { zeigToast("Keine " + ((ITEM_DEFS[ballTyp]||{}).name||ballTyp) + " mehr!"); return; }
   clearInterval(KAMPF_INTERVALL);
+  KAMPF.fangLaeuft = true;
   _animLaeuft = true;
+  rendereWurfBaelle(false);
   STATE.items[ballTyp]--;
   werfeBallAnimation(ballTyp, function() {
+    if (!KAMPF || KAMPF.vorbei) return;
     if (versucheFangen(KAMPF.gegner, ballTyp)) {
+      KAMPF.vorbei = true;
+      KAMPF.kannFangen = false;
+      KAMPF.fangLaeuft = false;
       var neuPkmn = KAMPF.gegner;
       var pd = getPkmn(neuPkmn.dexId);
       STATE.gefangen[neuPkmn.dexId] = true; STATE.gesehen[neuPkmn.dexId] = true;
       fuegeKampfLogHinzu("🎉 " + (pd ? pd.name : "?") + (neuPkmn.shiny ? " ✨" : "") + " gefangen!");
-      if (!inParty(neuPkmn)) inBox(neuPkmn);
-      zeigToast((pd ? pd.name : "?") + " gefangen!", 3000);
+      var ziel = inParty(neuPkmn) ? "Team" : (inBox(neuPkmn) ? "Box" : "");
+      if (typeof rendereTeamScreen === "function") rendereTeamScreen();
+      if (typeof rendereSpielerSprites === "function") rendereSpielerSprites();
+      zeigToast((pd ? pd.name : "?") + " gefangen!" + (ziel ? " → " + ziel : ""), 3000);
       _animLaeuft = false;
+      rendereWurfBaelle(false);
       kampfBeenden({ ergebnis: "gefangen" });
     } else {
+      KAMPF.fangLaeuft = false;
       fuegeKampfLogHinzu("Oh! " + ((getPkmn(KAMPF.gegner.dexId)||{}).name||"?") + " hat sich befreit!");
       var gMoveId = waehleKIAttacke(KAMPF.gegner, aktivePkmn());
       fuehreAngriffAnimation((MOVES[gMoveId]||{typ:"Normal"}).typ, false, function() {
@@ -590,9 +677,8 @@ function kampfBeenden(ende) {
       setTimeout(function() {
         versteckeKampfUI(); rendereGegnerSprite(null, false);
         vollHeilen(); STATE.etappe = 1;
-        var zone = getZone(STATE.zone);
-        var rueck = zone && zone.verbindungen && zone.verbindungen.find(v => v.richtung === "sued" || v.richtung === "west");
-        navigiereZu(rueck ? rueck.zoneId : "alabastia");
+  var ziel = (STATE.respawnZone && getZone(STATE.respawnZone)) ? STATE.respawnZone : "alabastia";
+  navigiereZu(ziel);
       }, 3000);
       break;
     case "gefangen":
@@ -672,14 +758,21 @@ function getEffektivenTick() {
   return itemAktiv("fahrrad") ? Math.floor(STAGE_TICK_MS / 2) : STAGE_TICK_MS;
 }
 
-function zeigOfflineBonus(sekunden) {
+function zeigOfflineBonus(sekunden, onClose) {
   var modal = document.getElementById("offlineModal");
   var msg   = document.getElementById("offlineMsg");
   if (!modal || !msg) return;
+  _offlineModalCallback = typeof onClose === "function" ? onClose : null;
   var h = Math.floor(sekunden / 3600), m = Math.floor((sekunden % 3600) / 60);
   msg.textContent = "Du warst " + (h > 0 ? h + "h " : "") + m + "m weg!";
   modal.style.display = "flex";
 }
 window.schliesseOfflineModal = function() {
   var m = document.getElementById("offlineModal"); if (m) m.style.display = "none";
+  var cb = _offlineModalCallback;
+  _offlineModalCallback = null;
+  if (cb) {
+    _wartetAufInput = false;
+    cb();
+  }
 };

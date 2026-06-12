@@ -17,7 +17,7 @@ function kampfStarten(modus, gegnerData) {
       kannFliehen: true,
       istTrainer: false,
       trainerDaten: null,
-      legendary: wildData.legendary || null,
+      legendary: gegnerData.legendary || null,
       xpGewonnen: 0,
       vorbei:    false,
     };

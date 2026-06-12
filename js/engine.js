@@ -60,6 +60,18 @@ function xpBisNaechstesLevel(pkmnInst) {
   return Math.max(1, next - cur);
 }
 
+function getEvolutionDaten(pd) {
+  return pd ? (pd.evo || pd.evolution || null) : null;
+}
+
+function pruefeLevelEvolution(pkmnInst) {
+  if (!pkmnInst) return null;
+  var pd = getPkmn(pkmnInst.dexId);
+  var evo = getEvolutionDaten(pd);
+  if (evo && evo.typ === "level" && pkmnInst.level >= evo.abLevel) return evo.zuId;
+  return null;
+}
+
 function createPkmnInst(dexId, level) {
   var pd = getPkmn(dexId);
   if (!pd) return null;
@@ -128,6 +140,7 @@ function reparierePkmnInst(p) {
   if (p.statusRunden === undefined) p.statusRunden = 0;
   if (p.shiny === undefined) p.shiny = false;
   if (p.geschlecht === undefined) p.geschlecht = genGeschlecht(p.dexId);
+  if (!p.entwickeltSich) p.entwickeltSich = pruefeLevelEvolution(p);
   if (!p._iid) p._iid = "p_repair_" + p.dexId + "_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
   return p;
 }
@@ -188,8 +201,9 @@ function vergebeXP(pkmnInst, xp, gegnerDexId) {
 
     meldungen.push((pkmnInst.nick || pd.name) + " ist jetzt Level " + pkmnInst.level + "!");
 
-    if (pd.evolution && pd.evolution.typ === "level" && pkmnInst.level >= pd.evolution.abLevel) {
-      pkmnInst.entwickeltSich = pd.evolution.zuId;
+    var evoZuId = pruefeLevelEvolution(pkmnInst);
+    if (evoZuId) {
+      pkmnInst.entwickeltSich = evoZuId;
       meldungen.push("✨ " + (pkmnInst.nick || pd.name) + " ist bereit zur Entwicklung!");
     }
   }
@@ -199,6 +213,10 @@ function vergebeXP(pkmnInst, xp, gegnerDexId) {
 function berechneXPGewinn(eigeneLevel, gegnerLevel, basisXP, istTrainer) {
   var trainerFaktor = istTrainer ? 1.5 : 1;
   var xp = Math.floor((trainerFaktor * basisXP * gegnerLevel) / 7);
+  if (!istTrainer && eigeneLevel > 1 && gegnerLevel < eigeneLevel * 0.5) {
+    var levelFaktor = gegnerLevel / (eigeneLevel * 0.5);
+    xp = Math.floor(xp * Math.max(0.25, levelFaktor));
+  }
   return Math.max(1, xp);
 }
 
@@ -229,11 +247,16 @@ function partyAmLeben() {
 
 function inBox(pkmnInst) {
   if (!STATE.box) STATE.box = [];
+  if (pkmnInst && pkmnInst._iid && STATE.box.some(p => p && p._iid === pkmnInst._iid)) return true;
+  if (pkmnInst && pkmnInst._iid && STATE.party && STATE.party.some(p => p && p._iid === pkmnInst._iid)) return true;
   STATE.box.push(pkmnInst);
   if (STATE.box.length > 240) STATE.box.shift();
+  return true;
 }
 function inParty(pkmnInst) {
   if (!STATE.party) STATE.party = [];
+  if (pkmnInst && pkmnInst._iid && STATE.party.some(p => p && p._iid === pkmnInst._iid)) return true;
+  if (pkmnInst && pkmnInst._iid && STATE.box && STATE.box.some(p => p && p._iid === pkmnInst._iid)) return true;
   if (STATE.party.length < 6) { STATE.party.push(pkmnInst); return true; }
   return false;
 }
@@ -246,8 +269,8 @@ function vollHeilen() {
   });
 }
 
-function flagGesetzt(id)  { return !!(STATE && STATE.flags && STATE.flags[id]); }
-function setzeFlag(id)    { if (STATE) { if (!STATE.flags) STATE.flags = {}; STATE.flags[id] = true; } }
+function flagGesetzt(id)  { return !!(id && STATE && STATE.flags && STATE.flags[id]); }
+function setzeFlag(id)    { if (id && STATE) { if (!STATE.flags) STATE.flags = {}; STATE.flags[id] = true; } }
 function zonenBesucht(id) { return !!(STATE && STATE.besucht && STATE.besucht[id]); }
 function markiereBesucht(id) { if (STATE) { if (!STATE.besucht) STATE.besucht = {}; STATE.besucht[id] = true; } }
 function trainerBesiegt(zoneId, etappe) { return !!(STATE && STATE.besiegt && STATE.besiegt[zoneId + ":" + etappe]); }
@@ -270,7 +293,7 @@ function neuesSpiel(uid, trainerName, starterDexId) {
     geld: 1000, orden: 0, ordenIds: [],
     besucht: { alabastia: true }, besiegt: {}, flags: {}, legendaryRespawns: {},
     gesehen: {}, gefangen: {},
-    zone: "alabastia", etappe: 1, gebaeude: null, zuletzt: Date.now(),
+    zone: "alabastia", respawnZone: "alabastia", etappe: 1, gebaeude: null, zuletzt: Date.now(),
   };
   STATE.gefangen[starterDexId] = true;
   STATE.gesehen[starterDexId]  = true;
@@ -298,6 +321,7 @@ function ladeSpiel(uid, gespeichert) {
   if (!STATE.party)    STATE.party   = [];
   if (!STATE.box)      STATE.box     = [];
   if (!STATE.ordenIds) STATE.ordenIds = [];
+  if (!STATE.respawnZone || !getZone(STATE.respawnZone)) STATE.respawnZone = "alabastia";
   migriereAlteZonenIds();
   migriereAlteMaschinenItems();
   migriereArenaTmBelohnungen();

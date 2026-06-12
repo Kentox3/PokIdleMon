@@ -4,6 +4,7 @@ function rendereTeamScreen() {
   var n = STATE.party.length;
 
   STATE.party.forEach((p, idx) => {
+    reparierePkmnInst(p);
     var pd = getPkmn(p.dexId), name = p.nick || (pd ? pd.name : "?");
     var shiny = !!p.shiny;
     var kpPct = Math.max(0, Math.round(p.kp / p.maxKP * 100));
@@ -13,7 +14,7 @@ function rendereTeamScreen() {
     var card = document.createElement("div");
     card.className = "team-card" + (p.kp <= 0 ? " team-ko" : "") + (entwicklung ? " team-evo-bereit" : "") + (shiny ? " team-shiny" : "");
     card.innerHTML =
-      `<img class="team-sprite${shiny?" sprite-shiny":""}" src="${spriteUrl(p.dexId,false,shiny)}" onerror="this.src='${spriteFallback(p.dexId,shiny)}'">` +
+      `<img class="team-sprite${shiny?" sprite-shiny":""}" src="${spriteFallback(p.dexId,shiny)}" onerror="this.style.opacity=0">` +
       `<div class="team-info">` +
         `<div class="team-nameline">` +
           `<b>${shiny?"✨":""}${name}</b>` +
@@ -113,3 +114,113 @@ window.triggerEvolution = function(idx) {
 // ══════════════════════════════════════════════════════════════
 //  TASCHE
 // ══════════════════════════════════════════════════════════════
+// Evolution overlay restored from IdleV2 style.
+var _evoAnimationLaeuft = false;
+
+function schliesseEvoOverlay(overlay) {
+  if (!overlay) return;
+  overlay.classList.add("evo-fadeout");
+  setTimeout(function() {
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    _evoAnimationLaeuft = false;
+  }, 450);
+}
+
+function zeigeEvoAnimation(altDexId, neuDexId, altName, neuName, shiny, anwenden) {
+  var overlay = document.createElement("div");
+  overlay.id = "evoOverlay";
+  overlay.innerHTML =
+    `<div class="evo-screen">` +
+      `<div class="evo-label" id="evoLabel">${altName} entwickelt sich...</div>` +
+      `<div class="evo-sprites">` +
+        `<img id="evoFrom" class="evo-sprite${shiny ? " evo-shiny" : ""}" src="${spriteFallback(altDexId, shiny)}">` +
+        `<img id="evoTo" class="evo-sprite evo-sprite-hidden${shiny ? " evo-shiny" : ""}" src="${spriteFallback(neuDexId, shiny)}">` +
+      `</div>` +
+      `<div class="evo-stats" id="evoStats" hidden></div>` +
+      `<button class="evo-close" id="evoClose" hidden>Weiter</button>` +
+      `<div class="evo-flash-overlay" id="evoFlash"></div>` +
+    `</div>`;
+  document.body.appendChild(overlay);
+
+  var fromEl = document.getElementById("evoFrom");
+  var toEl = document.getElementById("evoTo");
+  var label = document.getElementById("evoLabel");
+  var flash = document.getElementById("evoFlash");
+  var stats = document.getElementById("evoStats");
+  var close = document.getElementById("evoClose");
+  var pulse = 0;
+
+  function pulsiere() {
+    if (pulse >= 7) {
+      flash.style.transition = "opacity .35s";
+      flash.style.opacity = "1";
+      setTimeout(wechsel, 360);
+      return;
+    }
+    flash.style.transition = "opacity .16s";
+    flash.style.opacity = (pulse % 2 === 0) ? ".85" : "0";
+    pulse++;
+    setTimeout(pulsiere, 170);
+  }
+
+  function wechsel() {
+    fromEl.classList.add("evo-sprite-hidden");
+    toEl.classList.remove("evo-sprite-hidden");
+    setTimeout(function() {
+      flash.style.transition = "opacity .45s";
+      flash.style.opacity = "0";
+      label.textContent = "Herzlichen Glueckwunsch!";
+    }, 90);
+    setTimeout(fertig, 650);
+  }
+
+  function fertig() {
+    var p = anwenden();
+    label.innerHTML = `${altName} hat sich zu <b>${neuName}</b> entwickelt!`;
+    if (p) {
+      stats.innerHTML =
+        `<div class="evo-stat"><span>KP</span><b>${p.maxKP}</b></div>` +
+        `<div class="evo-stat"><span>Ang</span><b>${p.ang}</b></div>` +
+        `<div class="evo-stat"><span>Vert</span><b>${p.vert}</b></div>` +
+        `<div class="evo-stat"><span>Init</span><b>${p.init}</b></div>`;
+      stats.hidden = false;
+    }
+    close.hidden = false;
+    close.onclick = function() { schliesseEvoOverlay(overlay); };
+    setTimeout(function() { if (overlay.parentNode) schliesseEvoOverlay(overlay); }, 2600);
+  }
+
+  setTimeout(pulsiere, 600);
+}
+
+window.triggerEvolution = function(idx) {
+  var p = STATE.party[idx]; if (!p || !p.entwickeltSich) return;
+  if (_evoAnimationLaeuft) return;
+  _evoAnimationLaeuft = true;
+  var altName = p.nick || (getPkmn(p.dexId)||{}).name || "?";
+  var altId = p.dexId;
+  var neuId = p.entwickeltSich;
+  var neuPd = getPkmn(neuId);
+  var shiny = !!p.shiny;
+  if (!neuPd) { _evoAnimationLaeuft = false; return; }
+
+  zeigeEvoAnimation(altId, neuId, altName, neuPd.name || "?", shiny, function() {
+    var oldMax = p.maxKP || 1;
+    p.dexId = neuId; p.entwickeltSich = null;
+    var ivs = p.ivs || {}, evs = p.evs || {};
+    p.maxKP = berechneKP(neuPd.kp, p.level, ivs.kp || 0, evs.kp || 0);
+    p.kp = Math.min(p.maxKP, Math.max(1, (p.kp || 1) + (p.maxKP - oldMax)));
+    p.ang = berechneStat(neuPd.ang, p.level, ivs.ang || 0, evs.ang || 0);
+    p.vert = berechneStat(neuPd.vert, p.level, ivs.vert || 0, evs.vert || 0);
+    p.spAng = berechneStat(neuPd.spAng, p.level, ivs.spez || 0, evs.spez || 0);
+    p.spVert = berechneStat(neuPd.spVert, p.level, ivs.spez || 0, evs.spez || 0);
+    p.init = berechneStat(neuPd.init, p.level, ivs.init || 0, evs.init || 0);
+    if (STATE.gefangen) STATE.gefangen[neuId] = true;
+    if (STATE.gesehen) STATE.gesehen[neuId] = true;
+    speichern();
+    rendereTeamScreen();
+    rendereSpielerSprites();
+    zeigToast("Entwicklung abgeschlossen: " + altName + " -> " + (neuPd.name || "?"), 3500);
+    return p;
+  });
+};
